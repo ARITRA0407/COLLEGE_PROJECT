@@ -319,5 +319,9 @@ def recommend_colleges():
         print("Error in recommendation API:", e) # Log the error.
         return jsonify({'status': 'error', 'message': str(e)}), 500 # Return a JSON error response.
 
+# if __name__ == '__main__':
+#     app.run(debug=True) # Run the Flask application in debug mode.
+
 if __name__ == '__main__':
-    app.run(debug=True) # Run the Flask application in debug mode.
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
