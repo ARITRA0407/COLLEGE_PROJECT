@@ -1,0 +1,163 @@
+<div id="explore-root" class="explore-root">
+  <div class="explore-shell">
+    <header class="explore-header">
+      <h1>Explore Colleges</h1>
+      <p class="muted">
+        Search any institute and view consolidated details — placements,
+        reviews, maps, images and more.
+      </p>
+    </header>
+
+    <section class="picker-area" aria-label="Choose college">
+      <label for="college-select" class="muted">Select institute</label>
+      <div class="picker-row">
+        <select
+          id="college-select"
+          class="college-select"
+          aria-label="College select"
+        >
+          <option value="">Loading colleges...</option>
+        </select>
+
+        <!-- selected-name shows the currently selected institute next to dropdown -->
+        <div class="selected-wrap" aria-hidden="true">
+          <span id="selected-name" class="selected-name muted"
+            >No institute selected</span
+          >
+        </div>
+
+        <button id="load-btn" class="btn small" title="Load selected college">
+          Show
+        </button>
+      </div>
+    </section>
+
+    <!-- layout: left column now contains logo -> map -> picture -> reviews -> scores -> useful links
+         right column contains Programs & Stats and Placement Summary (as requested) -->
+    <main class="detail-grid" id="detail-grid">
+      <aside class="card left-col" id="left-col">
+        <div class="media-block">
+          <div class="logo-wrap" id="logo-wrap">
+            <!-- logo img inserted here -->
+          </div>
+          <div class="title-block">
+            <h2 id="inst-title">—</h2>
+            <div class="meta-line">
+              <span id="inst-district">District —</span>
+              <span id="inst-website" class="muted">Website —</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map first -->
+        <div class="map-card card" id="map-card">
+          <div class="card-head">Location</div>
+          <div
+            id="mini-map"
+            class="mini-map"
+            aria-label="College location map"
+          ></div>
+          <div class="coord-line muted" id="coord-line">Lat / Lon —</div>
+        </div>
+
+        <!-- Picture directly beneath the map (moved here) -->
+        <div class="card" id="picture-card">
+          <div class="card-head">Picture</div>
+          <div class="hero-picture card-body" id="hero-picture">
+            <!-- main picture inserted here -->
+          </div>
+        </div>
+
+        <!-- Reviews card placed below picture so it never overlays it -->
+        <div class="card reviews" id="reviews-card">
+          <div class="card-head">Reviews</div>
+          <div class="card-body" id="reviews-list">
+            <div class="muted">No reviews loaded.</div>
+          </div>
+        </div>
+
+        <!-- Scores: aggregated from reviews.csv (beneath reviews now) -->
+        <div class="card scores" id="scores-card">
+          <div class="card-head">Aggregated Review Scores</div>
+          <div class="card-body small" id="scores-body">
+            <div>Sentiment score: <strong id="sentiment-score">—</strong></div>
+            <div>Mess score: <strong id="mess-score">—</strong></div>
+            <div>Professor score: <strong id="professor-score">—</strong></div>
+            <div>Campus score: <strong id="campus-score">—</strong></div>
+            <div>
+              Infrastructure score: <strong id="infrastructure-score">—</strong>
+            </div>
+            <div>
+              Overall aspect score: <strong id="overall-aspect-score">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Useful links beneath scores -->
+        <div class="card raw-links muted" id="raw-links">
+          <div class="card-head">Useful links</div>
+          <div class="card-body small" id="links-body">
+            <!-- website shown as clickable link -->
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT column: Programs & Stats + Placement Summary as requested -->
+      <section class="card right-col" id="right-col">
+        <div class="card stats" id="programs-card">
+          <div class="card-head">Programs & Stats</div>
+          <div class="card-body small">
+            <div class="program-count">
+              <strong id="num-programs">0</strong> programs offered
+            </div>
+
+            <!-- program list -->
+            <ul id="program-list" class="program-list" aria-live="polite">
+              <!-- populated dynamically -->
+            </ul>
+
+            <div class="list-head">Top recruiters:</div>
+            <div id="top-recruiters" class="chip-list">—</div>
+
+            <div class="list-head">Popular job profiles:</div>
+            <div id="key-profiles" class="chip-list">—</div>
+          </div>
+        </div>
+
+        <div class="card placement" id="placement-card">
+          <div class="card-head">Placement Summary</div>
+          <div class="card-body small">
+            <div>Average CTC: <strong id="placement-avg">—</strong></div>
+            <div>Median CTC: <strong id="placement-med">—</strong></div>
+            <div>Highest CTC: <strong id="placement-high">—</strong></div>
+            <div>
+              Placement Rating: <strong id="placement-rating">—</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="explore-footer muted">
+      Data sourced from your CSV files (college.csv, reviews.csv,
+      placement.csv). Map powered by OpenStreetMap + Leaflet.
+    </footer>
+  </div>
+</div>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/explore.css') }}"
+/>
+
+<!-- Leaflet CSS + JS from CDN -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  crossorigin=""
+/>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  crossorigin=""
+></script>
+
+<script src="{{ url_for('static', filename='js/explore.js') }}"></script>

@@ -1,0 +1,206 @@
+<section id="about-section" aria-labelledby="about-heading" style="scroll-margin-top: 1.5rem;">
+  <div class="about-inner">
+    <header class="about-header">
+      <h2 id="about-heading">About</h2>
+      <p class="lead">
+        Hi — I'm Aritra. This site showcases college guidance, tools and resources for prospective students.
+        If you'd like to connect or have questions, use one of the contact options below.
+      </p>
+    </header>
+
+    <div class="about-grid" role="list">
+      <article class="card" role="listitem" aria-label="LinkedIn profile">
+        <div class="card-media">
+          <a href="https://www.linkedin.com/in/aritra0407/" target="_blank" rel="noopener noreferrer" aria-label="Open Aritra's LinkedIn (opens in new tab)" title="LinkedIn — opens in new tab">
+            <img src="{{ url_for('static', filename='images/linkedin.png') }}" alt="LinkedIn logo" class="contact-img" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h3>LinkedIn</h3>
+          <p class="muted">Professional profile & posts</p>
+          <a class="btn link-btn" href="https://www.linkedin.com/in/aritra0407/" target="_blank" rel="noopener noreferrer">
+            View profile
+          </a>
+        </div>
+      </article>
+
+      <article class="card" role="listitem" aria-label="WhatsApp number">
+        <div class="card-media">
+          <!-- Using wa.me link to open chat (international format assumed +91) -->
+          <a href="https://wa.me/917278735953" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">
+            <img src="{{ url_for('static', filename='images/whatsapp.jpg') }}" alt="WhatsApp logo" class="contact-img" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h3>WhatsApp</h3>
+          <p class="muted">Quick messages on WhatsApp</p>
+          <div class="contact-row">
+            <a class="plain-link" href="https://wa.me/917278735953" target="_blank" rel="noopener noreferrer">+91 72787 35953</a>
+            <button class="icon-btn" data-copy="+917278735953" title="Copy WhatsApp number" aria-label="Copy WhatsApp number">
+              Copy
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" role="listitem" aria-label="Contact phone">
+        <div class="card-media">
+          <a href="tel:+919874739638" aria-label="Call contact number" title="Call">
+            <img src="{{ url_for('static', filename='images/contact.png') }}" alt="Phone/contact icon" class="contact-img" />
+          </a>
+        </div>
+        <div class="card-body">
+          <h3>Phone</h3>
+          <p class="muted">Available for calls and messages</p>
+          <div class="contact-row">
+            <a class="plain-link" href="tel:+919874739638">+91 98747 39638</a>
+            <button class="icon-btn" data-copy="+919874739638" title="Copy phone number" aria-label="Copy phone number">
+              Copy
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <article class="card card-email" role="listitem" aria-label="Email">
+        <div class="card-media">
+          <!-- reuse contact.png for email if no dedicated email image; alt adjusted -->
+          <img src="{{ url_for('static', filename='images/email.jpg') }}" alt="Email/contact icon" class="contact-img" />
+        </div>
+        <div class="card-body">
+          <h3>Email</h3>
+          <p class="muted">For detailed requests & collaborations</p>
+          <div class="contact-row">
+            <a class="plain-link" href="mailto:aritra0407@gmail.com">aritra0407@gmail.com</a>
+            <button class="icon-btn" data-copy="aritra0407@gmail.com" title="Copy email" aria-label="Copy email address">Copy</button>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <footer class="about-footer" aria-label="Copyright">
+      <small id="copyright-line">© <span id="year-placeholder"></span> Aritra — All rights reserved.</small>
+    </footer>
+  </div>
+
+  <!-- Embedded styles (SCOPE ALL RULES to #about-section) -->
+  <style>
+    /* Scope prefix */
+    #about-section { 
+      background: #000; 
+      color: #fff; 
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
+      padding: 48px 16px; 
+    }
+
+    /* Layout */
+    #about-section .about-inner { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    #about-section .about-header { text-align: left; margin-bottom: 24px; }
+    #about-section .about-header h2 { font-size: 2rem; margin: 0 0 6px 0; letter-spacing: -0.02em; }
+    #about-section .lead { margin: 0; color: #e6e6e6; line-height: 1.45; }
+
+    /* Grid of cards */
+    #about-section .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 20px; }
+    #about-section .card { display: flex; gap: 14px; align-items: center; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.6); transition: transform 220ms ease, background 220ms ease; }
+    #about-section .card:hover { transform: translateY(-6px); background: rgba(255,255,255,0.04); }
+
+    #about-section .card-media { width: 64px; height: 64px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border-radius:10px; overflow:hidden; background: rgba(255,255,255,0.02); padding:6px; }
+    #about-section .contact-img { width: 100%; height: 100%; object-fit:contain; display:block; }
+
+    #about-section .card-body h3 { margin: 0 0 4px 0; font-size: 1.05rem; font-weight:600; }
+    #about-section .muted { margin: 0 0 10px 0; color: #cfcfcf; font-size: 0.92rem; }
+
+    #about-section .btn, #about-section .link-btn { display:inline-block; text-decoration:none; padding:8px 12px; border-radius:8px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.12); font-weight:600; font-size:0.92rem; }
+    #about-section .btn:hover, #about-section .link-btn:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.22); }
+
+    #about-section .contact-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    #about-section .plain-link { color: #fff; text-decoration: none; font-weight:600; border-bottom: 1px dashed rgba(255,255,255,0.06); padding-bottom:2px; }
+    #about-section .plain-link:focus, #about-section .plain-link:hover { outline: none; border-bottom-style: solid; }
+
+    #about-section .icon-btn { background: rgba(255,255,255,0.04); color: #fff; border: none; padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85rem; }
+    #about-section .icon-btn:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); }
+    #about-section .icon-btn:active { transform: translateY(0); }
+
+    #about-section .about-footer { margin-top: 22px; text-align:center; color:#bdbdbd; font-size:0.85rem; }
+
+    /* Small screens tweak */
+    @media (max-width: 520px) {
+      #about-section .card { padding: 12px; gap: 10px; }
+      #about-section .card-media { width:54px; height:54px; }
+      #about-section .about-header h2 { font-size:1.5rem; }
+    }
+
+    /* Focus styles (scoped) */
+    #about-section a:focus, #about-section button:focus { outline: 3px solid rgba(255,255,255,0.12); outline-offset: 3px; border-radius: 8px; }
+  </style>
+
+  <!-- Embedded JS: copy-to-clipboard and year insertion -->
+  <script>
+    (function () {
+      // Insert current year in copyright
+      const yearEl = document.getElementById('year-placeholder');
+      if (yearEl) {
+        yearEl.textContent = new Date().getFullYear();
+      }
+
+      // Copy-to-clipboard logic for copy buttons
+      function showTempMessage(button, msg) {
+        const orig = button.innerText;
+        button.innerText = msg;
+        button.disabled = true;
+        setTimeout(() => {
+          button.innerText = orig;
+          button.disabled = false;
+        }, 1400);
+      }
+
+      document.querySelectorAll('#about-section .icon-btn[data-copy]').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const value = this.getAttribute('data-copy');
+          if (!value) return;
+          // Try modern clipboard API first
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(value).then(() => {
+              showTempMessage(this, 'Copied!');
+            }).catch(() => {
+              // fallback
+              fallbackCopy(value, this);
+            });
+          } else {
+            fallbackCopy(value, this);
+          }
+        });
+      });
+
+      function fallbackCopy(text, button) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          // Avoid scrolling to bottom
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          if (ok) showTempMessage(button, 'Copied!');
+          else showTempMessage(button, 'Copy failed');
+        } catch (e) {
+          showTempMessage(button, 'Copy failed');
+        }
+      }
+
+      // Improve keyboard accessibility: allow Enter on cards to follow primary link
+      document.querySelectorAll('#about-section .card').forEach(card => {
+        card.tabIndex = 0;
+        card.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            const link = card.querySelector('a[href]');
+            if (link) {
+              link.click();
+            }
+          }
+        });
+      });
+    })();
+  </script>
+</section>

@@ -1,0 +1,88 @@
+<!-- templates/partials/recommendation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>College Recommendation System</title>
+  <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/recommendation.css') }}"
+    />
+ 
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>College Recommendation System</h1>
+      <p class="lead">Enter your expected rank and program (required). Other filters are optional. Use the client-side Sort control to reorder returned results.</p>
+    </header>
+
+    <form id="recommendation-form" class="filters-row">
+      <div class="grid">
+        <div>
+          <label for="rank">Your Expected Rank</label>
+          <input id="rank" name="rank" type="number" min="1" placeholder="e.g., 1500" required />
+        </div>
+
+        <div>
+          <label for="program">Program</label>
+          <select id="program" name="program" required>
+            <option value="" disabled selected>Select Program</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="stream">Stream (optional)</label>
+          <select id="stream" name="stream"><option value="">Any</option></select>
+        </div>
+
+        <div>
+          <label for="quota">Quota (optional)</label>
+          <select id="quota" name="quota"><option value="">Any</option></select>
+        </div>
+
+        <div>
+          <label for="category">Category (optional)</label>
+          <select id="category" name="category"><option value="">Any</option></select>
+        </div>
+
+        <div>
+          <label for="location">Location (optional)</label>
+          <select id="location" name="location"><option value="">Any</option></select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <button type="submit">Get Recommendations</button>
+      </div>
+    </form>
+
+    <!-- client-side sort control (single selector) -->
+    <div class="controls" style="margin-bottom:12px;">
+      <label style="margin:0; font-weight:600;">Client-side sort by:</label>
+      <select id="client_sort_metric" style="width:260px; padding:8px;">
+        <option value="Predicted Closing Rank">Predicted Closing Rank (best first)</option>
+        <option value="Max Average CTC">Avg CTC (high to low)</option>
+        <option value="placement_score">Placement Score (high to low)</option>
+        <option value="overall_aspect_score">Overall Score (high to low)</option>
+        <option value="professor_score">Professor Score (high to low)</option>
+        <option value="mess_score">Mess Score (high to low)</option>
+      </select>
+
+      <button id="apply_client_sort" style="padding:8px 12px; background:#0b74d1; color:#fff; border-radius:6px; border:0; cursor:pointer;">Apply Sort</button>
+      <button id="reset_client_sort" style="padding:8px 12px; background:#6b7280; color:#fff; border-radius:6px; border:0; cursor:pointer;">Reset</button>
+    </div>
+
+    <div id="results-area">
+      <div id="results-message" class="message" style="display:none;"></div>
+      <div id="results-list" class="results-list"></div>
+    </div>
+
+    <p style="margin-top:12px; color:var(--muted); font-size:13px;">Note: Program and Rank are required. Server-side min filters were removed; local sort only reorders returned results.</p>
+  </div>
+
+
+<script src="{{ url_for('static', filename='js/recommendation.js') }}"></script>
+</body>
+</html>

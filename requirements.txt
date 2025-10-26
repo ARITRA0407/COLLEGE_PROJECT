@@ -1,0 +1,5 @@
+Flask # The main web framework
+pandas
+python-dotenv
+scikit-learn
+numpy

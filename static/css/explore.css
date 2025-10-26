@@ -1,0 +1,313 @@
+/* === Full-width override for this Explore partial ===
+   This makes the explore-shell span nearly the full viewport width while
+   keeping an inner gutter for readability.
+   Place this first so it overrides page-wrap constraints from index.html.
+*/
+.explore-root {
+  padding: 12px 10px !important;
+}
+.explore-shell {
+  width: 100vw; /* span entire viewport width */
+  max-width: 100vw; /* don't cap width */
+  margin: 0 calc(-50vw + 50%); /* center the element across full viewport */
+  box-sizing: border-box;
+  padding: 0 20px; /* inner gutter so content doesn't touch edges */
+  max-height: none;
+}
+
+/* Embedded CSS for explore.html — lightweight, modern */
+:root {
+  --bg: #f7fafc;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --glass: rgba(15, 23, 42, 0.04);
+  --radius: 12px;
+  --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+}
+.explore-root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.explore-header h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+}
+.explore-header .muted {
+  color: var(--muted);
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.picker-area {
+  margin: 14px 0;
+}
+.picker-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.college-select {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e6edf3;
+  background: var(--card);
+  font-size: 14px;
+}
+.selected-wrap {
+  padding: 0 6px;
+  min-width: 260px;
+  text-align: left;
+}
+.selected-name {
+  display: inline-block;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.12);
+}
+.btn.small {
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+/* layout */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: visible;
+  border: 1px solid rgba(15, 23, 42, 0.03);
+}
+.left-col {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.right-col {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.media-block {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.logo-wrap img {
+  width: 84px;
+  height: 84px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: var(--glass);
+  padding: 8px;
+}
+.title-block h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.meta-line {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.card-head {
+  padding: 12px 14px;
+  font-weight: 700;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(255, 255, 255, 0.9)
+  );
+  border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+  color: #0f172a;
+  letter-spacing: 0.3px;
+}
+
+/* programs list */
+.program-count {
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #0f172a;
+}
+.program-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 10px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 480px;
+  overflow: auto;
+}
+.program-list li {
+  background: var(--glass);
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #0f172a;
+  width: 100%;
+}
+
+/* chips for recruiters / profiles */
+.list-head {
+  margin-top: 8px;
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 220px;
+  overflow: auto;
+  padding-right: 6px;
+}
+.chip {
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.06);
+  font-size: 13px;
+  color: #0f172a;
+}
+
+/* map + placement */
+.mini-map {
+  height: 180px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.card-body {
+  padding: 10px 12px;
+}
+.card-body.small {
+  font-size: 14px;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.coord-line {
+  font-size: 12px;
+  margin-top: 8px;
+  display: block;
+}
+
+.hero-picture {
+  height: 260px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+}
+.hero-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.reviews {
+  margin-top: 6px;
+}
+.reviews .card-body {
+  max-height: 320px;
+  overflow: auto;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.review-item {
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(37, 99, 235, 0.03);
+}
+.review-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.scores .card-body.small div {
+  margin-bottom: 6px;
+}
+
+.raw-links .card-body a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.explore-footer {
+  margin-top: 14px;
+  font-size: 13px;
+  text-align: center;
+  padding: 6px;
+  color: var(--muted);
+}
+
+/* responsive */
+@media (max-width: 1280px) {
+  .explore-shell {
+    padding: 0 16px;
+  }
+}
+@media (max-width: 980px) {
+  .explore-shell {
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 12px;
+  }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .left-col {
+    order: 2;
+  }
+  .right-col {
+    order: 1;
+  }
+  .hero-picture {
+    height: 200px;
+  }
+  .mini-map {
+    height: 160px;
+  }
+}

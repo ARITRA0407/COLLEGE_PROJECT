@@ -1,0 +1,141 @@
+/* Container */
+    #top-scroller-wrap {
+      width: 100%;
+      overflow: hidden;
+      box-sizing: border-box;
+      padding: 12px 4px;
+      background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+      border-radius: 8px;
+      border: 1px solid rgba(20,40,60,0.04);
+      box-shadow: 0 6px 18px rgba(20,40,60,0.04);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    /* The moving track */
+    #top-track {
+      display: flex;
+      align-items: stretch;
+      gap: 16px;
+      will-change: transform;
+      /* We'll animate transform in JS/CSS */
+    }
+
+    /* Each card (box) */
+    .top-card {
+      flex: 0 0 220px; /* fixed card width */
+      min-width: 220px;
+      max-width: 220px;
+      background: linear-gradient(180deg, #ffffff, #fbfdff);
+      border-radius: 10px;
+      border: 1px solid rgba(30,60,90,0.06);
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(30,50,80,0.04);
+      display: flex;
+      flex-direction: column;
+      transition: transform 200ms ease, box-shadow 200ms ease;
+    }
+
+    .top-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 10px 30px rgba(30,50,80,0.08);
+    }
+
+    .top-card .card-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+    }
+
+    .rank-badge {
+      background: linear-gradient(180deg,#1f66d1,#155cb8);
+      color: white;
+      min-width: 36px;
+      height: 36px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 14px;
+      box-shadow: 0 6px 12px rgba(31,102,209,0.12);
+    }
+
+    .card-head .title {
+      font-size: 14px;
+      line-height: 1.1;
+      color: #0e2540;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      max-width: calc(220px - 36px - 40px); /* clamp for ellipsis */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .card-head .title:focus,
+    .card-head .title:hover {
+      text-decoration: underline;
+    }
+
+    /* Image area: add black frame outside image to enforce same size */
+    .card-img-wrap {
+      width: 100%;
+      height: 130px;
+      padding: 4px;                /* black border thickness */
+      background: #000;           /* black frame */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* inner image box (white canvas inside black frame) */
+    .card-img-inner {
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-img-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* ensures uniform cropping to fill box */
+      display: block;
+    }
+
+    .card-footer {
+      padding: 10px;
+      font-size: 12px;
+      color: #35506b;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .no-data {
+      padding: 20px;
+      color: #556a7a;
+      text-align: center;
+    }
+
+    /* For accessibility and small screens: shrink width */
+    @media (max-width: 900px) {
+      .top-card { flex: 0 0 180px; min-width: 180px; max-width: 180px; }
+      .card-img-wrap { height: 110px; }
+      .card-head .title { max-width: calc(180px - 36px - 40px); }
+    }
+
+    @media (max-width: 520px) {
+      .top-card { flex: 0 0 160px; min-width: 160px; max-width: 160px; }
+      .card-img-wrap { height: 90px; padding: 3px; }
+      .card-head .title { max-width: calc(160px - 36px - 40px); }
+    }

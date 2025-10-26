@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>College Comparison</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/comparision.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Left panel -->
+      <div class="panel" id="panelA">
+        <div class="panel-header">
+          <div style="font-weight: 700">Compare A</div>
+          <div class="select-row">
+            <select id="instituteA">
+              <option value="">Select Institute</option>
+            </select>
+            <select id="programA">
+              <option value="">Select Program</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-body" id="bodyA">
+          <!-- Visuals (logo removed) -->
+          <div class="visuals">
+            <img id="photoA" class="college-img" src="" alt="college photo" />
+          </div>
+
+          <div class="item-row">
+            <div class="label">Location</div>
+            <div class="value">
+              <div id="locTextA">—</div>
+              <div class="map-frame" id="mapA"></div>
+            </div>
+          </div>
+
+          <div class="item-row">
+            <div class="label">Website</div>
+            <div class="value">
+              <a id="websiteA" href="#" target="_blank">—</a>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <!-- filters removed — graph will always show averages across available data -->
+            <canvas id="chartA" height="120"></canvas>
+          </div>
+
+          <div class="stat-grid" id="placementGridA">
+            <div class="stat">
+              <div class="title">Average CTC</div>
+              <div class="num" id="avgCtcA">—</div>
+            </div>
+            <div class="stat">
+              <div class="title">Median CTC</div>
+              <div class="num" id="medCtcA">—</div>
+            </div>
+            <div class="stat">
+              <div class="title">Highest CTC</div>
+              <div class="num" id="highCtcA">—</div>
+            </div>
+            <div class="stat">
+              <div class="title">Institution Rank</div>
+              <div class="num" id="instRankA">—</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="title" style="color: var(--muted); margin-top: 6px">
+              Placement Rating
+            </div>
+            <div class="stars" id="starsA">—</div>
+          </div>
+
+          <div class="item-row" style="margin-top: 8px">
+            <div class="label">Sentiment Score</div>
+            <div class="value" id="sentimentA">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Mess Score</div>
+            <div class="value" id="messA">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Professor Score</div>
+            <div class="value" id="profA">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Campus Score</div>
+            <div class="value" id="campusA">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Infrastructure Score</div>
+            <div class="value" id="infraA">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Overall Aspect Score</div>
+            <div class="value" id="overallA">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right panel -->
+      <div class="panel" id="panelB">
+        <div class="panel-header">
+          <div style="font-weight: 700">Compare B</div>
+          <div class="select-row">
+            <select id="instituteB">
+              <option value="">Select Institute</option>
+            </select>
+            <select id="programB">
+              <option value="">Select Program</option>
+            </select>
+          </div>
+          <button id="compareBtn" class="compare-btn" disabled>Compare</button>
+        </div>
+        <div class="panel-body" id="bodyB">
+          <div class="visuals">
+            <img id="photoB" class="college-img" src="" alt="college photo" />
+          </div>
+
+          <div class="item-row">
+            <div class="label">Location</div>
+            <div class="value">
+              <div id="locTextB">—</div>
+              <div class="map-frame" id="mapB"></div>
+            </div>
+          </div>
+
+          <div class="item-row">
+            <div class="label">Website</div>
+            <div class="value">
+              <a id="websiteB" href="#" target="_blank">—</a>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <!-- filters removed — graph will always show averages across available data -->
+            <canvas id="chartB" height="120"></canvas>
+          </div>
+
+          <div class="stat-grid" id="placementGridB">
+            <div class="stat">
+              <div class="title">Average CTC</div>
+              <div class="num" id="avgCtcB">—</div>
+            </div>
+            <div class="stat">
+              <div class="title">Median CTC</div>
+              <div class="num" id="medCtcB">—</div>
+            </div>
+            <div class="stat">
+              <div class="title">Highest CTC</div>
+              <div class="num" id="highCtcB">—</div>
+            </div>
+            <div class="stat">
+              <div class="title">Institution Rank</div>
+              <div class="num" id="instRankB">—</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="title" style="color: var(--muted); margin-top: 6px">
+              Placement Rating
+            </div>
+            <div class="stars" id="starsB">—</div>
+          </div>
+
+          <div class="item-row" style="margin-top: 8px">
+            <div class="label">Sentiment Score</div>
+            <div class="value" id="sentimentB">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Mess Score</div>
+            <div class="value" id="messB">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Professor Score</div>
+            <div class="value" id="profB">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Campus Score</div>
+            <div class="value" id="campusB">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Infrastructure Score</div>
+            <div class="value" id="infraB">—</div>
+          </div>
+          <div class="item-row">
+            <div class="label">Overall Aspect Score</div>
+            <div class="value" id="overallB">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="note">
+      Tip: CSVs are served from <code>/csv/</code> (adjust CSV_BASE in script if
+      needed).
+    </footer>
+
+    <!-- debug badge -->
+    <div id="compare-debug-badge">Compare button hidden — see console</div>
+
+    <script src="{{ url_for('static', filename='js/comparision.js') }}"></script>
+  </body>
+</html>

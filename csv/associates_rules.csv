@@ -1,0 +1,479 @@
+antecedent,consequent,support,confidence,lift
+quota=all india,category=open,0.385249,1.0,2.260483
+quota=all india;stream=b.e/b. tech,category=open,0.384655,1.0,2.260483
+district=kolkata,stream=b.e/b. tech,0.33917,1.0,1.007099
+district=kolkata;quota=home state,stream=b.e/b. tech,0.231654,1.0,1.007099
+category=tuition fee waiver,quota=home state,0.158937,1.0,1.626675
+category=tuition fee waiver;stream=b.e/b. tech,quota=home state,0.15827,1.0,1.626675
+program=computer science & engineering,stream=b.e/b. tech,0.142762,1.0,1.007099
+category=open;district=kolkata,stream=b.e/b. tech,0.130593,1.0,1.007099
+district=north 24 parganas,stream=b.e/b. tech,0.114566,1.0,1.007099
+district=kolkata;quota=all india,category=open,0.107517,1.0,2.260483
+district=kolkata;quota=all india,stream=b.e/b. tech,0.107517,1.0,1.007099
+category=sc,quota=home state,0.101877,1.0,1.626675
+category=sc;stream=b.e/b. tech,quota=home state,0.100913,1.0,1.626675
+program=electrical engineering,stream=b.e/b. tech,0.098167,1.0,1.007099
+program=information technology,stream=b.e/b. tech,0.094012,1.0,1.007099
+district=nadia,stream=b.e/b. tech,0.078207,1.0,1.007099
+program=computer science & engineering;quota=home state,stream=b.e/b. tech,0.076352,1.0,1.007099
+category=open;program=computer science & engineering,stream=b.e/b. tech,0.07472,1.0,1.007099
+category=obc - a,quota=home state,0.074423,1.0,1.626675
+category=obc - a;stream=b.e/b. tech,quota=home state,0.073533,1.0,1.626675
+program=electronics & communication engineering,stream=b.e/b. tech,0.0719,1.0,1.007099
+category=obc - b,quota=home state,0.070936,1.0,1.626675
+category=open;district=north 24 parganas,stream=b.e/b. tech,0.070565,1.0,1.007099
+program=mechanical engineering,stream=b.e/b. tech,0.070119,1.0,1.007099
+category=obc - b;stream=b.e/b. tech,quota=home state,0.070045,1.0,1.626675
+district=south 24 parganas,stream=b.e/b. tech,0.069971,1.0,1.007099
+program=computer science & engineering;quota=all india,category=open,0.066409,1.0,2.260483
+program=computer science & engineering;quota=all india,stream=b.e/b. tech,0.066409,1.0,1.007099
+district=north 24 parganas;quota=all india,category=open,0.066187,1.0,2.260483
+district=north 24 parganas;quota=all india,stream=b.e/b. tech,0.066187,1.0,1.007099
+category=st,quota=home state,0.062996,1.0,1.626675
+category=st;stream=b.e/b. tech,quota=home state,0.062032,1.0,1.626675
+program=civil engineering,stream=b.e/b. tech,0.057283,1.0,1.007099
+program=information technology;quota=home state,stream=b.e/b. tech,0.057283,1.0,1.007099
+district=hooghly,stream=b.e/b. tech,0.056615,1.0,1.007099
+district=nadia;quota=home state,stream=b.e/b. tech,0.056467,1.0,1.007099
+program=electrical engineering;quota=home state,stream=b.e/b. tech,0.053647,1.0,1.007099
+category=open;program=electrical engineering,stream=b.e/b. tech,0.05246,1.0,1.007099
+category=tuition fee waiver;district=kolkata,quota=home state,0.049714,1.0,1.626675
+category=tuition fee waiver;district=kolkata,stream=b.e/b. tech,0.049714,1.0,1.007099
+district=north 24 parganas;quota=home state,stream=b.e/b. tech,0.048379,1.0,1.007099
+category=open;district=south 24 parganas,quota=all india,0.047859,1.0,2.595724
+district=south 24 parganas;quota=all india,category=open,0.047859,1.0,2.260483
+category=open;district=south 24 parganas,stream=b.e/b. tech,0.047859,1.0,1.007099
+district=south 24 parganas;quota=all india,stream=b.e/b. tech,0.047859,1.0,1.007099
+category=ews,quota=home state,0.047043,1.0,1.626675
+category=ews;stream=b.e/b. tech,quota=home state,0.046746,1.0,1.626675
+category=open;program=electronics & communication engineering,stream=b.e/b. tech,0.044817,1.0,1.007099
+program=electrical engineering;quota=all india,category=open,0.04452,1.0,2.260483
+program=electrical engineering;quota=all india,stream=b.e/b. tech,0.04452,1.0,1.007099
+district=purba medinipur,stream=b.e/b. tech,0.043407,1.0,1.007099
+district=paschim bardhaman;quota=all india,category=open,0.04311,1.0,2.260483
+category=open;district=paschim bardhaman,quota=all india,0.04311,1.0,2.595724
+category=open;program=information technology,stream=b.e/b. tech,0.042888,1.0,1.007099
+district=jalpaiguri,quota=home state,0.041997,1.0,1.626675
+program=mechanical engineering;quota=home state,stream=b.e/b. tech,0.040736,1.0,1.007099
+program=electronics & communication engineering;quota=all india,category=open,0.040142,1.0,2.260483
+program=electronics & communication engineering;quota=all india,stream=b.e/b. tech,0.040142,1.0,1.007099
+category=sc;district=kolkata,quota=home state,0.038881,1.0,1.626675
+category=sc;district=kolkata,stream=b.e/b. tech,0.038881,1.0,1.007099
+district=kolkata;program=information technology,stream=b.e/b. tech,0.037991,1.0,1.007099
+district=paschim bardhaman;quota=home state,stream=b.e/b. tech,0.037991,1.0,1.007099
+program=computer science & engineering - tfw,category=tuition fee waiver,0.037323,1.0,6.291783
+program=computer science & engineering - tfw,quota=home state,0.037323,1.0,1.626675
+program=computer science & engineering - tfw,stream=b.e/b. tech,0.037323,1.0,1.007099
+category=tuition fee waiver;program=computer science & engineering - tfw,quota=home state,0.037323,1.0,1.626675
+program=computer science & engineering - tfw;quota=home state,category=tuition fee waiver,0.037323,1.0,6.291783
+category=tuition fee waiver;program=computer science & engineering - tfw,stream=b.e/b. tech,0.037323,1.0,1.007099
+program=computer science & engineering - tfw;stream=b.e/b. tech,category=tuition fee waiver,0.037323,1.0,6.291783
+program=computer science & engineering - tfw;stream=b.e/b. tech,quota=home state,0.037323,1.0,1.626675
+program=computer science & engineering - tfw;quota=home state,stream=b.e/b. tech,0.037323,1.0,1.007099
+program=information technology;quota=all india,category=open,0.036729,1.0,2.260483
+program=information technology;quota=all india,stream=b.e/b. tech,0.036729,1.0,1.007099
+category=open;program=mechanical engineering,stream=b.e/b. tech,0.036358,1.0,1.007099
+district=jalpaiguri;stream=b.e/b. tech,quota=home state,0.035542,1.0,1.626675
+program=computer science & engineering (artificial intelligence and machine learning),stream=b.e/b. tech,0.035023,1.0,1.007099
+district=kolkata;program=computer science & engineering,stream=b.e/b. tech,0.034355,1.0,1.007099
+district=hooghly;quota=home state,stream=b.e/b. tech,0.033539,1.0,1.007099
+category=open;program=civil engineering,stream=b.e/b. tech,0.033316,1.0,1.007099
+program=electronics & communication engineering;quota=home state,stream=b.e/b. tech,0.031758,1.0,1.007099
+district=cooch behar,stream=b.e/b. tech,0.030793,1.0,1.007099
+district=cooch behar;quota=home state,stream=b.e/b. tech,0.030422,1.0,1.007099
+category=open (pwd),quota=home state,0.029829,1.0,1.626675
+program=mechanical engineering;quota=all india,category=open,0.029383,1.0,2.260483
+program=mechanical engineering;quota=all india,stream=b.e/b. tech,0.029383,1.0,1.007099
+category=open (pwd);stream=b.e/b. tech,quota=home state,0.029012,1.0,1.626675
+program=civil engineering;quota=home state,stream=b.e/b. tech,0.02879,1.0,1.007099
+program=civil engineering;quota=all india,category=open,0.028493,1.0,2.260483
+program=civil engineering;quota=all india,stream=b.e/b. tech,0.028493,1.0,1.007099
+category=st;district=kolkata,quota=home state,0.028419,1.0,1.626675
+category=st;district=kolkata,stream=b.e/b. tech,0.028419,1.0,1.007099
+district=murshidabad,stream=b.e/b. tech,0.028345,1.0,1.007099
+district=purulia,quota=home state,0.027603,1.0,1.626675
+district=purulia,stream=b.e/b. tech,0.027603,1.0,1.007099
+district=purulia;quota=home state,stream=b.e/b. tech,0.027603,1.0,1.007099
+district=purulia;stream=b.e/b. tech,quota=home state,0.027603,1.0,1.626675
+program=computer science & engineering (artificial intelligence and machine learning);quota=all india,category=open,0.026786,1.0,2.260483
+category=open;program=computer science & engineering (artificial intelligence and machine learning),quota=all india,0.026786,1.0,2.595724
+category=open;program=computer science & engineering (artificial intelligence and machine learning),stream=b.e/b. tech,0.026786,1.0,1.007099
+program=computer science & engineering (artificial intelligence and machine learning);quota=all india,stream=b.e/b. tech,0.026786,1.0,1.007099
+district=kolkata;program=electrical engineering,stream=b.e/b. tech,0.026638,1.0,1.007099
+category=open;district=hooghly,stream=b.e/b. tech,0.026638,1.0,1.007099
+category=open;district=nadia,stream=b.e/b. tech,0.026119,1.0,1.007099
+district=malda,stream=b.e/b. tech,0.025302,1.0,1.007099
+district=purba medinipur;quota=all india,category=open,0.025302,1.0,2.260483
+category=open;district=purba medinipur,quota=all india,0.025302,1.0,2.595724
+category=open;district=purba medinipur,stream=b.e/b. tech,0.025302,1.0,1.007099
+district=purba medinipur;quota=all india,stream=b.e/b. tech,0.025302,1.0,1.007099
+category=obc - a;district=kolkata,quota=home state,0.024783,1.0,1.626675
+category=obc - a;district=kolkata,stream=b.e/b. tech,0.024783,1.0,1.007099
+category=obc - b;district=kolkata,quota=home state,0.024041,1.0,1.626675
+category=obc - b;district=kolkata,stream=b.e/b. tech,0.024041,1.0,1.007099
+district=murshidabad;quota=home state,stream=b.e/b. tech,0.023299,1.0,1.007099
+program=computer science & engineering (data science),stream=b.e/b. tech,0.023225,1.0,1.007099
+district=hooghly;quota=all india,category=open,0.023076,1.0,2.260483
+district=hooghly;quota=all india,stream=b.e/b. tech,0.023076,1.0,1.007099
+program=information technology (tfw),category=tuition fee waiver,0.022928,1.0,6.291783
+program=information technology (tfw),quota=home state,0.022928,1.0,1.626675
+program=information technology (tfw),stream=b.e/b. tech,0.022928,1.0,1.007099
+program=information technology (tfw);quota=home state,category=tuition fee waiver,0.022928,1.0,6.291783
+category=tuition fee waiver;program=information technology (tfw),quota=home state,0.022928,1.0,1.626675
+category=tuition fee waiver;program=information technology (tfw),stream=b.e/b. tech,0.022928,1.0,1.007099
+program=information technology (tfw);stream=b.e/b. tech,category=tuition fee waiver,0.022928,1.0,6.291783
+program=information technology (tfw);quota=home state,stream=b.e/b. tech,0.022928,1.0,1.007099
+program=information technology (tfw);stream=b.e/b. tech,quota=home state,0.022928,1.0,1.626675
+category=tuition fee waiver;district=north 24 parganas,quota=home state,0.022557,1.0,1.626675
+category=tuition fee waiver;district=north 24 parganas,stream=b.e/b. tech,0.022557,1.0,1.007099
+district=south 24 parganas;quota=home state,stream=b.e/b. tech,0.022112,1.0,1.007099
+district=nadia;quota=all india,category=open,0.021741,1.0,2.260483
+district=nadia;quota=all india,stream=b.e/b. tech,0.021741,1.0,1.007099
+district=north 24 parganas;program=computer science & engineering,stream=b.e/b. tech,0.021518,1.0,1.007099
+program=chemical engineering,stream=b.e/b. tech,0.020257,1.0,1.007099
+quota=all india,stream=b.e/b. tech,0.384655,0.998459,1.005547
+category=open;quota=all india,stream=b.e/b. tech,0.384655,0.998459,1.005547
+district=paschim bardhaman,stream=b.e/b. tech,0.080953,0.99817,1.005256
+category=open;district=paschim bardhaman,stream=b.e/b. tech,0.042962,0.996558,1.003632
+district=paschim bardhaman;quota=all india,stream=b.e/b. tech,0.042962,0.996558,1.003632
+category=open,stream=b.e/b. tech,0.440825,0.996478,1.003552
+category=tuition fee waiver,stream=b.e/b. tech,0.15827,0.995798,1.002868
+category=tuition fee waiver;quota=home state,stream=b.e/b. tech,0.15827,0.995798,1.002868
+category=ews,stream=b.e/b. tech,0.046746,0.993691,1.000745
+category=ews;quota=home state,stream=b.e/b. tech,0.046746,0.993691,1.000745
+category=sc,stream=b.e/b. tech,0.100913,0.990532,0.997564
+category=sc;quota=home state,stream=b.e/b. tech,0.100913,0.990532,0.997564
+quota=home state,stream=b.e/b. tech,0.608296,0.989499,0.996524
+category=obc - a,stream=b.e/b. tech,0.073533,0.988036,0.99505
+category=obc - a;quota=home state,stream=b.e/b. tech,0.073533,0.988036,0.99505
+district=cooch behar,quota=home state,0.030422,0.987952,1.607076
+district=cooch behar;stream=b.e/b. tech,quota=home state,0.030422,0.987952,1.607076
+category=obc - b,stream=b.e/b. tech,0.070045,0.987448,0.994458
+category=obc - b;quota=home state,stream=b.e/b. tech,0.070045,0.987448,0.994458
+category=st,stream=b.e/b. tech,0.062032,0.984688,0.991678
+category=st;quota=home state,stream=b.e/b. tech,0.062032,0.984688,0.991678
+district=howrah,stream=b.e/b. tech,0.02597,0.983146,0.990126
+category=open;quota=home state,stream=b.e/b. tech,0.05617,0.983117,0.990096
+category=open (pwd),stream=b.e/b. tech,0.029012,0.972637,0.979542
+category=open (pwd);quota=home state,stream=b.e/b. tech,0.029012,0.972637,0.979542
+category=open;district=north 24 parganas,quota=all india,0.066187,0.93796,2.434686
+category=open;program=electronics & communication engineering,quota=all india,0.040142,0.895695,2.324978
+category=open;program=computer science & engineering,quota=all india,0.066409,0.888779,2.307024
+category=open;stream=b.e/b. tech,quota=all india,0.384655,0.87258,2.264978
+category=open,quota=all india,0.385249,0.870849,2.260483
+category=open;district=hooghly,quota=all india,0.023076,0.866295,2.248664
+category=open;program=information technology,quota=all india,0.036729,0.856401,2.222982
+category=open;program=civil engineering,quota=all india,0.028493,0.855234,2.219951
+category=open;program=electrical engineering,quota=all india,0.04452,0.848656,2.202878
+district=jalpaiguri,stream=b.e/b. tech,0.035542,0.84629,0.852298
+district=jalpaiguri;quota=home state,stream=b.e/b. tech,0.035542,0.84629,0.852298
+category=open;district=nadia,quota=all india,0.021741,0.832386,2.160645
+category=open;district=kolkata,quota=all india,0.107517,0.823295,2.137048
+district=murshidabad,quota=home state,0.023299,0.82199,1.33711
+district=murshidabad;stream=b.e/b. tech,quota=home state,0.023299,0.82199,1.33711
+category=open;program=mechanical engineering,quota=all india,0.029383,0.808163,2.097769
+program=computer science & engineering (artificial intelligence and machine learning),category=open,0.026786,0.764831,1.728886
+program=computer science & engineering (artificial intelligence and machine learning),quota=all india,0.026786,0.764831,1.985289
+program=computer science & engineering (artificial intelligence and machine learning);stream=b.e/b. tech,category=open,0.026786,0.764831,1.728886
+program=computer science & engineering (artificial intelligence and machine learning);stream=b.e/b. tech,quota=all india,0.026786,0.764831,1.985289
+district=nadia,quota=home state,0.056467,0.722011,1.174478
+district=nadia;stream=b.e/b. tech,quota=home state,0.056467,0.722011,1.174478
+district=south 24 parganas,category=open,0.047859,0.683987,1.546142
+district=south 24 parganas,quota=all india,0.047859,0.683987,1.775442
+district=south 24 parganas;stream=b.e/b. tech,category=open,0.047859,0.683987,1.546142
+district=south 24 parganas;stream=b.e/b. tech,quota=all india,0.047859,0.683987,1.775442
+district=kolkata,quota=home state,0.231654,0.683002,1.111021
+district=kolkata;stream=b.e/b. tech,quota=home state,0.231654,0.683002,1.111021
+district=kolkata;program=information technology,quota=home state,0.024931,0.65625,1.067505
+district=kolkata;program=computer science & engineering,quota=home state,0.021889,0.637149,1.036434
+program=electronics & communication engineering,category=open,0.044817,0.623323,1.409011
+program=electronics & communication engineering;stream=b.e/b. tech,category=open,0.044817,0.623323,1.409011
+district=north 24 parganas,category=open,0.070565,0.615933,1.392305
+district=north 24 parganas;stream=b.e/b. tech,category=open,0.070565,0.615933,1.392305
+stream=b.e/b. tech,quota=home state,0.608296,0.612614,0.996524
+program=information technology,quota=home state,0.057283,0.609313,0.991155
+program=information technology;stream=b.e/b. tech,quota=home state,0.057283,0.609313,0.991155
+district=hooghly,quota=home state,0.033539,0.592398,0.96364
+district=hooghly;stream=b.e/b. tech,quota=home state,0.033539,0.592398,0.96364
+district=purba medinipur,category=open,0.025302,0.582906,1.317649
+district=purba medinipur,quota=all india,0.025302,0.582906,1.513063
+district=purba medinipur;stream=b.e/b. tech,category=open,0.025302,0.582906,1.317649
+district=purba medinipur;stream=b.e/b. tech,quota=all india,0.025302,0.582906,1.513063
+program=civil engineering,category=open,0.033316,0.581606,1.314711
+program=civil engineering;stream=b.e/b. tech,category=open,0.033316,0.581606,1.314711
+program=mechanical engineering,quota=home state,0.040736,0.580952,0.945021
+program=mechanical engineering;stream=b.e/b. tech,quota=home state,0.040736,0.580952,0.945021
+district=north 24 parganas,quota=all india,0.066187,0.57772,1.499602
+district=north 24 parganas;stream=b.e/b. tech,quota=all india,0.066187,0.57772,1.499602
+program=electronics & communication engineering,quota=all india,0.040142,0.558308,1.449212
+program=electronics & communication engineering;stream=b.e/b. tech,quota=all india,0.040142,0.558308,1.449212
+program=electrical engineering,quota=home state,0.053647,0.546485,0.888954
+program=electrical engineering;stream=b.e/b. tech,quota=home state,0.053647,0.546485,0.888954
+program=computer science & engineering,quota=home state,0.076352,0.534823,0.869984
+program=computer science & engineering;stream=b.e/b. tech,quota=home state,0.076352,0.534823,0.869984
+program=electrical engineering,category=open,0.05246,0.534392,1.207983
+program=electrical engineering;stream=b.e/b. tech,category=open,0.05246,0.534392,1.207983
+district=paschim bardhaman,category=open,0.04311,0.531565,1.201593
+district=paschim bardhaman,quota=all india,0.04311,0.531565,1.379795
+district=paschim bardhaman;stream=b.e/b. tech,category=open,0.042962,0.530706,1.199651
+district=paschim bardhaman;stream=b.e/b. tech,quota=all india,0.042962,0.530706,1.377566
+program=computer science & engineering,category=open,0.07472,0.523389,1.183111
+program=computer science & engineering;stream=b.e/b. tech,category=open,0.07472,0.523389,1.183111
+program=mechanical engineering,category=open,0.036358,0.518519,1.172102
+program=mechanical engineering;stream=b.e/b. tech,category=open,0.036358,0.518519,1.172102
+program=civil engineering,quota=home state,0.02879,0.502591,0.817552
+program=civil engineering;stream=b.e/b. tech,quota=home state,0.02879,0.502591,0.817552
+program=civil engineering,quota=all india,0.028493,0.497409,1.291137
+program=civil engineering;stream=b.e/b. tech,quota=all india,0.028493,0.497409,1.291137
+district=hooghly,category=open,0.026638,0.470511,1.063582
+district=hooghly;stream=b.e/b. tech,category=open,0.026638,0.470511,1.063582
+district=paschim bardhaman;stream=b.e/b. tech,quota=home state,0.037991,0.469294,0.763389
+district=paschim bardhaman,quota=home state,0.037991,0.468435,0.761992
+district=north 24 parganas;quota=home state,category=tuition fee waiver,0.022557,0.466258,2.933592
+program=computer science & engineering,quota=all india,0.066409,0.465177,1.20747
+program=computer science & engineering;stream=b.e/b. tech,quota=all india,0.066409,0.465177,1.20747
+category=st;stream=b.e/b. tech,district=kolkata,0.028419,0.458134,1.350749
+program=information technology,category=open,0.042888,0.456196,1.031223
+program=information technology;stream=b.e/b. tech,category=open,0.042888,0.456196,1.031223
+program=electrical engineering,quota=all india,0.04452,0.453515,1.177199
+program=electrical engineering;stream=b.e/b. tech,quota=all india,0.04452,0.453515,1.177199
+category=st,district=kolkata,0.028419,0.451119,1.330066
+category=st;quota=home state,district=kolkata,0.028419,0.451119,1.330066
+stream=b.e/b. tech,category=open,0.440825,0.443955,1.003552
+program=electronics & communication engineering,quota=home state,0.031758,0.441692,0.71849
+program=electronics & communication engineering;stream=b.e/b. tech,quota=home state,0.031758,0.441692,0.71849
+program=information technology;quota=home state,district=kolkata,0.024931,0.435233,1.283228
+district=north 24 parganas,quota=home state,0.048379,0.42228,0.686912
+district=north 24 parganas;stream=b.e/b. tech,quota=home state,0.048379,0.42228,0.686912
+program=mechanical engineering,quota=all india,0.029383,0.419048,1.087732
+program=mechanical engineering;stream=b.e/b. tech,quota=all india,0.029383,0.419048,1.087732
+district=hooghly,quota=all india,0.023076,0.407602,1.058021
+district=hooghly;stream=b.e/b. tech,quota=all india,0.023076,0.407602,1.058021
+program=information technology,district=kolkata,0.037991,0.404104,1.191449
+program=information technology;stream=b.e/b. tech,district=kolkata,0.037991,0.404104,1.191449
+category=open;quota=home state,district=kolkata,0.023076,0.403896,1.190835
+program=information technology,quota=all india,0.036729,0.390687,1.014115
+program=information technology;stream=b.e/b. tech,quota=all india,0.036729,0.390687,1.014115
+stream=b.e/b. tech,quota=all india,0.384655,0.387386,1.005547
+category=sc;stream=b.e/b. tech,district=kolkata,0.038881,0.385294,1.13599
+district=kolkata,category=open,0.130593,0.385036,0.870368
+district=kolkata;stream=b.e/b. tech,category=open,0.130593,0.385036,0.870368
+category=sc,district=kolkata,0.038881,0.381646,1.125234
+category=sc;quota=home state,district=kolkata,0.038881,0.381646,1.125234
+quota=home state;stream=b.e/b. tech,district=kolkata,0.231654,0.380825,1.122812
+quota=home state,district=kolkata,0.231654,0.376826,1.111021
+category=obc - b;stream=b.e/b. tech,district=kolkata,0.024041,0.34322,1.011941
+stream=b.e/b. tech,district=kolkata,0.33917,0.341578,1.007099
+category=obc - b,district=kolkata,0.024041,0.338912,0.999238
+category=obc - b;quota=home state,district=kolkata,0.024041,0.338912,0.999238
+category=obc - a;stream=b.e/b. tech,district=kolkata,0.024783,0.337033,0.993699
+district=nadia,category=open,0.026119,0.333966,0.754924
+district=nadia;stream=b.e/b. tech,category=open,0.026119,0.333966,0.754924
+category=obc - a,district=kolkata,0.024783,0.333001,0.98181
+category=obc - a;quota=home state,district=kolkata,0.024783,0.333001,0.98181
+district=kolkata,quota=all india,0.107517,0.316998,0.822841
+district=kolkata;stream=b.e/b. tech,quota=all india,0.107517,0.316998,0.822841
+district=south 24 parganas,quota=home state,0.022112,0.316013,0.51405
+district=south 24 parganas;stream=b.e/b. tech,quota=home state,0.022112,0.316013,0.51405
+category=tuition fee waiver;stream=b.e/b. tech,district=kolkata,0.049714,0.314112,0.926117
+category=tuition fee waiver,district=kolkata,0.049714,0.312792,0.922226
+category=tuition fee waiver;quota=home state,district=kolkata,0.049714,0.312792,0.922226
+category=open;stream=b.e/b. tech,district=kolkata,0.130593,0.296246,0.873444
+category=open,district=kolkata,0.130593,0.295203,0.870368
+program=computer science & engineering;quota=home state,district=kolkata,0.021889,0.286686,0.845257
+quota=all india;stream=b.e/b. tech,district=kolkata,0.107517,0.279514,0.82411
+quota=all india,district=kolkata,0.107517,0.279083,0.822841
+category=open;quota=all india,district=kolkata,0.107517,0.279083,0.822841
+district=nadia,quota=all india,0.021741,0.277989,0.721582
+district=nadia;stream=b.e/b. tech,quota=all india,0.021741,0.277989,0.721582
+program=electrical engineering,district=kolkata,0.026638,0.271353,0.800049
+program=electrical engineering;stream=b.e/b. tech,district=kolkata,0.026638,0.271353,0.800049
+quota=home state;stream=b.e/b. tech,category=tuition fee waiver,0.15827,0.260185,1.63703
+quota=home state,category=tuition fee waiver,0.158937,0.25854,1.626675
+program=computer science & engineering,district=kolkata,0.034355,0.240644,0.709509
+program=computer science & engineering;stream=b.e/b. tech,district=kolkata,0.034355,0.240644,0.709509
+category=tuition fee waiver;stream=b.e/b. tech,program=computer science & engineering - tfw,0.037323,0.235818,6.318331
+category=tuition fee waiver,program=computer science & engineering - tfw,0.037323,0.234827,6.291783
+category=tuition fee waiver;quota=home state,program=computer science & engineering - tfw,0.037323,0.234827,6.291783
+district=kolkata;quota=home state,category=tuition fee waiver,0.049714,0.214606,1.350255
+district=north 24 parganas,category=tuition fee waiver,0.022557,0.196891,1.238797
+district=north 24 parganas;stream=b.e/b. tech,category=tuition fee waiver,0.022557,0.196891,1.238797
+district=north 24 parganas,program=computer science & engineering,0.021518,0.187824,1.315645
+district=north 24 parganas;stream=b.e/b. tech,program=computer science & engineering,0.021518,0.187824,1.315645
+category=open;district=kolkata,quota=home state,0.023076,0.176705,0.287441
+quota=all india;stream=b.e/b. tech,program=computer science & engineering,0.066409,0.172647,1.209334
+quota=all india,program=computer science & engineering,0.066409,0.172381,1.20747
+category=open;quota=all india,program=computer science & engineering,0.066409,0.172381,1.20747
+quota=all india;stream=b.e/b. tech,district=north 24 parganas,0.066187,0.172068,1.501917
+quota=all india,district=north 24 parganas,0.066187,0.171803,1.499602
+category=open;quota=all india,district=north 24 parganas,0.066187,0.171803,1.499602
+category=open;stream=b.e/b. tech,program=computer science & engineering,0.07472,0.1695,1.187293
+category=open,program=computer science & engineering,0.07472,0.168903,1.183111
+district=kolkata;quota=home state,category=sc,0.038881,0.167841,1.647484
+quota=home state;stream=b.e/b. tech,category=sc,0.100913,0.165894,1.628372
+quota=home state,category=sc,0.101877,0.165721,1.626675
+category=open;stream=b.e/b. tech,district=north 24 parganas,0.070565,0.160074,1.397227
+category=open,district=north 24 parganas,0.070565,0.15951,1.392305
+stream=b.e/b. tech,category=tuition fee waiver,0.15827,0.159393,1.002868
+program=computer science & engineering,district=north 24 parganas,0.021518,0.150728,1.315645
+program=computer science & engineering;stream=b.e/b. tech,district=north 24 parganas,0.021518,0.150728,1.315645
+district=kolkata,category=tuition fee waiver,0.049714,0.146576,0.922226
+district=kolkata;stream=b.e/b. tech,category=tuition fee waiver,0.049714,0.146576,0.922226
+category=tuition fee waiver;stream=b.e/b. tech,program=information technology (tfw),0.022928,0.144866,6.318331
+category=tuition fee waiver,program=information technology (tfw),0.022928,0.144258,6.291783
+category=tuition fee waiver;quota=home state,program=information technology (tfw),0.022928,0.144258,6.291783
+stream=b.e/b. tech,program=computer science & engineering,0.142762,0.143775,1.007099
+category=tuition fee waiver;stream=b.e/b. tech,district=north 24 parganas,0.022557,0.142522,1.244024
+category=tuition fee waiver,district=north 24 parganas,0.022557,0.141923,1.238797
+category=tuition fee waiver;quota=home state,district=north 24 parganas,0.022557,0.141923,1.238797
+category=open,quota=home state,0.057134,0.129151,0.210087
+category=open;stream=b.e/b. tech,quota=home state,0.05617,0.12742,0.20727
+quota=home state;stream=b.e/b. tech,program=computer science & engineering,0.076352,0.125518,0.879216
+quota=all india;stream=b.e/b. tech,district=south 24 parganas,0.047859,0.124421,1.778182
+quota=all india,district=south 24 parganas,0.047859,0.12423,1.775442
+category=open;quota=all india,district=south 24 parganas,0.047859,0.12423,1.775442
+quota=home state,program=computer science & engineering,0.076352,0.1242,0.869984
+district=kolkata;quota=home state,category=st,0.028419,0.122678,1.947383
+quota=home state,category=obc - a,0.074423,0.121062,1.626675
+quota=home state;stream=b.e/b. tech,category=obc - a,0.073533,0.120883,1.624269
+category=open;stream=b.e/b. tech,program=electrical engineering,0.05246,0.119004,1.212253
+category=open,program=electrical engineering,0.05246,0.118584,1.207983
+quota=all india;stream=b.e/b. tech,program=electrical engineering,0.04452,0.115741,1.179016
+quota=all india,program=electrical engineering,0.04452,0.115562,1.177199
+category=open;quota=all india,program=electrical engineering,0.04452,0.115562,1.177199
+quota=home state,category=obc - b,0.070936,0.115389,1.626675
+stream=b.e/b. tech,district=north 24 parganas,0.114566,0.115379,1.007099
+quota=home state;stream=b.e/b. tech,category=obc - b,0.070045,0.11515,1.623302
+district=kolkata,category=sc,0.038881,0.114636,1.125234
+district=kolkata;stream=b.e/b. tech,category=sc,0.038881,0.114636,1.125234
+district=kolkata,program=information technology,0.037991,0.112011,1.191449
+district=kolkata;stream=b.e/b. tech,program=information technology,0.037991,0.112011,1.191449
+quota=all india,district=paschim bardhaman,0.04311,0.111903,1.379795
+category=open;quota=all india,district=paschim bardhaman,0.04311,0.111903,1.379795
+quota=all india;stream=b.e/b. tech,district=paschim bardhaman,0.042962,0.11169,1.377167
+category=open;stream=b.e/b. tech,district=south 24 parganas,0.047859,0.108568,1.551607
+category=open,district=south 24 parganas,0.047859,0.108185,1.546142
+district=kolkata;quota=home state,program=information technology,0.024931,0.107623,1.144783
+district=kolkata;quota=home state,category=obc - a,0.024783,0.106983,1.437493
+quota=all india;stream=b.e/b. tech,program=electronics & communication engineering,0.040142,0.10436,1.451449
+quota=all india,program=electronics & communication engineering,0.040142,0.104199,1.449212
+category=open;quota=all india,program=electronics & communication engineering,0.040142,0.104199,1.449212
+district=kolkata;quota=home state,category=obc - b,0.024041,0.10378,1.463011
+quota=home state,category=st,0.062996,0.102474,1.626675
+quota=home state;stream=b.e/b. tech,category=st,0.062032,0.101976,1.618765
+category=open;stream=b.e/b. tech,program=electronics & communication engineering,0.044817,0.101666,1.413992
+stream=b.e/b. tech,category=sc,0.100913,0.101629,0.997564
+category=open,program=electronics & communication engineering,0.044817,0.101308,1.409011
+district=kolkata,program=computer science & engineering,0.034355,0.101291,0.709509
+district=kolkata;stream=b.e/b. tech,program=computer science & engineering,0.034355,0.101291,0.709509
+district=kolkata;quota=home state,category=open,0.023076,0.099616,0.225179
+stream=b.e/b. tech,program=electrical engineering,0.098167,0.098864,1.007099
+category=open;stream=b.e/b. tech,district=paschim bardhaman,0.042962,0.097458,1.201689
+category=open,district=paschim bardhaman,0.04311,0.097451,1.201593
+category=open;stream=b.e/b. tech,program=information technology,0.042888,0.09729,1.034868
+category=open,program=information technology,0.042888,0.096947,1.031223
+quota=all india;stream=b.e/b. tech,program=information technology,0.036729,0.095486,1.01568
+quota=all india,program=information technology,0.036729,0.095339,1.014115
+category=open;quota=all india,program=information technology,0.036729,0.095339,1.014115
+stream=b.e/b. tech,program=information technology,0.094012,0.094679,1.007099
+district=kolkata;quota=home state,program=computer science & engineering,0.021889,0.094491,0.661877
+quota=home state;stream=b.e/b. tech,program=information technology,0.057283,0.094169,1.001673
+quota=home state,program=information technology,0.057283,0.09318,0.991155
+quota=home state,category=open,0.057134,0.092939,0.210087
+quota=home state;stream=b.e/b. tech,district=nadia,0.056467,0.092828,1.186942
+quota=home state;stream=b.e/b. tech,category=open,0.05617,0.09234,0.208732
+quota=home state,district=nadia,0.056467,0.091853,1.174478
+quota=home state;stream=b.e/b. tech,program=electrical engineering,0.053647,0.088192,0.898388
+quota=home state,program=electrical engineering,0.053647,0.087266,0.888954
+district=kolkata,category=st,0.028419,0.083789,1.330066
+district=kolkata;stream=b.e/b. tech,category=st,0.028419,0.083789,1.330066
+category=open;stream=b.e/b. tech,program=mechanical engineering,0.036358,0.082478,1.176245
+category=open,program=mechanical engineering,0.036358,0.082187,1.172102
+stream=b.e/b. tech,district=paschim bardhaman,0.080953,0.081527,1.005256
+quota=home state;stream=b.e/b. tech,district=north 24 parganas,0.048379,0.079532,0.694202
+stream=b.e/b. tech,district=nadia,0.078207,0.078763,1.007099
+quota=home state,district=north 24 parganas,0.048379,0.078696,0.686912
+district=kolkata,program=electrical engineering,0.026638,0.078539,0.800049
+district=kolkata;stream=b.e/b. tech,program=electrical engineering,0.026638,0.078539,0.800049
+quota=home state;stream=b.e/b. tech,category=ews,0.046746,0.076848,1.633566
+quota=home state,category=ews,0.047043,0.076524,1.626675
+quota=all india;stream=b.e/b. tech,program=mechanical engineering,0.029383,0.076389,1.089411
+quota=all india,program=mechanical engineering,0.029383,0.076271,1.087732
+category=open;quota=all india,program=mechanical engineering,0.029383,0.076271,1.087732
+category=open;stream=b.e/b. tech,program=civil engineering,0.033316,0.075577,1.319358
+category=open,program=civil engineering,0.033316,0.07531,1.314711
+quota=all india;stream=b.e/b. tech,program=civil engineering,0.028493,0.074074,1.29313
+stream=b.e/b. tech,category=obc - a,0.073533,0.074055,0.99505
+quota=all india,program=civil engineering,0.028493,0.07396,1.291137
+category=open;quota=all india,program=civil engineering,0.028493,0.07396,1.291137
+district=kolkata,category=obc - a,0.024783,0.073069,0.98181
+district=kolkata;stream=b.e/b. tech,category=obc - a,0.024783,0.073069,0.98181
+stream=b.e/b. tech,program=electronics & communication engineering,0.0719,0.072411,1.007099
+district=kolkata,category=obc - b,0.024041,0.070882,0.999238
+district=kolkata;stream=b.e/b. tech,category=obc - b,0.024041,0.070882,0.999238
+stream=b.e/b. tech,program=mechanical engineering,0.070119,0.070617,1.007099
+stream=b.e/b. tech,category=obc - b,0.070045,0.070543,0.994458
+stream=b.e/b. tech,district=south 24 parganas,0.069971,0.070468,1.007099
+quota=all india;stream=b.e/b. tech,program=computer science & engineering (artificial intelligence and machine learning),0.026786,0.069637,1.988353
+quota=all india,program=computer science & engineering (artificial intelligence and machine learning),0.026786,0.06953,1.985289
+category=open;quota=all india,program=computer science & engineering (artificial intelligence and machine learning),0.026786,0.06953,1.985289
+quota=home state,district=jalpaiguri,0.041997,0.068316,1.626675
+quota=home state;stream=b.e/b. tech,program=mechanical engineering,0.040736,0.066968,0.955049
+quota=home state,program=mechanical engineering,0.040736,0.066264,0.945021
+quota=all india;stream=b.e/b. tech,district=purba medinipur,0.025302,0.065779,1.515398
+quota=all india,district=purba medinipur,0.025302,0.065678,1.513063
+category=open;quota=all india,district=purba medinipur,0.025302,0.065678,1.513063
+stream=b.e/b. tech,category=st,0.062032,0.062472,0.991678
+quota=home state;stream=b.e/b. tech,district=paschim bardhaman,0.037991,0.062454,0.770079
+quota=home state,district=paschim bardhaman,0.037991,0.061798,0.761992
+quota=home state;stream=b.e/b. tech,program=computer science & engineering - tfw,0.037323,0.061356,1.643938
+category=open;stream=b.e/b. tech,program=computer science & engineering (artificial intelligence and machine learning),0.026786,0.060764,1.734998
+quota=home state,program=computer science & engineering - tfw,0.037323,0.060712,1.626675
+category=open,program=computer science & engineering (artificial intelligence and machine learning),0.026786,0.06055,1.728886
+category=open;stream=b.e/b. tech,district=hooghly,0.026638,0.060428,1.067342
+category=open,district=hooghly,0.026638,0.060215,1.063582
+quota=all india;stream=b.e/b. tech,district=hooghly,0.023076,0.059992,1.059654
+quota=all india,district=hooghly,0.023076,0.0599,1.058021
+category=open;quota=all india,district=hooghly,0.023076,0.0599,1.058021
+category=open;stream=b.e/b. tech,district=nadia,0.026119,0.059249,0.757593
+category=open,district=nadia,0.026119,0.059041,0.754924
+quota=home state;stream=b.e/b. tech,district=jalpaiguri,0.035542,0.058429,1.391247
+stream=b.e/b. tech,program=civil engineering,0.057283,0.057689,1.007099
+category=open;stream=b.e/b. tech,district=purba medinipur,0.025302,0.057398,1.322307
+category=open,district=purba medinipur,0.025302,0.057196,1.317649
+stream=b.e/b. tech,district=hooghly,0.056615,0.057017,1.007099
+quota=all india;stream=b.e/b. tech,district=nadia,0.021741,0.05652,0.722695
+quota=all india,district=nadia,0.021741,0.056433,0.721582
+category=open;quota=all india,district=nadia,0.021741,0.056433,0.721582
+quota=home state;stream=b.e/b. tech,district=hooghly,0.033539,0.055135,0.973866
+quota=home state,district=hooghly,0.033539,0.054556,0.96364
+quota=home state;stream=b.e/b. tech,program=electronics & communication engineering,0.031758,0.052208,0.726115
+quota=home state,program=electronics & communication engineering,0.031758,0.05166,0.71849
+quota=home state;stream=b.e/b. tech,district=cooch behar,0.030422,0.050012,1.624131
+quota=home state,district=cooch behar,0.030422,0.049487,1.607076
+quota=home state,category=open (pwd),0.029829,0.048521,1.626675
+quota=home state;stream=b.e/b. tech,category=open (pwd),0.029012,0.047695,1.598954
+quota=home state;stream=b.e/b. tech,program=civil engineering,0.02879,0.047329,0.826228
+stream=b.e/b. tech,category=ews,0.046746,0.047078,1.000745
+quota=home state,program=civil engineering,0.02879,0.046832,0.817552
+quota=home state;stream=b.e/b. tech,district=purulia,0.027603,0.045377,1.643938
+quota=home state,district=purulia,0.027603,0.0449,1.626675
+stream=b.e/b. tech,district=purba medinipur,0.043407,0.043715,1.007099
+quota=home state;stream=b.e/b. tech,district=murshidabad,0.023299,0.038302,1.351299
+quota=home state,district=murshidabad,0.023299,0.0379,1.33711
+quota=home state;stream=b.e/b. tech,program=information technology (tfw),0.022928,0.037692,1.643938
+stream=b.e/b. tech,program=computer science & engineering - tfw,0.037323,0.037588,1.007099
+quota=home state,program=information technology (tfw),0.022928,0.037296,1.626675
+quota=home state;stream=b.e/b. tech,district=south 24 parganas,0.022112,0.03635,0.519505
+quota=home state,district=south 24 parganas,0.022112,0.035969,0.51405
+stream=b.e/b. tech,district=jalpaiguri,0.035542,0.035794,0.852298
+stream=b.e/b. tech,program=computer science & engineering (artificial intelligence and machine learning),0.035023,0.035271,1.007099
+stream=b.e/b. tech,district=cooch behar,0.030793,0.031012,1.007099
+stream=b.e/b. tech,category=open (pwd),0.029012,0.029218,0.979542
+stream=b.e/b. tech,district=murshidabad,0.028345,0.028546,1.007099
+stream=b.e/b. tech,district=purulia,0.027603,0.027799,1.007099
+stream=b.e/b. tech,district=howrah,0.02597,0.026155,0.990126
+stream=b.e/b. tech,district=malda,0.025302,0.025482,1.007099
+stream=b.e/b. tech,program=computer science & engineering (data science),0.023225,0.02339,1.007099
+stream=b.e/b. tech,program=information technology (tfw),0.022928,0.023091,1.007099
+stream=b.e/b. tech,program=chemical engineering,0.020257,0.020401,1.007099
