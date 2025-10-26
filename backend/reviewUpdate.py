@@ -10,7 +10,14 @@ import os
 
 # Define the absolute path to the CSV file based on your directory structure
 # WARNING: Ensure this path is correct on the machine running the script.
-CSV_FILE_PATH = r'C:\Users\aritr\Desktop\COLLEGE PROJECT\csv\reviews.csv'
+
+# Dynamically get the directory where this script is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Build a relative path to the CSV file (assuming "csv/reviews.csv" is relative to your project root)
+CSV_FILE_PATH = os.path.join(BASE_DIR, '..', 'csv', 'reviews.csv')
+CSV_FILE_PATH = os.path.normpath(CSV_FILE_PATH)
+
 ASPECT_MAX_SCORE = 10.0
 SCORE_SCALING_FACTOR = 0.5  # Controls how quickly aspect scores rise (adjust as needed)
 
