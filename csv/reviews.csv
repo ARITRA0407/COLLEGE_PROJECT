@@ -1,0 +1,518 @@
+review_id,college_id,college_name,review_text,date,source,rating,sentiment_score,word_count,mess_score,professor_score,campus_score,placements_score,infrastructure_score,overall_aspect_score
+R0001,1,ALIPURDUAR GOVERNMENT ENGINEERING AND MANAGEMENT COLLEGE,"My experience at ALIPURDUAR GOVERNMENT ENGINEERING AND MANAGEMENT COLLEGE has been mixed, but insightful, reflecting its rank.
+Many professors are active in research, bringing innovative ideas into the classroom.
+The campus wide AC system is efficient AC and works well during summer.
+The entire campus is surprisingly clean and feels extremely safe.
+Visitors are required to register their details at the main entrance.
+The computer lab has a great sound system for multimedia classes.",2025-08-21,Shiksha,3,0.98,45,5.0,5.0,10.0,5.0,5.0,6.0
+R0002,2,"Abacus Institute of Engineering & Management, Mogra, Hooghly","My experience at Abacus Institute of Engineering & Management, Mogra, Hooghly has been mixed, but insightful, reflecting its rank.
+Experienced faculty always share relevant industry insights.
+There are always healthy options available for fitness enthusiasts.
+The placement team ensures clear communication throughout the hiring cycle.
+I look forward to the best meals served during festival times.
+The roads and pathways are organized and easy to navigate.
+Our highest salary package has seen a significant jump this year.",2024-07-20,Google Reviews,3,0.99,51,5.0,8.0,5.0,5.0,5.0,5.6
+R0003,3,"Academy of Technology, Adisaptagram, Hooghly","My experience at Academy of Technology, Adisaptagram, Hooghly has been mixed, but insightful, reflecting its rank.
+Placement records are maintained digitally by the central office.
+We appreciate the hygienic environment and the delicious weekly menu.
+Student traffic causes severe congestion and loud noise during breaks.
+The dining area is always spotless and clean dining area.
+The staff working in the mess is always friendly staff and accommodating.",2024-10-13,Shiksha,4,0.9,43,10.0,7.0,9.0,5.0,5.0,7.2
+R0004,4,"Adamas University, Barasat","My experience at Adamas University, Barasat has been mixed, but insightful, reflecting its rank.
+The hostel rooms are modern hostel rooms with good amenities.
+I experienced negligence from a particular mentor regarding project guidance.
+The entire campus is surprisingly clean and feels extremely safe.
+The general upkeep of the facilities is commendable.
+The mess hall is closed on all public holidays for maintenance.",2025-05-18,CollegeDunia,4,0.94,39,5.0,8.0,10.0,5.0,5.0,6.6
+R0005,5,"Aliah University, New Town","My experience at Aliah University, New Town has been mixed, but insightful, reflecting its rank.
+The security team is friendly and highly vigilant, making me feel safe.
+Student traffic causes severe congestion and loud noise during breaks.
+Their communication style is clear and highly effective.
+They use fresh ingredients, which greatly improves the taste.
+The main library closes its doors at 9 PM every evening.
+The grounds are well-maintained, creating a calm atmosphere for study.",2024-11-30,Shiksha,3,0.99,48,5.0,7.0,9.0,5.0,5.0,6.2
+R0006,6,"Asansol Engineering College, Asansol, Burdwan","My experience at Asansol Engineering College, Asansol, Burdwan has been mixed, but insightful, reflecting its rank.
+Compared to other colleges, the food quality is good food and relatively cheap.
+Our alumni network is very successful alumni and actively assists in placements.
+The excellent presentation of the food is a pleasant surprise.
+The campus environment is truly beautiful and feels very spacious.
+The college publishes accurate and transparent data on salaries.",2024-12-23,Shiksha,4,0.99,42,8.5,5.0,10.0,5.0,5.0,6.7
+R0007,7,"B.P. Poddar Institute of Management & Technology, Kolkata","My experience at B.P. Poddar Institute of Management & Technology, Kolkata has been mixed, but insightful, reflecting its rank.
+The drainage system seems good drainage, even during heavy monsoon season.
+The mess staff provides good service with quick serving times.
+We appreciate the fair grading and consistent high standards.
+The main library closes its doors at 9 PM every evening.",2025-07-27,Google Reviews,3,0.9,39,5.0,5.0,5.0,5.0,5.0,5.0
+R0008,8,"Bankura Unnayani Institute of Engineering, Bankura","My experience at Bankura Unnayani Institute of Engineering, Bankura has been mixed, but insightful, reflecting its rank.
+The building maintenance team is quick and responsive to issues.
+Students receive unparalleled industry exposure through internships.
+The laboratories are spacious and equipped with high-tech equipment.
+Experienced faculty always share relevant industry insights.
+Class scheduling is handled centrally by the administration.",2025-02-17,CollegeDunia,3,0.72,39,5.0,8.0,7.0,5.0,5.0,6.0
+R0009,9,"Bengal College of Engineering & Technology, Durgapur","My experience at Bengal College of Engineering & Technology, Durgapur has been mixed, but insightful, reflecting its rank.
+The campus environment is truly beautiful and feels very spacious.
+We received excellent teaching from supportive staff throughout the course.
+Compared to other colleges, the food quality is good food and relatively cheap.
+The dessert options are great desserts and well-received by students.
+The mock interviews and assessment tests are extremely beneficial.",2024-09-17,Google Reviews,4,0.98,43,8.5,10.0,10.0,5.0,5.0,7.7
+R0010,10,"Bengal Institute of Technology, Dhapa, Kolkata","My experience at Bengal Institute of Technology, Dhapa, Kolkata has been mixed, but insightful, reflecting its rank.
+The campus is incredibly messy with litter visible near walkways.
+The grounds are well-maintained, creating a calm atmosphere for study.
+The quality of the tea and coffee served is remarkably good.
+The mock interviews and assessment tests are extremely beneficial.
+They are excellent soup recipes offered every week.",2024-07-17,StudentForum,3,0.91,41,5.0,5.0,3.0,5.0,5.0,4.6
+R0011,11,"Bidhan Chandra Krishi Viswa Vidyalaya, Mohanpur, Nadia","My experience at Bidhan Chandra Krishi Viswa Vidyalaya, Mohanpur, Nadia has been mixed, but insightful, reflecting its rank.
+The placement team ensures clear communication throughout the hiring cycle.
+Some faculty are unhelpful and seem to have low expectation for student output.
+Mock interviews are regularly conducted by alumni volunteers.
+Final year students are provided with intensive career counseling.",2024-12-23,Quora,3,-0.45,40,5.0,4.0,5.0,5.0,5.0,4.8
+R0012,12,"Budge Budge Institute of Technology, Budge-Budge","My experience at Budge Budge Institute of Technology, Budge-Budge has been mixed, but insightful, reflecting its rank.
+There is a small, functional post office located near the gate.
+All classrooms have projectors installed for teaching purposes.
+Office hours are posted clearly on the department notice board.
+The landscaping is eco-friendly, featuring beautiful natural elements.",2024-04-28,Google Reviews,3,0.92,35,5.0,6.0,7.0,5.0,5.0,5.6
+R0013,13,"Calcutta Institute of Engineering & Management, Tollygunge, Kolkata","My experience at Calcutta Institute of Engineering & Management, Tollygunge, Kolkata has been mixed, but insightful, reflecting its rank.
+There is zero core placements for specialized engineering branches.
+Experienced faculty always share relevant industry insights.
+I feel the mess offers exceptional value for money.
+The civil engineering department has its own separate material testing lab.
+There are always healthy options available for fitness enthusiasts.
+My professors were consistently helpful and responsive to all queries.",2025-09-22,StudentForum,3,0.96,48,5.0,10.0,5.0,5.0,5.0,6.0
+R0014,14,"Calcutta Institute of Technology, Uluberia, Howrah","My experience at Calcutta Institute of Technology, Uluberia, Howrah has been mixed, but insightful, reflecting its rank.
+The computer lab has a great sound system for multimedia classes.
+We have plenty of common areas with charging points and fast wifi.
+The cell has tie-ups with 50+ companies annually.
+The department maintains a standard ratio of professors to students.
+Final year students are provided with intensive career counseling.
+The staff working in the mess is always friendly staff and accommodating.",2025-07-25,Google Reviews,3,0.83,48,5.0,7.0,5.0,5.0,6.5,5.7
+R0015,15,"Camellia Institute of Technology & Management, Bainchi, Hooghly","My experience at Camellia Institute of Technology & Management, Bainchi, Hooghly has been mixed, but insightful, reflecting its rank.
+The placement process feels unethical due to lack of transparency.
+The security systems are updated and feature modern surveillance.
+We received excellent teaching from supportive staff throughout the course.
+I found their methods for explaining complex topics highly effective.
+The campus wide AC system is efficient AC and works well during summer.
+The security team is friendly and highly vigilant, making me feel safe.",2025-04-06,Quora,4,0.98,53,5.0,10.0,10.0,5.0,9.0,7.8
+R0016,16,"Camellia Institute of Technology, Badu Road, Madhyamgram","My experience at Camellia Institute of Technology, Badu Road, Madhyamgram has been mixed, but insightful, reflecting its rank.
+The weekend special meals often have a lovely homemade feel.
+A small clinic is available on the campus premises during weekdays.
+Many great opportunities are provided by good companies visiting the campus.
+The security systems are updated and feature modern surveillance.",2024-08-10,Quora,4,0.98,38,5.0,5.0,5.0,9.5,9.0,6.7
+R0017,17,"Camellia School of Engineering & Technology, Barasat","My experience at Camellia School of Engineering & Technology, Barasat has been mixed, but insightful, reflecting its rank.
+Many instructors are disengaged and lack any real passion for teaching.
+The mess food is surprisingly tasty and boasts a wide variety of meals.
+All classrooms are now digital classrooms with smart boards.
+The college has invested in new buildings, improving overall aesthetics.
+The infrastructure looks fine but is poorly maintained overall.
+There are always healthy options available for fitness enthusiasts.",2025-07-24,Google Reviews,3,0.96,49,10.0,5.0,5.0,2.5,7.0,5.9
+R0018,18,"College of Engineering and Management, Kolaghat","My experience at College of Engineering and Management, Kolaghat has been mixed, but insightful, reflecting its rank.
+They are excellent at negotiating with good companies for better roles.
+The highest package offered last year was 18 LPA.
+Truly dedicated professionals who go the extra mile for students.
+They are excellent soup recipes offered every week.
+The ROI is poor ROI given the high tuition fees charged.",2025-05-10,StudentForum,2,0.97,41,5.0,5.0,5.0,2.0,5.0,4.4
+R0019,19,"Cooch Behar Government Engineering College, Cooch Behar","My experience at Cooch Behar Government Engineering College, Cooch Behar has been mixed, but insightful, reflecting its rank.
+They focus equally on core jobs as well as IT roles.
+The weekend special meals often have a lovely homemade feel.
+We enjoy modern facilities and a vast, green open area for activities.
+It is a truly well-maintained environment with state-of-the-art facilities.
+Many new faculty members lack depth in their subject matter.",2025-07-29,Shiksha,3,0.96,46,5.0,5.0,10.0,5.0,5.0,6.0
+R0020,20,"Dr. B. C. Roy Engineering College, Durgapur","My experience at Dr. B. C. Roy Engineering College, Durgapur has been mixed, but insightful, reflecting its rank.
+There is zero core placements for specialized engineering branches.
+The drainage system seems good drainage, even during heavy monsoon season.
+We receive no guidance on off-campus opportunities.
+Our highest salary package has seen a significant jump this year.",2025-05-02,CollegeDunia,3,0.77,35,5.0,5.0,5.0,5.0,5.0,5.0
+R0021,21,"Dr.Sudhir Chandra Sur Institute of Technology and Sports Complex, Dum Dum","My experience at Dr.Sudhir Chandra Sur Institute of Technology and Sports Complex, Dum Dum has been mixed, but insightful, reflecting its rank.
+The washrooms are always clean washrooms and well-maintained.
+The computer lab has a great sound system for multimedia classes.
+The security systems are updated and feature modern surveillance.
+The career guidance provided by the cell is excellent training.
+The campus suffers from an unreliable network connection.
+Special thanks to the supportive team for personalized guidance.",2025-09-07,Shiksha,4,0.98,49,5.0,8.0,10.0,5.0,9.0,7.4
+R0022,22,"Dream Institute of Technology, Bishnupur, 24-Parganas-South","My experience at Dream Institute of Technology, Bishnupur, 24-Parganas-South has been mixed, but insightful, reflecting its rank.
+There is zero core placements for specialized engineering branches.
+The teaching methods are often boring lectures and rely heavily on old presentations.
+We benefit from modern labs and a great library facility.
+The security team is friendly and highly vigilant, making me feel safe.
+The daily menu provides a balanced diet of proteins and vegetables.",2025-09-20,CollegeDunia,4,0.97,46,5.0,7.0,8.0,5.0,7.5,6.5
+R0023,23,"Dumkal Institute of Engineering & Technology, Dumkal, Murshidabad","My experience at Dumkal Institute of Engineering & Technology, Dumkal, Murshidabad has been mixed, but insightful, reflecting its rank.
+Visitors are required to register their details at the main entrance.
+The placement staff is professional staff and handles logistics smoothly.
+I particularly enjoy the dedicated space for student clubs and activities.
+The drainage system seems good drainage, even during heavy monsoon season.
+The ROI is poor ROI given the high tuition fees charged.
+Placements are poor, and less package offers are the norm for most branches.",2025-02-12,Shiksha,2,0.54,55,5.0,5.0,5.0,1.0,5.0,4.2
+R0024,24,"Durgapur Institute of Advanced Technology & Management, Durgapur","My experience at Durgapur Institute of Advanced Technology & Management, Durgapur has been mixed, but insightful, reflecting its rank.
+The mess staff provides good service with quick serving times.
+The level of required depth in assignments is often vague and confusing.
+The security systems are updated and feature modern surveillance.
+We appreciate the reliable power backup system throughout the campus.
+A large number of students receive many offers before graduation.
+The career guidance provided by the cell is excellent training.",2025-04-14,Shiksha,3,0.91,52,5.0,5.0,8.0,5.0,9.0,6.4
+R0025,25,"Elitte College of Engineering,Mahispota, Sodepur","My experience at Elitte College of Engineering,Mahispota, Sodepur has been mixed, but insightful, reflecting its rank.
+The placement team ensures clear communication throughout the hiring cycle.
+Placements are poor, and less package offers are the norm for most branches.
+The kitchen staff seems disorganized and overwhelmed.
+The college suffers from inadequate security and bad lighting after dark.
+They are excellent soup recipes offered every week.
+The placement office is located on the third floor of the main block.",2025-08-13,StudentForum,2,-0.91,49,5.0,5.0,5.0,1.0,5.0,4.2
+R0026,26,"FACULTY OF TECHNOLOGY, UTTAR BANGA KRISHI VISWAVIDYALAYA","My experience at FACULTY OF TECHNOLOGY, UTTAR BANGA KRISHI VISWAVIDYALAYA has been mixed, but insightful, reflecting its rank.
+The central auditorium has a large capacity for college events.
+The impressive architecture makes the campus stand out.
+Truly dedicated professionals who go the extra mile for students.
+The sheer variety of meals ensures that the food is never monotonous.",2024-11-05,Google Reviews,3,0.92,35,6.0,5.0,5.0,5.0,5.0,5.2
+R0027,27,"Future Institute of Engineering & Management, Sonarpur","My experience at Future Institute of Engineering & Management, Sonarpur has been mixed, but insightful, reflecting its rank.
+Final year students are provided with intensive career counseling.
+The security systems are updated and feature modern surveillance.
+All documentation must be submitted through the online portal.
+The washrooms are always clean washrooms and well-maintained.
+The teaching clarity provided by the core faculty is unmatched.",2025-06-12,Shiksha,4,0.87,39,5.0,5.0,10.0,5.0,9.0,6.8
+R0028,28,"Future Institute of Technology, Boral, Garia","My experience at Future Institute of Technology, Boral, Garia has been mixed, but insightful, reflecting its rank.
+The daily menu provides a balanced diet of proteins and vegetables.
+The building maintenance team is quick and responsive to issues.
+We appreciate the fair grading and consistent high standards.
+The washrooms are always clean washrooms and well-maintained.",2024-12-05,Google Reviews,3,0.92,34,5.0,5.0,9.0,5.0,5.0,5.8
+R0029,29,"Gargi Memorial Institute of Technology, Baruipur, Kolkata","My experience at Gargi Memorial Institute of Technology, Baruipur, Kolkata has been mixed, but insightful, reflecting its rank.
+We received excellent teaching from supportive staff throughout the course.
+The college has invested in new buildings, improving overall aesthetics.
+The power backup system is bad power backup and fails frequently.
+The staff working in the mess is always friendly staff and accommodating.",2025-05-08,Quora,3,0.63,40,5.0,10.0,5.0,5.0,7.0,6.4
+R0030,30,"Ghani Khan Choudhury Institute of Engineering & Technology, Malda","My experience at Ghani Khan Choudhury Institute of Engineering & Technology, Malda has been mixed, but insightful, reflecting its rank.
+The daily menu provides a balanced diet of proteins and vegetables.
+The mock interviews and assessment tests are extremely beneficial.
+The lecture hall chairs are uncomfortable and need replacing.
+The cooked meals are always cold food by the time they are served.
+The cell has tie-ups with 50+ companies annually.",2024-12-26,StudentForum,3,-0.42,42,5.0,5.0,3.0,5.0,5.0,4.6
+R0031,31,"Global Institute of Management and Technology, Krishnanagar, Nadia","My experience at Global Institute of Management and Technology, Krishnanagar, Nadia has been mixed, but insightful, reflecting its rank.
+Classrooms offer comfortable seating and good ventilation.
+Experienced faculty always share relevant industry insights.
+The library and academic blocks are quiet zones, perfect for focus.
+The menu is highly seasonal menu and changes to keep things interesting.
+The ROI is poor ROI given the high tuition fees charged.
+The college operates its own internal transport shuttle service.",2024-12-28,Google Reviews,3,0.92,53,5.0,8.0,5.0,1.0,5.0,4.8
+R0032,32,"Goverment College of Engineering and Leather Technology, Kolkata","My experience at Goverment College of Engineering and Leather Technology, Kolkata has been mixed, but insightful, reflecting its rank.
+Final year students are provided with intensive career counseling.
+Communication from the placement cell is slow communication and often unclear.
+We attract many top recruiters from diverse industries every year.
+Placement fees must be paid upon receiving a letter of intent.
+We only see mass recruiter only companies with low salary packages.
+The college recently upgraded its bandwidth to 1 Gbps.",2025-08-17,Quora,3,0.08,53,5.0,3.0,5.0,5.0,5.0,4.6
+R0033,33,"Govt. College of Engg. & Textile Technology, Berhampore","My experience at Govt. College of Engg. & Textile Technology, Berhampore has been mixed, but insightful, reflecting its rank.
+There are two main gates for entry and exit from the main campus grounds.
+Special thanks to the supportive team for personalized guidance.
+There is often no drinking water available on some floors.
+The juice served here is watered down and tastes extremely poor.
+The campus is highly accessible with good pathways and ramps.
+The promised assistance with CV writing never materialized.",2025-01-10,Shiksha,3,0.88,47,5.0,8.0,5.0,1.0,5.0,4.8
+R0034,34,"Govt. College of Engineering & Ceramic Technology, Kolkata","My experience at Govt. College of Engineering & Ceramic Technology, Kolkata has been mixed, but insightful, reflecting its rank.
+The head of department has been in place for nearly ten years.
+Placements are poor, and less package offers are the norm for most branches.
+I feel the mess offers exceptional value for money.
+The classroom ventilation is poor, making it stuffy in the summer.
+The administrative response time from the teaching staff is extremely slow.",2025-03-25,CollegeDunia,2,-0.86,43,5.0,3.0,5.0,1.0,5.0,3.8
+R0035,35,"Govt. College of Engineering & Textile Technology, Serampore","My experience at Govt. College of Engineering & Textile Technology, Serampore has been mixed, but insightful, reflecting its rank.
+The open door policy of the faculty encourages great mentorship.
+The laboratories are spacious and equipped with high-tech equipment.
+The mess management is unhygienic and needs immediate oversight.
+Many of the science labs have broken equipment that is unusable.
+Communication from the placement cell is slow communication and often unclear.",2025-06-04,CollegeDunia,2,0.15,42,2.0,3.0,7.0,5.0,1.0,3.6
+R0036,36,"Greater Kolkata College of Engineering & Management, Baruipur","My experience at Greater Kolkata College of Engineering & Management, Baruipur has been mixed, but insightful, reflecting its rank.
+Placement fees must be paid upon receiving a letter of intent.
+The entire process is usually completed by March every year.
+The security team is friendly and highly vigilant, making me feel safe.
+The lecture hall chairs are uncomfortable and need replacing.
+The official placement rate seems exaggerated and low success in reality.",2025-02-01,Google Reviews,3,0.93,48,5.0,7.0,9.0,2.5,5.0,5.7
+R0037,37,"Guru Nanak Institute of Technology, Panihati, Sodepur","My experience at Guru Nanak Institute of Technology, Panihati, Sodepur has been mixed, but insightful, reflecting its rank.
+My professors were consistently helpful and responsive to all queries.
+The infrastructure is designed for high-tech equipment and future scalability.
+Experienced faculty always share relevant industry insights.
+The library is too small and is very crowded during exam time.
+The staff is always eager to encourage participation and innovative projects.",2024-10-18,Shiksha,3,0.97,41,5.0,10.0,1.0,5.0,5.0,5.2
+R0038,38,"Haldia Institute of Technology, Haldia, Purba Medinipur","My experience at Haldia Institute of Technology, Haldia, Purba Medinipur has been mixed, but insightful, reflecting its rank.
+The college follows the UGC guidelines for faculty promotion strictly.
+Their punitive approach makes the learning environment unnecessarily strict.
+The career guidance provided by the cell is excellent training.
+There are two main gates for entry and exit from the main campus grounds.
+The daily menu provides a balanced diet of proteins and vegetables.",2024-11-05,CollegeDunia,3,0.15,46,5.0,3.0,5.0,5.0,5.0,4.6
+R0039,39,"Hemnalini Memorial College of Engineering, Haringhata","My experience at Hemnalini Memorial College of Engineering, Haringhata has been mixed, but insightful, reflecting its rank.
+Special thanks to the supportive team for personalized guidance.
+There is no placement support for non-IT or non-core branches, which is frustrating.
+The mess staff provides good service with quick serving times.
+The library is too small and is very crowded during exam time.
+The campus provides fast wifi across all academic blocks.",2025-03-05,Quora,3,0.75,42,5.0,8.0,1.0,3.0,6.5,4.7
+R0040,40,"Heritage Institute of Technology, Kolkata","My experience at Heritage Institute of Technology, Kolkata has been mixed, but insightful, reflecting its rank.
+The prices are high cost, making the food unreasonably expensive.
+The library is too small and has slow wifi in the reading room.
+Our highest salary package has seen a significant jump this year.
+The campus provides fast wifi across all academic blocks.",2024-11-19,StudentForum,2,-0.04,36,3.0,3.0,2.0,5.0,5.0,3.6
+R0041,41,"Hooghly Engineering & Technology College, Hooghly","My experience at Hooghly Engineering & Technology College, Hooghly has been mixed, but insightful, reflecting its rank.
+The campus wide AC system is efficient AC and works well during summer.
+There is a noted problem with instructor absenteeism, especially in the afternoon slots.
+The dessert options are great desserts and well-received by students.
+I experienced negligence from a particular mentor regarding project guidance.
+I found their methods for explaining complex topics highly effective.",2025-03-28,StudentForum,3,0.93,44,5.0,8.0,5.0,5.0,5.0,5.6
+R0042,42,"Ideal Institute of Engineering, Kalyani","My experience at Ideal Institute of Engineering, Kalyani has been mixed, but insightful, reflecting its rank.
+I frequently find stale ingredients in the cooked meals.
+Many new faculty members lack depth in their subject matter.
+The basketball court is in poor condition and badly maintained.
+The sheer variety of meals ensures that the food is never monotonous.
+We benefit from their vast expertise and helpful academic resources.
+Communication from the placement cell is slow communication and often unclear.",2024-10-28,CollegeDunia,3,-0.9,49,6.0,7.0,8.0,1.0,5.0,5.4
+R0043,43,"Imps College of Engineering & Technology, Malda","My experience at Imps College of Engineering & Technology, Malda has been mixed, but insightful, reflecting its rank.
+The presentation is totally unappetizing, making it hard to eat.
+We suffered due to the poor communicator skills of several senior staff.
+Hostel residents pay a mandatory annual infrastructure fee.
+The plates and glasses are visibly unclean plates sometimes.
+The sports complex features excellent sports facilities including a new gym.
+We enjoy modern facilities and a vast, green open area for activities.",2024-10-14,Shiksha,3,0.04,54,5.0,5.0,10.0,1.0,5.0,5.2
+R0044,44,"Institute of Pharmacy, Jalpaiguri","My experience at Institute of Pharmacy, Jalpaiguri has been mixed, but insightful, reflecting its rank.
+The institute follows a standard fire safety protocol.
+The grounds are well-maintained, creating a calm atmosphere for study.
+We benefit from modern labs and a great library facility.
+The common areas are always spotless and remarkably clean.
+Students receive unparalleled industry exposure through internships.
+The placement cell is unsupportive cell and slow to respond to queries.",2025-07-10,CollegeDunia,4,0.97,45,5.0,4.5,10.0,6.5,7.5,6.7
+R0045,45,"Institute of Science and Technology, Paschim Medinipur","My experience at Institute of Science and Technology, Paschim Medinipur has been mixed, but insightful, reflecting its rank.
+The plates and glasses are visibly unclean plates sometimes.
+I particularly enjoy the dedicated space for student clubs and activities.
+Classrooms offer comfortable seating and good ventilation.
+The open fields offer ample space for sports and recreation.",2025-06-05,CollegeDunia,3,0.96,36,5.0,5.0,7.0,5.0,5.0,5.4
+R0046,46,Jadavpur University,"My experience at Jadavpur University has been mixed, but insightful, reflecting its rank.
+The central areas are constantly crowded, especially during peak hours.
+The campus suffers from an unreliable network connection.
+The hostel rooms are modern hostel rooms with good amenities.
+Security protocols are excellent security, ensuring a secure environment.
+Hostel residents pay a mandatory annual infrastructure fee.",2025-05-21,CollegeDunia,3,0.95,40,5.0,5.0,3.0,5.0,5.0,4.6
+R0047,47,"Jalpaiguri Goverment Engineering College,Jalpaiguri","My experience at Jalpaiguri Goverment Engineering College,Jalpaiguri has been mixed, but insightful, reflecting its rank.
+The placement office is extremely well-organized and supportive cell.
+External catering is occasionally brought in for special events.
+The library's collection of technical books is inadequate seating.
+Compared to other colleges, the food quality is good food and relatively cheap.
+Many students find themselves with no placement at the end of the year.
+The staff is always eager to encourage participation and innovative projects.",2024-04-24,CollegeDunia,3,0.95,48,8.5,8.0,5.0,4.5,5.0,6.2
+R0048,48,"Jis College of Engineering, Kalyani, Nadia","My experience at Jis College of Engineering, Kalyani, Nadia has been mixed, but insightful, reflecting its rank.
+The power backup system is bad power backup and fails frequently.
+The food is consistently bad food, often leaving me with stomach issues.
+The AC system is faulty AC and frequently breaks down in classrooms.
+The library holds approximately 50,000 physical books in its collection.
+The campus is divided into four main academic blocks.
+The excellent presentation of the food is a pleasant surprise.",2024-12-13,StudentForum,2,-0.75,49,3.0,5.0,3.0,5.0,5.0,4.2
+R0049,49,"Jis University, Agarpara","My experience at Jis University, Agarpara has been mixed, but insightful, reflecting its rank.
+Our highest salary package has seen a significant jump this year.
+It is difficult to reach professors outside of fixed office hours, making them unapproachable.
+The juice served here is watered down and tastes extremely poor.
+The grading system felt excessively strict and sometimes unfair.
+The campus uses a card-based access system for labs.",2025-01-29,CollegeDunia,2,-0.89,43,5.0,3.0,5.0,1.0,5.0,3.8
+R0050,50,"Jld Engineering and Management College, Baruipur","My experience at Jld Engineering and Management College, Baruipur has been mixed, but insightful, reflecting its rank.
+The mess food is surprisingly tasty and boasts a wide variety of meals.
+The college publishes accurate and transparent data on salaries.
+The central library is well-stocked books and very quiet.
+Students are allowed three 'dream company' attempts during the cycle.
+The college suffers from inadequate security and bad lighting after dark.",2024-07-19,CollegeDunia,3,-0.85,43,10.0,5.0,5.0,5.0,5.0,6.0
+R0051,51,"Kaji Nazrul University, Asansol","My experience at Kaji Nazrul University, Asansol has been mixed, but insightful, reflecting its rank.
+The mess management is unhygienic and needs immediate oversight.
+The lack of green space is depressing, making the campus dull.
+The campus suffers from an unreliable network connection.
+I found their methods for explaining complex topics highly effective.
+We only see mass recruiter only companies with low salary packages.
+Only few companies visit, offering limited choice of roles.",2025-02-09,CollegeDunia,3,-0.95,47,2.0,5.0,8.0,4.0,5.0,4.8
+R0052,52,"Kalyani Goverment Engineering College, Kalyani, Nadia","My experience at Kalyani Goverment Engineering College, Kalyani, Nadia has been mixed, but insightful, reflecting its rank.
+The building maintenance team is quick and responsive to issues.
+The maintenance team is slow repairs and unresponsive to complaints.
+The infrastructure is shabby and needs immediate aesthetic repair.
+We only see mass recruiter only companies with low salary packages.
+We received excellent teaching from supportive staff throughout the course.
+The open door policy of the faculty encourages great mentorship.",2025-04-06,CollegeDunia,3,0.95,50,5.0,3.5,5.0,5.0,5.0,4.7
+R0053,53,"Mallabhum Institute of Technology, Bishnupur, Bankura","My experience at Mallabhum Institute of Technology, Bishnupur, Bankura has been mixed, but insightful, reflecting its rank.
+Much of the older architecture makes the buildings feel old and small.
+I experienced negligence from a particular mentor regarding project guidance.
+Many labs are severely outdated and contain old equipment.
+Students must complete mandatory soft skill training before interviews.",2024-12-30,CollegeDunia,2,-0.55,40,5.0,8.0,1.0,5.0,1.0,4.0
+R0054,54,"Maulana Abul Kalam Azad University of Technology, West Bengal","My experience at Maulana Abul Kalam Azad University of Technology, West Bengal has been mixed, but insightful, reflecting its rank.
+Our highest salary package has seen a significant jump this year.
+The walls of the older buildings are cracked and show signs of poor upkeep.
+Experienced faculty always share relevant industry insights.
+The main block feels run-down and smells bad near the cafeteria.",2024-07-18,Quora,2,-0.87,43,5.0,8.0,3.0,1.0,5.0,4.4
+R0055,55,"Mckv Institute of Engineering, Liluah, Howrah","My experience at Mckv Institute of Engineering, Liluah, Howrah has been mixed, but insightful, reflecting its rank.
+The impressive architecture makes the campus stand out.
+They use fresh ingredients, which greatly improves the taste.
+The buildings are new buildings, and we have ample equipment for practical sessions.
+There are leaky roofs in the older academic blocks that need urgent repair.
+The placement staff is professional staff and handles logistics smoothly.",2025-08-22,Google Reviews,3,0.91,43,5.0,5.0,3.0,5.0,8.0,5.2
+R0056,56,"Meghnad Saha Institute of Technology, Kolkata","My experience at Meghnad Saha Institute of Technology, Kolkata has been mixed, but insightful, reflecting its rank.
+Some faculty are unhelpful and seem to have low expectation for student output.
+We receive no guidance on off-campus opportunities.
+The institute follows a strict policy on one-job-per-student rule.
+The drainage system seems good drainage, even during heavy monsoon season.",2024-06-03,Quora,2,0.42,36,5.0,2.0,5.0,5.0,5.0,4.4
+R0057,57,"Murshidabad College of Engineering & Technology, Murshidabad","My experience at Murshidabad College of Engineering & Technology, Murshidabad has been mixed, but insightful, reflecting its rank.
+The cutlery is dirty cutlery, raising serious hygiene flags.
+The common washrooms are rarely cleaned and are constantly dirty.
+I frequently find stale ingredients in the cooked meals.
+Their dedication to student success is truly inspiring.",2024-11-07,StudentForum,3,0.67,34,5.0,5.0,2.5,5.0,5.0,4.5
+R0058,58,"Narula Institute of Technology, Agarpara, Kolkata","My experience at Narula Institute of Technology, Agarpara, Kolkata has been mixed, but insightful, reflecting its rank.
+The kitchen area smells bad, suggesting poor ventilation.
+The dining hall is rarely cleaned between meal times.
+My professors were consistently helpful and responsive to all queries.
+The staff frequently provides slow feedback on assignments and exams.",2024-11-18,StudentForum,3,-0.45,35,5.0,7.0,7.0,1.0,5.0,5.0
+R0059,59,"Netaji Subhas Engineering College, Garia, Kolkata","My experience at Netaji Subhas Engineering College, Garia, Kolkata has been mixed, but insightful, reflecting its rank.
+The prices are high cost, making the food unreasonably expensive.
+Placements are poor, and less package offers are the norm for most branches.
+The food is consistently bad food, often leaving me with stomach issues.
+The daily menu is monotonous and often leaves the food tasteless.
+We receive no guidance on off-campus opportunities.",2025-06-06,CollegeDunia,2,-0.85,44,1.0,5.0,5.0,1.0,5.0,3.4
+R0060,60,"Nshm Knowledge Campus, Durgapur Group of Institutions","My experience at Nshm Knowledge Campus, Durgapur Group of Institutions has been mixed, but insightful, reflecting its rank.
+The common washrooms are rarely cleaned and are constantly dirty.
+Drinking water facilities are available on every floor.
+We enjoy modern facilities and a vast, green open area for activities.
+There are no opportunities for internships provided by the college.
+The library's collection of technical books is inadequate seating.",2024-05-15,CollegeDunia,3,-0.36,41,5.0,5.0,10.0,5.0,5.0,6.0
+R0061,61,"Om Dayal Group of Institutions, Uluberia, Howrah","My experience at Om Dayal Group of Institutions, Uluberia, Howrah has been mixed, but insightful, reflecting its rank.
+The official speed limit inside the campus is 20 km/h.
+The lighting is dim lighting, making it difficult to study late.
+The administrative response time from the teaching staff is extremely slow.
+We suffered due to the poor communicator skills of several senior staff.
+The ROI is poor ROI given the high tuition fees charged.
+The washrooms are always clean washrooms and well-maintained.",2024-08-30,Quora,3,-0.94,51,5.0,3.0,9.0,1.0,5.0,4.6
+R0062,62,"Pailan College of Management & Technology, Pailan Park","My experience at Pailan College of Management & Technology, Pailan Park has been mixed, but insightful, reflecting its rank.
+Lectures were engaging, showing the genuine passion of the instructors.
+Classrooms offer comfortable seating and good ventilation.
+Our highest salary package has seen a significant jump this year.
+The advertised data is unclear data and often misleading.
+Lab timings are from 9 AM to 5 PM on weekdays.
+We benefit from modern labs and a great library facility.",2024-12-14,StudentForum,3,0.97,45,5.0,5.0,8.0,5.0,7.5,6.1
+R0063,63,"Ramkrishna Mahato Government Engineering College, Purulia","My experience at Ramkrishna Mahato Government Engineering College, Purulia has been mixed, but insightful, reflecting its rank.
+There are leaky roofs in the older academic blocks that need urgent repair.
+The plates and glasses are visibly unclean plates sometimes.
+The evening snack options are incredibly limited and plain.
+The hostel rooms are modern hostel rooms with good amenities.
+The placement process feels unethical due to lack of transparency.
+The administrative response time from the teaching staff is extremely slow.",2025-09-05,Shiksha,3,-0.76,52,5.0,3.0,8.0,5.0,5.0,5.2
+R0064,64,"Rcc Institute of Information Technology, Kolkata","My experience at Rcc Institute of Information Technology, Kolkata has been mixed, but insightful, reflecting its rank.
+There are limited options available for vegetarian students.
+I often see flies everywhere near the serving counters.
+The security measures are weak and often ignore obvious safety breaches.
+The quality of oil used in cooking seems poor quality and oily.
+The dining hall is rarely cleaned between meal times.
+The library is too small and has slow wifi in the reading room.",2024-10-05,CollegeDunia,2,-0.78,50,2.5,3.0,6.0,1.0,3.5,3.2
+R0065,65,"Regent Education and Research Foundation, Barasat, Kolkata","My experience at Regent Education and Research Foundation, Barasat, Kolkata has been mixed, but insightful, reflecting its rank.
+Some faculty are unhelpful and seem to have low expectation for student output.
+The cell operates under the guidance of the Dean of Student Affairs.
+All classrooms are now digital classrooms with smart boards.
+The dessert options are great desserts and well-received by students.
+They are committed to finishing the syllabus on time and effectively.
+I experienced negligence from a particular mentor regarding project guidance.",2025-03-17,Google Reviews,3,0.93,47,5.0,7.0,5.0,5.0,5.0,5.4
+R0066,66,"Sanaka Education Trusts Group of Institutions, Durgapur, Burdwan","My experience at Sanaka Education Trusts Group of Institutions, Durgapur, Burdwan has been mixed, but insightful, reflecting its rank.
+The washrooms are always clean washrooms and well-maintained.
+I wish the professors were more encouraging instead of being overly critical.
+The advertised data is unclear data and often misleading.
+The infrastructure is insufficient to accommodate the increasing number of students.
+The dinner serving time ends promptly at 10 PM.",2025-03-08,Quora,3,0.77,40,5.0,5.0,9.0,5.0,3.0,5.4
+R0067,67,"Seacom Engineering College, Sankrail, Howrah","My experience at Seacom Engineering College, Sankrail, Howrah has been mixed, but insightful, reflecting its rank.
+We have plenty of common areas with charging points and fast wifi.
+They strictly adhere to hygienic standards in all preparation areas.
+There are always healthy options available for fitness enthusiasts.
+The administrative response time from the teaching staff is extremely slow.
+The library is too small and is very crowded during exam time.
+The evening snack options are incredibly limited and plain.",2025-05-16,CollegeDunia,3,0.76,47,9.0,2.0,1.0,5.0,6.5,4.7
+R0068,68,"Seacom Skills University, Bolpur","My experience at Seacom Skills University, Bolpur has been mixed, but insightful, reflecting its rank.
+We only see mass recruiter only companies with low salary packages.
+The campus provides fast wifi across all academic blocks.
+Many students find themselves with no placement at the end of the year.
+Many labs are severely outdated and contain old equipment.",2024-05-21,Shiksha,2,-0.9,36,5.0,5.0,1.0,3.0,1.0,3.0
+R0069,69,"Siliguri Institute of Technology, Siliguri","My experience at Siliguri Institute of Technology, Siliguri has been mixed, but insightful, reflecting its rank.
+The campus environment is truly beautiful and feels very spacious.
+They use fresh ingredients, which greatly improves the taste.
+There are limited options available for vegetarian students.
+The college recently introduced a mandatory faculty feedback system.
+My professors were consistently helpful and responsive to all queries.
+Many great opportunities are provided by good companies visiting the campus.",2025-01-11,Shiksha,4,0.99,46,5.0,9.0,10.0,9.5,5.0,7.7
+R0070,70,"Sister Nivedita University, New Town","My experience at Sister Nivedita University, New Town has been mixed, but insightful, reflecting its rank.
+I felt some teachers were biased in their evaluation, which was demoralizing.
+Student traffic causes severe congestion and loud noise during breaks.
+The infrastructure is insufficient to accommodate the increasing number of students.
+The plates and glasses are visibly unclean plates sometimes.
+The dining area is always spotless and clean dining area.",2024-06-26,Quora,3,-0.26,42,5.0,5.0,9.0,5.0,3.0,5.4
+R0071,71,"St. Thomas College of Engineering & Technology, Khidirpur, Kolkata","My experience at St. Thomas College of Engineering & Technology, Khidirpur, Kolkata has been mixed, but insightful, reflecting its rank.
+The building maintenance team is quick and responsive to issues.
+Attendance is mandatory for all faculty members during exam week.
+The placement office is extremely well-organized and supportive cell.
+The prices are high cost, making the food unreasonably expensive.
+The entire process is highly biased process towards a select group of students.
+The infrastructure is insufficient to accommodate the increasing number of students.",2025-07-01,Google Reviews,3,0.64,51,3.0,8.0,5.0,6.5,3.0,5.1
+R0072,72,"Supreme Knowledge Foundation Group of Institutions, Mankundu, Hooghly","My experience at Supreme Knowledge Foundation Group of Institutions, Mankundu, Hooghly has been mixed, but insightful, reflecting its rank.
+The main block feels run-down and smells bad near the cafeteria.
+The dining hall is rarely cleaned between meal times.
+The security team is friendly and highly vigilant, making me feel safe.
+The lighting is dim lighting, making it difficult to study late.
+The power backup system is bad power backup and fails frequently.
+We have access to the latest software licenses in all computer labs.",2025-08-20,Google Reviews,3,-0.74,55,5.0,7.0,10.0,5.0,5.0,6.4
+R0073,73,"Swami Vivekananda Institute of Science & Technology, Sonarpur","My experience at Swami Vivekananda Institute of Science & Technology, Sonarpur has been mixed, but insightful, reflecting its rank.
+We have access to the latest software licenses in all computer labs.
+The staff frequently provides slow feedback on assignments and exams.
+The preparation is often poor quality, leading to unhygienic concerns.
+Communication from the placement cell is slow communication and often unclear.
+The library's collection of technical books is inadequate seating.
+Placements are poor, and less package offers are the norm for most branches.",2025-03-04,CollegeDunia,2,-0.94,51,1.0,2.0,5.0,1.0,5.0,2.8
+R0074,74,Swami Vivekananda University,"My experience at Swami Vivekananda University has been mixed, but insightful, reflecting its rank.
+The campus suffers from an unreliable network connection.
+There is often no drinking water available on some floors.
+Many new faculty members lack depth in their subject matter.
+We appreciate the reliable power backup system throughout the campus.
+The general upkeep of the facilities is commendable.
+The placement cell is unsupportive cell and slow to respond to queries.",2024-11-12,StudentForum,3,-0.74,44,5.0,4.5,5.0,6.5,5.0,5.2
+R0075,75,"Techno Engineering Collge Banipur, 24 Parganas-North","My experience at Techno Engineering Collge Banipur, 24 Parganas-North has been mixed, but insightful, reflecting its rank.
+I often see flies everywhere near the serving counters.
+The mess management is unhygienic and needs immediate oversight.
+The service is slow service, leading to long queues during lunch.
+Maintenance is poor upkeep, often leaving common areas dirty and unkempt.",2025-08-13,CollegeDunia,2,-0.91,39,2.0,3.0,2.0,1.0,5.0,2.6
+R0076,76,"Techno India University, Salt Lake","My experience at Techno India University, Salt Lake has been mixed, but insightful, reflecting its rank.
+Their punitive approach makes the learning environment unnecessarily strict.
+I wish the professors were more encouraging instead of being overly critical.
+The lighting is dim lighting, making it difficult to study late.
+Microwaves are available for student use near the main counter.
+The lack of green space is depressing, making the campus dull.",2025-09-01,Quora,3,-0.9,44,5.0,3.0,8.0,5.0,5.0,5.2
+R0077,77,Techno International Batanagar,"My experience at Techno International Batanagar has been mixed, but insightful, reflecting its rank.
+The placement process feels unethical due to lack of transparency.
+The presentation is totally unappetizing, making it hard to eat.
+The washrooms are constantly dirty washrooms and unhygienic.
+The quality of oil used in cooking seems poor quality and oily.",2025-06-21,CollegeDunia,2,-0.95,34,1.0,5.0,2.0,1.0,5.0,2.8
+R0078,78,"Techno International New Town, Rajarhat, New Town","My experience at Techno International New Town, Rajarhat, New Town has been mixed, but insightful, reflecting its rank.
+The lack of green space is depressing, making the campus dull.
+We suffered due to the poor communicator skills of several senior staff.
+I wish the professors were more encouraging instead of being overly critical.
+The cutlery is dirty cutlery, raising serious hygiene flags.",2024-12-01,CollegeDunia,2,-0.95,40,5.0,5.0,5.0,1.0,5.0,4.2
+R0079,79,"Techno Main Salt Lake, Sector-V, Salt Lake","My experience at Techno Main Salt Lake, Sector-V, Salt Lake has been mixed, but insightful, reflecting its rank.
+The college has a strong placement record, with students securing high package deals.
+A minimum GPA of 7.5 is required to sit for top company interviews.
+The worst dishes are served on Sunday nights, consistently disappointing.
+There are limited options available for vegetarian students.
+The infrastructure is designed for high-tech equipment and future scalability.",2024-06-06,CollegeDunia,3,-0.57,46,5.0,5.0,5.0,10.0,5.0,6.0
+R0080,80,"UNIVERSITY INSTITUTE OF TECHNOLOGY, BURDWAN UNIVERSITY","My experience at UNIVERSITY INSTITUTE OF TECHNOLOGY, BURDWAN UNIVERSITY has been mixed, but insightful, reflecting its rank.
+The level of required depth in assignments is often vague and confusing.
+The placement statistics seem fake and are skewed to a few top students.
+Many instructors are disengaged and lack any real passion for teaching.
+The college suffers from inadequate security and bad lighting after dark.
+The average package for the ECE department is 5.5 LPA.",2024-12-23,StudentForum,3,-0.93,43,5.0,5.0,5.0,3.0,5.0,4.6
+R0081,81,UNIVERSITY OF ENGINEERING AND MANAGEMENT KOLKATA,"My experience at UNIVERSITY OF ENGINEERING AND MANAGEMENT KOLKATA has been mixed, but insightful, reflecting its rank.
+The mess management is unhygienic and needs immediate oversight.
+The staff is untrained staff and cannot answer basic career questions.
+The basketball court is in poor condition and badly maintained.
+The institute consistently demonstrates a good ROI for tuition fees.
+The plates and glasses are visibly unclean plates sometimes.",2025-09-08,StudentForum,2,-0.83,42,2.0,5.0,7.0,1.0,5.0,4.0
+R0082,82,"UNIVERSITY OF KALYANI, KALYANI","My experience at UNIVERSITY OF KALYANI, KALYANI has been mixed, but insightful, reflecting its rank.
+Many new faculty members lack depth in their subject matter.
+The kitchen area smells bad, suggesting poor ventilation.
+The placement team ensures clear communication throughout the hiring cycle.
+The maintenance team is slow repairs and unresponsive to complaints.
+The common washrooms are rarely cleaned and are constantly dirty.",2025-04-18,CollegeDunia,2,-0.95,43,5.0,1.0,4.0,1.0,5.0,3.2
+R0083,83,University Of Calcutta,"My experience at University Of Calcutta has been mixed, but insightful, reflecting its rank.
+The placement statistics seem fake and are skewed to a few top students.
+There is often no drinking water available on some floors.
+The kitchen staff seems disorganized and overwhelmed.
+Many of the science labs have broken equipment that is unusable.
+The daily menu is monotonous and often leaves the food tasteless.",2025-05-06,Shiksha,2,-0.91,37,1.0,5.0,5.0,3.0,1.0,3.0
+R0084,84,West Bengal University of Animal & Fishery Sciences,"My experience at West Bengal University of Animal & Fishery Sciences has been mixed, but insightful, reflecting its rank.
+The promised assistance with CV writing never materialized.
+Many labs are severely outdated and contain old equipment.
+The staff is untrained staff and cannot answer basic career questions.
+The maintenance team is slow repairs and unresponsive to complaints.
+The faculty email response time is officially 48 hours.
+The small size of the campus limits opportunities for large-scale events.",2024-05-09,Google Reviews,2,-0.23,50,5.0,1.0,1.0,5.0,1.0,2.6

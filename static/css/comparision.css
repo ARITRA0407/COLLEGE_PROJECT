@@ -1,0 +1,249 @@
+:root {
+  --bg: #f6f8fa;
+  --card: #ffffff;
+  --muted: #7b8794;
+  --accent: #0ea5a4; /* teal */
+  --accent-2: #2563eb; /* blue */
+  --good: #16a34a; /* green */
+  --bad: #dc2626; /* red */
+  --gold: #f6c156;
+  --shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  --radius: 12px;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial;
+}
+.container {
+  display: flex;
+  gap: 18px;
+  padding: 18px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Two vertical panels take full width */
+.panel {
+  flex: 1;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* make header a positioned container so the button can be absolutely placed reliably */
+.panel-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #eef2f7;
+  background: linear-gradient(
+    90deg,
+    rgba(14, 165, 164, 0.03),
+    rgba(37, 99, 235, 0.02)
+  );
+  position: relative;
+}
+.select-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e6edf3;
+  background: #fff;
+  min-width: 160px; /* ensure selects accept pointer events */
+  pointer-events: auto;
+}
+
+/* force the compare button to top-right and very visible */
+.compare-btn {
+  margin-left: auto;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--accent-2);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.6;
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  z-index: 999999;
+  display: inline-block;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.compare-btn.enabled {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.panel-body {
+  padding: 18px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Top: images (only photo now) */
+.visuals {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.college-img {
+  flex: 1;
+  height: 110px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #e9eef3;
+  max-width: 100%;
+}
+
+.item-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.item-row .label {
+  min-width: 160px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.value {
+  flex: 1;
+  background: #fbfcfd;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #eef2f7;
+  word-break: break-word;
+}
+
+/* Map small window */
+.map-frame {
+  width: 100%;
+  height: 180px;
+  border-radius: 8px;
+  border: 1px solid #e6edf3;
+  overflow: hidden;
+}
+
+/* Chart area */
+.chart-card {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #eef2f7;
+  background: #fff;
+}
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px; /* left as placeholder but not used */
+}
+.stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.stat {
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #eef2f7;
+}
+.stat .title {
+  color: var(--muted);
+  font-size: 13px;
+}
+.stat .num {
+  font-weight: 700;
+  font-size: 18px;
+  margin-top: 6px;
+}
+.stars {
+  display: inline-block;
+}
+
+/* star rendering (partial fill) */
+.star {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
+  margin-right: 2px;
+}
+.star .star-empty {
+  color: #e6e6e6;
+}
+.star .star-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--gold);
+  height: 100%;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .container {
+    flex-direction: column;
+  }
+  select {
+    min-width: 130px;
+  }
+  /* on very small screens place the compare button inline instead of absolute */
+  .compare-btn {
+    position: static;
+    margin-left: auto;
+  }
+}
+
+/* small helper for highlight */
+.higher {
+  color: var(--good);
+  font-weight: 700;
+}
+.lower {
+  color: var(--bad);
+  font-weight: 700;
+}
+
+footer.note {
+  padding: 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* tiny debug badge (hidden by default) */
+#compare-debug-badge {
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  background: rgba(220, 38, 38, 0.95);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 999999;
+  display: none;
+}

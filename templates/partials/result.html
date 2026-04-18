@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .wrapper {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .left, .right {
+            padding: 18px;
+            overflow-y: auto;
+        }
+
+        .left { width: 60%; }
+
+        .right {
+            width: 40%;
+            background: rgba(0,0,0,0.25);
+            backdrop-filter: blur(10px);
+        }
+
+        .screen2 {
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .box {
+            background: rgba(255,255,255,0.12);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        .career {
+            background: rgba(255,255,255,0.15);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+
+        .level-high { color: #00ffcc; font-weight: bold; }
+        .level-medium { color: #ffd966; font-weight: bold; }
+        .level-low { color: #ff9999; font-weight: bold; }
+
+        ul { margin: 4px 0; padding-left: 18px; }
+
+        .tag-good { color: #a8ffb0; }
+        .tag-bad { color: #ffb3b3; }
+
+        canvas {
+            background: white;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .bar {
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: #00ffcc;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <!-- ================= LEFT: SKILLS ================= -->
+    <div class="left">
+
+        <h2>🧠 Your AI Skill Analysis</h2>
+
+        <div class="box">
+            📊 AI Analysis Complete<br>
+            Confidence, speed, and accuracy evaluated
+        </div>
+
+        {% set items = result.items() | list %}
+
+        {# 🔥 IMPORTANT FIX: USE SORTED RESULT FROM APP.PY #}
+        {% set sorted = items | sort(attribute='1.score', reverse=true) %}
+
+        {% for c, v in sorted %}
+
+        {% set idx = loop.index0 %}
+
+        <div class="box">
+
+            <b>{{ c }}</b>
+
+            <!-- HIGH / MEDIUM / LOW BASED ON FINAL RANK -->
+            <span class="
+                {% if idx < 6 %}level-high
+                {% elif idx < 11 %}level-medium
+                {% else %}level-low{% endif %}
+            ">
+                {% if idx < 6 %}High
+                {% elif idx < 11 %}Medium
+                {% else %}Low{% endif %}
+            </span>
+
+            <br><br>
+
+            Score: {{ v.score }}
+
+            <div class="bar">
+                <div class="bar-fill" style="width:{{ v.score * 100 }}%"></div>
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- ================= RIGHT: JOBS ================= -->
+    <div class="right">
+
+        <h2>🎯 Top 5 Careers</h2>
+
+        {% for r in rec %}
+        <div class="career">
+            <h3>{{ r.get("Job","Unknown") }}</h3>
+            <b>{{ r.get("score",0) }}%</b>
+        </div>
+        {% endfor %}
+
+        <!-- ================= AI INSIGHT ================= -->
+        {% set sorted_high = sorted %}
+        {% set sorted_low = items | sort(attribute='1.score') %}
+
+        <div class="box">
+            <h3>🧠 AI Insight</h3>
+
+            <p>
+                Best Skill:
+                <b>{{ sorted_high[0][0] if sorted_high else "N/A" }}</b>
+            </p>
+
+            <b>✔ Strengths (Top 2)</b>
+            <ul>
+                {% for i in range(2) %}
+                    {% if i < sorted_high|length %}
+                        <li class="tag-good">✔ {{ sorted_high[i][0] }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+
+            <b>⚠ Weakness (Bottom 2)</b>
+            <ul>
+                {% for i in range(2) %}
+                    {% if i < sorted_low|length %}
+                        <li class="tag-bad">⚠ {{ sorted_low[i][0] }}</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= SCREEN 2 ================= -->
+<div class="screen2">
+
+    <h2>📊 Performance Graphs</h2>
+
+    <canvas id="skillChart" width="400" height="200"></canvas>
+    <canvas id="timeChart" width="400" height="200"></canvas>
+
+    <h2>📈 Learning Curve (AI Study Plan)</h2>
+    <canvas id="learningChart" width="400" height="200"></canvas>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const resultData = {{ result | tojson }};
+const timeData = {{ time_avg | tojson }};
+
+/* ================= SKILL CHART ================= */
+new Chart(document.getElementById("skillChart"), {
+    type: "bar",
+    data: {
+        labels: Object.keys(resultData),
+        datasets: [{
+            label: "Skill Score",
+            data: Object.values(resultData).map(v => v.score)
+        }]
+    }
+});
+
+/* ================= TIME CHART ================= */
+new Chart(document.getElementById("timeChart"), {
+    type: "line",
+    data: {
+        labels: Object.keys(timeData),
+        datasets: [{
+            label: "Avg Time",
+            data: Object.values(timeData)
+        }]
+    }
+});
+
+/* ================= LEARNING CURVE ================= */
+
+const arr = Object.keys(resultData).map(k => ({
+    cat: k,
+    score: resultData[k].score,
+    time: 1 - resultData[k].score
+}));
+
+arr.sort((a,b)=>a.score-b.score);
+
+let total = arr.reduce((s,a)=>s+a.time,0);
+arr.forEach(a => a.time = (a.time/total)*100);
+
+new Chart(document.getElementById("learningChart"), {
+    type: "line",
+    data: {
+        labels: arr.map(x => x.cat),
+        datasets: [{
+            label: "Recommended Study Time (%)",
+            data: arr.map(x => x.time),
+            borderColor: "#00ffcc",
+            backgroundColor: "rgba(0,255,204,0.1)",
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4
+        }]
+    }
+});
+</script>
+
+</body>
+</html>

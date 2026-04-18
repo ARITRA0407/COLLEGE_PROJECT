@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Specifies the character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Ensures the page is responsive and sets viewport dimensions -->
+    <title>Edvance</title>
+    <!-- Sets the title of the webpage -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Includes the Tailwind CSS framework via CDN -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Links the Inter font from Google Fonts -->
+
+    <!-- Link the custom CSS file using Flask's url_for for correct path resolution -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/header.css') }}"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <!-- Defines the main body with a light gray background -->
+
+    <!-- Header Section -->
+    <header class="main-header">
+      <!-- Container for the main site navigation and branding -->
+      <div class="logo-container">
+        <!-- Section for the logo and site name -->
+        <!-- Dynamically links the logo image using url_for -->
+        <img
+          src="{{ url_for('static', filename='images/logo.png') }}"
+          alt="edVance Logo"
+          class="logo-img"
+        />
+        <a href="/" class="website-name">edVance</a>
+        <!-- Link to the homepage -->
+      </div>
+
+      <nav class="main-nav">
+        <!-- Main navigation menu -->
+        <div class="nav-item dropdown">
+          <span class="nav-link dropdown-toggle">Service</span>
+          <div class="dropdown-menu">
+            <a href="{{ url_for('comparison') }}" class="dropdown-item"
+              >College Comparison</a
+            >
+            <a href="{{ url_for('explore_colleges') }}" class="dropdown-item"
+              >Explore College</a
+            >
+            <a href="{{ url_for('top_ranked_colleges') }}" class="dropdown-item"
+              >Top Ranked Colleges</a
+            >
+          </div>
+        </div>
+
+        <div class="nav-item dropdown">
+          <span class="nav-link dropdown-toggle">Counselling</span>
+          <div class="dropdown-menu">
+            <a href="{{ url_for('recommendation_page') }}" class="dropdown-item"
+              >Recommendation</a
+            >
+            <a href="{{ url_for('ai_guidance') }}" class="dropdown-item"
+              >AI Guidance</a
+            >
+          </div>
+        </div>
+      </nav>
+
+      <div class="auth-buttons">
+        <!-- Container for authentication buttons/status -->
+        {% if logged_in %}
+        <!-- Jinja condition: checks if user is logged in -->
+        <!-- Displays a welcome message using the part of the username before '@' -->
+        <span class="welcome-text">Welcome, {{ username.split('@')[0] }}</span>
+        <!-- Logout link, dynamically linked -->
+        <a href="{{ url_for('logout') }}" class="auth-btn logout-btn">Logout</a>
+        {% else %}
+        <!-- If user is not logged in -->
+        <button class="auth-btn login-btn">Login</button>
+        <!-- Login button -->
+        <button class="auth-btn signup-btn">Sign Up</button>
+        <!-- Sign Up button -->
+        {% endif %}
+      </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="main-content">
+      <!-- The area for the main page content -->
+      <!-- Dynamically links the banner image using url_for -->
+      <img
+        src="{{ url_for('static', filename='images/body.png') }}"
+        alt="Edvance campus hero"
+      />
+    </main>
+
+    <!-- Authentication Modal (Only rendered if user is not logged in) -->
+    {% if not logged_in %}
+    <div id="auth-modal" class="modal">
+      <!-- Modal container -->
+      <div class="modal-content">
+        <!-- Modal content area -->
+        <span class="close-btn">&times;</span>
+        <!-- Close button for the modal -->
+        <h2>Access edVance</h2>
+        <!-- Modal title -->
+        <button class="google-auth-btn">
+          <!-- Google sign-in button -->
+          <!-- Dynamically links the Google icon image -->
+          <img
+            src="{{ url_for('static', filename='images/google-icon.png') }}"
+            alt="Google Icon"
+            class="google-icon"
+          />
+          Continue with Google
+        </button>
+        <div class="separator">OR</div>
+        <!-- Separator text -->
+        <form id="auth-form">
+          <!-- Form for email/password login/signup -->
+          <input
+            type="text"
+            id="auth-username"
+            placeholder="Username/Email"
+            required
+          />
+          <!-- Username/Email input -->
+          <input
+            type="password"
+            id="auth-password"
+            placeholder="Password"
+            required
+          />
+          <!-- Password input -->
+          <button type="submit" id="auth-submit-btn" class="auth-submit-btn">
+            Login
+          </button>
+          <!-- Submit button -->
+          <!-- Toggles between login and signup views -->
+          <p class="toggle-auth">
+            New user? <span id="toggle-to-signup">Sign Up</span>
+          </p>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Link the custom JavaScript file here for better performance -->
+    <script src="{{ url_for('static', filename='js/header.js') }}"></script>
+  </body>
+</html>

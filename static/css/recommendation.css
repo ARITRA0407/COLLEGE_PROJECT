@@ -1,0 +1,109 @@
+:root{
+      --card-bg: #fff;
+      --surface: #f8fafc;
+      --muted: #6b7280;
+      --accent: #0a66c2;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --card-radius: 10px;
+      --card-gap: 14px;
+    }
+
+    /* Page basics: keep some padding but allow full-bleed content */
+    html, body { height:100%; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background:#f3f6f8;
+      color:#111;
+      margin:0;
+      padding:20px 0; /* vertical padding only; horizontal handled by container */
+      box-sizing:border-box;
+    }
+
+    /* FULL-WIDTH container so cards can use full viewport width */
+    .container {
+      width: 100vw;
+      max-width: 100vw;
+      margin: 0;
+      padding: 0 24px; /* keep some horizontal gutter so content doesn't touch edges */
+      box-sizing: border-box;
+    }
+
+    header { margin-bottom:18px; }
+    h1 { color:var(--accent); margin:0 0 6px 0; font-size:22px; }
+    .lead { color:var(--muted); margin:0 0 12px 0; font-size:14px; }
+
+    /* form */
+    .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:12px; }
+    label { display:block; margin-bottom:6px; font-weight:600; color:#222; font-size:13px; }
+    input, select, button { width:100%; padding:10px 12px; border-radius:6px; border:1px solid #e6eef6; background:#fff; box-sizing:border-box; }
+    button { background:var(--accent); color:#fff; border:0; cursor:pointer; font-weight:700; padding:11px; }
+    .filters-row { margin-bottom:20px; display:flex; gap:12px; flex-direction:column; }
+
+    /* messages */
+    .message { padding:12px; border-radius:8px; margin-bottom:12px; }
+    .error { background:#fff0f0; color:var(--danger); border:1px solid #ffd6d6; }
+    .warning { background:#fff7ed; color:#92400e; border:1px solid #ffe8c7; }
+    .info { background:#eff6ff; color:#04316b; border:1px solid #dbeafe; }
+
+    /* card container */
+    .controls { display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+    .results-list { display:flex; flex-direction:column; gap:var(--card-gap); margin-top:14px; }
+
+    /* single card - use full width */
+    .college-card {
+      display:flex;
+      gap:16px;
+      background:var(--card-bg);
+      border-radius:var(--card-radius);
+      box-shadow: 0 6px 22px rgba(15,23,42,0.06);
+      overflow:hidden;
+      min-height:220px;
+      align-items:stretch;
+      transition: transform .12s ease, box-shadow .12s ease;
+
+      /* make card full width inside the container (account for container horizontal padding) */
+      width: calc(100% - 48px);
+      margin: 0 auto;
+    }
+    .college-card:hover { transform: translateY(-6px); box-shadow: 0 14px 40px rgba(15,23,42,0.12); }
+
+    /* left (narrow) & right (wide) parts */
+    /* slightly narrower left so the right side grows on wide screens */
+    .card-left { flex: 0 0 260px; background:var(--surface); padding:12px; display:flex; flex-direction:column; gap:10px; align-items:stretch; box-sizing:border-box; }
+    .card-right { flex: 1 1 auto; padding:14px; display:flex; flex-direction:column; gap:8px; box-sizing:border-box; }
+
+    /* logo + title row */
+    .logo-row { display:flex; gap:10px; align-items:center; }
+    .logo-img { width:64px; height:64px; object-fit:contain; border-radius:8px; border:1px solid #e6eef6; background:#fff; padding:6px; }
+    .inst-link { font-weight:700; color:var(--accent); text-decoration:none; font-size:15px; }
+    .inst-link:hover { text-decoration:underline; }
+
+    /* picture */
+    .picture { width:100%; height:140px; object-fit:cover; border-radius:6px; border:1px solid #e6eef6; background:#fff; }
+
+    /* small embedded map */
+    .map-frame { width:100%; height:120px; border:0; border-radius:6px; box-shadow:inset 0 0 0 1px #eef2f7; }
+
+    /* right side details grid */
+    .details-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; align-items:start; }
+    .detail { display:flex; flex-direction:column; gap:4px; }
+    .detail .k { font-size:12px; color:var(--muted); }
+    .detail .v { font-weight:600; color:#111; font-size:14px; }
+
+    /* highlight row for ranks/ctc */
+    .highlight-row { display:flex; gap:12px; align-items:center; }
+    .rank-pill { padding:6px 10px; background:#fff; border-radius:8px; border:1px solid #e6eef6; font-weight:700; }
+    .ctc { color:var(--success); font-weight:800; }
+    .score { background:#fff; padding:6px 8px; border-radius:8px; border:1px solid #f1f5f9; font-weight:700; }
+
+    /* keep small screens stacked and full-width */
+    @media (max-width:900px) {
+      .container { padding: 0 12px; }
+      .college-card { flex-direction:column; width:100%; min-height:unset; }
+      .card-left { flex: 0 0 auto; padding:10px; width:100%; }
+      .card-right { padding:12px; }
+      .picture { height:180px; }
+      .details-grid { grid-template-columns: 1fr; }
+      .map-frame { height:160px; }
+    }
