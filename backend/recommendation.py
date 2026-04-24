@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import os
+import pickle
 import itertools
 from collections import Counter, defaultdict
 
@@ -29,10 +30,16 @@ class CollegeRecommender:
     """
 
     RULES_FILENAME = 'associates_rules.csv'  # stored under data_root_dir/csv/
+    CACHE_FILENAME = 'college_recommender_cache.pkl'
 
     def __init__(self, data_root_dir="."):
         self.data_root_dir = os.path.abspath(data_root_dir)
+        self.results_dir = os.path.join(self.data_root_dir, 'results')
+        os.makedirs(self.results_dir, exist_ok=True)
+        self.cache_path = os.path.join(self.results_dir, self.CACHE_FILENAME)
         self.dataframes = {}
+        if self._load_prepared_cache():
+            return
         self._load_all_data()
         self._prepare_master_rank_df()
         self._prepare_quality_data()
@@ -43,6 +50,11 @@ class CollegeRecommender:
         except Exception as e:
             print("Warning: association rules generation failed:", e)
 
+        try:
+            self._save_prepared_cache()
+        except Exception as e:
+            print("Warning: recommender cache save failed:", e)
+
         if getattr(self, 'merged_df', pd.DataFrame()).empty:
             print("⚠️ WARNING: Master rank data is empty. Recommendations will fail.")
 
@@ -51,6 +63,70 @@ class CollegeRecommender:
     # ---------------------
     def _get_file_path(self, file_name):
         return os.path.join(self.data_root_dir, 'csv', file_name)
+
+    def _cache_signature(self):
+        source_files = [
+            self._get_file_path('college.csv'),
+            self._get_file_path('rank_2021.csv'),
+            self._get_file_path('rank_2022.csv'),
+            self._get_file_path('rank_2023.csv'),
+            self._get_file_path('rank_2024.csv'),
+            self._get_file_path('rank_2025.csv'),
+            self._get_file_path('placement.csv'),
+            self._get_file_path('reviews.csv'),
+            self._get_file_path(self.RULES_FILENAME),
+            __file__,
+        ]
+        signature = {}
+        for path in source_files:
+            if os.path.exists(path):
+                signature[path] = os.path.getmtime(path)
+        return signature
+
+    def _load_prepared_cache(self):
+        if not os.path.exists(self.cache_path):
+            return False
+
+        try:
+            with open(self.cache_path, 'rb') as cache_file:
+                payload = pickle.load(cache_file)
+        except Exception:
+            return False
+
+        if payload.get('signature') != self._cache_signature():
+            return False
+
+        for attr in [
+            'master_rank_df',
+            'merged_df',
+            'full_college_df',
+            'full_placement_df',
+            'placement_max_ctc',
+            'full_reviews_df',
+            'reviews_avg_for_filter',
+            'combined_quality_df',
+            'assoc_rules_df',
+        ]:
+            setattr(self, attr, payload.get(attr, pd.DataFrame()))
+
+        print("CollegeRecommender loaded from cache.")
+        return True
+
+    def _save_prepared_cache(self):
+        payload = {
+            'signature': self._cache_signature(),
+            'master_rank_df': getattr(self, 'master_rank_df', pd.DataFrame()),
+            'merged_df': getattr(self, 'merged_df', pd.DataFrame()),
+            'full_college_df': getattr(self, 'full_college_df', pd.DataFrame()),
+            'full_placement_df': getattr(self, 'full_placement_df', pd.DataFrame()),
+            'placement_max_ctc': getattr(self, 'placement_max_ctc', pd.DataFrame()),
+            'full_reviews_df': getattr(self, 'full_reviews_df', pd.DataFrame()),
+            'reviews_avg_for_filter': getattr(self, 'reviews_avg_for_filter', pd.DataFrame()),
+            'combined_quality_df': getattr(self, 'combined_quality_df', pd.DataFrame()),
+            'assoc_rules_df': getattr(self, 'assoc_rules_df', pd.DataFrame()),
+        }
+        with open(self.cache_path, 'wb') as cache_file:
+            pickle.dump(payload, cache_file, protocol=pickle.HIGHEST_PROTOCOL)
 
     def _load_all_data(self):
         file_names = [

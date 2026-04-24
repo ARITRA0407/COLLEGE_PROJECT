@@ -6,13 +6,8 @@ let streak = 0;
 
 let startTime = 0;
 let timerInterval = null;
-
-// 🔥 prevent double click / stuck state
 let isLoadingNext = false;
 
-// ===============================
-// ✅ FULL 17-CATEGORY SKILL STATE
-// ===============================
 let skillState = {
     AI_Int: 0,
     Coding_Int: 0,
@@ -33,27 +28,27 @@ let skillState = {
     User_Empathy: 0
 };
 
+let skillCounts = Object.fromEntries(
+    Object.keys(skillState).map(key => [key, 0])
+);
+
 let confidence = 50;
 
-// ---------------- LOAD ---------------- //
 window.onload = () => {
     localStorage.removeItem("questions");
     startQuiz();
 };
 
-// ---------------- CONFIDENCE ---------------- //
 function updateConfidence(val) {
     confidence = Number(val);
     const el = document.getElementById("confValue");
     if (el) el.innerText = confidence + "%";
 }
 
-// ---------------- START ---------------- //
 function startQuiz() {
     fetch("/start", { method: "POST" })
         .then(res => res.json())
         .then(data => {
-
             if (!Array.isArray(data) || data.length === 0) {
                 document.getElementById("quiz").innerHTML = "No questions";
                 return;
@@ -61,7 +56,6 @@ function startQuiz() {
 
             questions = data;
             localStorage.setItem("questions", JSON.stringify(data));
-
             showQuestion();
         })
         .catch(err => {
@@ -69,9 +63,7 @@ function startQuiz() {
         });
 }
 
-// ---------------- SHOW QUESTION ---------------- //
 function showQuestion() {
-
     const q = questions[0];
     if (!q) return;
 
@@ -86,7 +78,6 @@ function showQuestion() {
         ${createOption(q, "Option3", "Weight3")}
     `;
 
-    // safe UI updates
     const cur = document.getElementById("currentCategory");
     const nxt = document.getElementById("nextCategory");
 
@@ -97,18 +88,16 @@ function showQuestion() {
     clearInterval(timerInterval);
 
     timerInterval = setInterval(() => {
-        let t = (Date.now() - startTime) / 1000;
+        const elapsed = (Date.now() - startTime) / 1000;
         const timer = document.getElementById("timer");
-        if (timer) timer.innerText = "⏱ Time: " + t.toFixed(1) + "s";
+        if (timer) timer.innerText = "Time: " + elapsed.toFixed(1) + "s";
     }, 100);
 
     updateDifficultyUI(q);
     renderSkills();
 }
 
-// ---------------- OPTIONS ---------------- //
 function createOption(q, optKey, weightKey) {
-
     const option = q?.[optKey];
     const weight = Number(q?.[weightKey] || 0);
 
@@ -122,34 +111,39 @@ function createOption(q, optKey, weightKey) {
     `;
 }
 
-// ---------------- SELECT ---------------- //
 function selectOption(btn, weight, w1, w2, w3) {
-
-    if (isLoadingNext) return; // 🔥 block spam clicks
+    if (isLoadingNext) return;
     isLoadingNext = true;
 
     clearInterval(timerInterval);
 
     const timeTaken = (Date.now() - startTime) / 1000;
-
-    document.querySelectorAll(".opt").forEach(b => b.disabled = true);
+    document.querySelectorAll(".opt").forEach(button => {
+        button.disabled = true;
+    });
 
     btn.style.background = "#00c853";
     btn.style.color = "white";
 
-    let all_w = [w1, w2, w3];
-    let maxW = Math.max(...all_w);
+    const allWeights = [w1, w2, w3];
+    const maxWeight = Math.max(...allWeights);
 
-    if (weight >= maxW) streak++;
+    if (weight >= maxWeight) streak++;
     else streak = 0;
 
-    const st = document.getElementById("streak");
-    if (st) st.innerText = "🔥 Streak: " + streak;
+    const streakLabel = document.getElementById("streak");
+    if (streakLabel) streakLabel.innerText = "Streak: " + streak;
+
+    const currentQuestion = questions[0] || {};
 
     answers.push({
-        category: questions[0]?.Category || "",
+        question_id: currentQuestion["Question ID"] || "",
+        question_text: currentQuestion["Question Text"] || "",
+        category: currentQuestion.Category || "",
+        difficulty: currentQuestion.Difficulty || "Medium",
+        selected_option: btn.innerText.trim(),
         weight: weight,
-        all_weights: all_w,
+        all_weights: allWeights,
         time: timeTaken,
         confidence: confidence,
         streak: streak
@@ -157,112 +151,98 @@ function selectOption(btn, weight, w1, w2, w3) {
 
     totalAnswered++;
     updateProgressBar();
-
-    // 🔥 ensure transition delay + safety
     setTimeout(goNext, 200);
 }
 
-// ---------------- NEXT ---------------- //
 function goNext() {
-
     fetch("/next", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify([answers[answers.length - 1]])
     })
-    .then(res => res.json())
-    .then(data => {
+        .then(res => res.json())
+        .then(data => {
+            isLoadingNext = false;
 
-        isLoadingNext = false; // 🔥 unlock
+            if (!Array.isArray(data) || data.length === 0) {
+                document.getElementById("quiz").innerHTML =
+                    "<h3>Quiz Completed</h3>";
+                return;
+            }
 
-        if (!Array.isArray(data) || data.length === 0) {
-            document.getElementById("quiz").innerHTML =
-                "<h3>Quiz Completed</h3>";
-            return;
-        }
+            questions = data;
+            localStorage.setItem("questions", JSON.stringify(data));
 
-        questions = data;
-        localStorage.setItem("questions", JSON.stringify(data));
-
-        showQuestion();
-        updateSkill();
-        showAIHint();
-    })
-    .catch(err => {
-        console.error("Next error:", err);
-        isLoadingNext = false; // 🔥 always unlock even on error
-    });
+            showQuestion();
+            updateSkill();
+            showAIHint();
+        })
+        .catch(err => {
+            console.error("Next error:", err);
+            isLoadingNext = false;
+        });
 }
 
-// ---------------- SKILL UPDATE ---------------- //
 function updateSkill() {
-
     const ans = answers[answers.length - 1];
     if (!ans) return;
 
-    const speed = ans.time < 2 ? 1 : ans.time < 5 ? 0.7 : 0.4;
-    const score = ans.weight * speed * (confidence / 100);
-
+    const speed = ans.time < 2 ? 1 : ans.time < 5 ? 0.75 : 0.5;
+    const maxWeight = Math.max(...(ans.all_weights || [ans.weight || 0, 1]));
+    const normalized = maxWeight > 0 ? (ans.weight / maxWeight) : 0;
+    const score = normalized * speed * (ans.confidence / 100);
     const cat = ans.category;
 
     if (skillState.hasOwnProperty(cat)) {
-        skillState[cat] += score;
+        skillCounts[cat] = (skillCounts[cat] || 0) + 1;
+        skillState[cat] =
+            ((skillState[cat] * (skillCounts[cat] - 1)) + score) /
+            skillCounts[cat];
     }
 
     renderSkills();
 }
 
-// ---------------- RENDER SKILLS ---------------- //
 function renderSkills() {
-
     const box = document.getElementById("skillsBox");
     if (!box) return;
 
     box.innerHTML = "";
 
-    Object.keys(skillState).forEach(k => {
-        box.innerHTML += `<div>${k}: ${skillState[k].toFixed(2)}</div>`;
+    Object.keys(skillState).forEach(key => {
+        box.innerHTML += `<div>${key}: ${skillState[key].toFixed(2)}</div>`;
     });
 }
 
-// ---------------- HINT ---------------- //
 function showAIHint() {
-
     const ans = answers[answers.length - 1];
     if (!ans) return;
 
     let hint =
-        ans.time < 2 ? "⚡ Fast" :
-        ans.time > 5 ? "🐢 Slow" :
-        "⚖ Normal";
+        ans.time < 2 ? "Fast" :
+        ans.time > 5 ? "Slow" :
+        "Normal";
 
-    if (ans.confidence > 80 &&
-        ans.weight < Math.max(...ans.all_weights)) {
-        hint += " | ⚠ Overconfidence";
+    if (ans.confidence > 80 && ans.weight < Math.max(...ans.all_weights)) {
+        hint += " | Overconfidence detected";
     }
 
     const hintBox = document.getElementById("aiHint");
     if (hintBox) hintBox.innerText = hint;
 }
 
-// ---------------- UI ---------------- //
 function updateDifficultyUI(q) {
     const el = document.getElementById("difficulty");
     if (el) el.innerText = "Difficulty: " + (q.Difficulty || "Medium");
 }
 
-// ---------------- PROGRESS ---------------- //
 function updateProgressBar() {
-
-    let percent = (totalAnswered / 17) * 100;
-
+    const percent = (totalAnswered / 17) * 100;
     const bar = document.getElementById("progressBar");
     if (bar) bar.style.width = Math.min(percent, 100) + "%";
 }
 
-// ---------------- STOP ---------------- //
 function stopQuiz() {
-
     if (totalAnswered < 17) {
         alert("Answer at least 17 questions!");
         return;

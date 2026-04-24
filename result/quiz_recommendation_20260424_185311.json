@@ -1,0 +1,170 @@
+{
+  "generated_at": "2026-04-24T18:53:11.712858",
+  "model_stack": {
+    "retrieval_model": "cosine_similarity + PCA_latent_matching",
+    "reranker_model": "hybrid_fallback",
+    "training_metrics": {
+      "training_mode": "hybrid_fallback",
+      "synthetic_samples": 0,
+      "top1_accuracy": 0.0,
+      "top3_accuracy": 0.0,
+      "macro_f1": 0.0,
+      "log_loss": null
+    }
+  },
+  "summary_metrics": {
+    "avg_skill": 0.7
+  },
+  "category_metrics": {
+    "AI_Int": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Coding_Int": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Design_Int": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Logical_Reasoning": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Analytical_Reasoning": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Verbal_Reasoning": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Math_Reasoning": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Coding_Skill": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Web_Arch": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Data_Mining": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Crypto_Focus": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Cloud_Ops": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Low_Level": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "DB_Design": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "System_Opt": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "Risk_Eval": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    },
+    "User_Empathy": {
+      "reliability": 0.8,
+      "score": 0.7,
+      "level": "High"
+    }
+  },
+  "recommendations": [
+    {
+      "Job": "Full Stack Developer",
+      "score": 60.1,
+      "match_score": 0.601,
+      "rule_score": 1.0,
+      "cosine_score": 0.9556,
+      "latent_score": 0.0,
+      "model_probability": 0.0,
+      "readiness_score": 0.9294,
+      "alignment_score": 0.8235,
+      "reliability_score": 0.8,
+      "matched_strengths": [
+        "Risk_Eval",
+        "Crypto_Focus",
+        "User_Empathy"
+      ],
+      "growth_areas": [
+        "System_Opt",
+        "Logical_Reasoning"
+      ]
+    },
+    {
+      "Job": "Mobile Application Developer",
+      "score": 59.64,
+      "match_score": 0.5964,
+      "rule_score": 1.0,
+      "cosine_score": 0.9039,
+      "latent_score": 0.0,
+      "model_probability": 0.0,
+      "readiness_score": 0.9647,
+      "alignment_score": 0.7382,
+      "reliability_score": 0.8,
+      "matched_strengths": [
+        "Risk_Eval",
+        "Data_Mining",
+        "DB_Design"
+      ],
+      "growth_areas": [
+        "User_Empathy",
+        "Coding_Int"
+      ]
+    },
+    {
+      "Job": "Backend Developer",
+      "score": 59.44,
+      "match_score": 0.5944,
+      "rule_score": 1.0,
+      "cosine_score": 0.93,
+      "latent_score": 0.0,
+      "model_probability": 0.0,
+      "readiness_score": 0.9176,
+      "alignment_score": 0.7765,
+      "reliability_score": 0.8,
+      "matched_strengths": [
+        "User_Empathy",
+        "Risk_Eval",
+        "Crypto_Focus"
+      ],
+      "growth_areas": [
+        "System_Opt",
+        "Logical_Reasoning"
+      ]
+    }
+  ]
+}

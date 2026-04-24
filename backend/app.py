@@ -1,8 +1,14 @@
 # app.py
-from dotenv import load_dotenv
+try:
+    from dotenv import load_dotenv
+except Exception:
+    def load_dotenv():
+        return False
+
 load_dotenv()
 import os
 import sys
+import threading
 from flask import Flask, render_template, request, jsonify, send_from_directory, abort
 from werkzeug.utils import safe_join
 import pandas as pd
@@ -13,6 +19,8 @@ import random
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory of the current file (app.py).
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR) # Get the parent directory, which is the project root.
 sys.path.append(BACKEND_DIR) # Add the backend directory to the Python path for importing modules.
+RESULT_REPORT_DIR = os.path.join(PROJECT_ROOT, "result")
+os.makedirs(RESULT_REPORT_DIR, exist_ok=True)
 # ================= QUIZ SYSTEM INTEGRATION ================= #
 # template/static configuration
 TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates') # Define the path to the templates folder.
@@ -22,6 +30,19 @@ app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR) # 
 # ================= QUIZ CSV LOAD ================= #
 
 CSV_FOLDER = os.path.join(PROJECT_ROOT, 'csv')
+user_data = {}
+quiz_recommender = None
+college_recommender = None
+recommender = None
+CollegeRecommender = None
+HybridCareerRecommender = None
+top_module = None
+ai_module = None
+d_map = {"Easy": 0.2, "Medium": 0.5, "Hard": 0.8}
+_quiz_recommender_lock = threading.Lock()
+_college_recommender_lock = threading.Lock()
+_top_module_lock = threading.Lock()
+_ai_module_lock = threading.Lock()
 
 try:
     q_df = pd.read_csv(os.path.join(CSV_FOLDER, "QUESTIONS.csv"), encoding="latin1")
@@ -46,13 +67,73 @@ try:
     # Difficulty weight map
     d_map = {"Easy": 0.2, "Medium": 0.5, "Hard": 0.8}
 
-    user_data = {}
 
     print("✅ Quiz CSV loaded successfully from:", CSV_FOLDER)
 
 except Exception as e:
     print("❌ Quiz CSV load error:", e)
     q_df, career_df = None, None
+
+
+def get_quiz_recommender():
+    global quiz_recommender
+    global HybridCareerRecommender
+
+    if quiz_recommender is not None or career_df is None:
+        return quiz_recommender
+
+    with _quiz_recommender_lock:
+        if quiz_recommender is not None or career_df is None:
+            return quiz_recommender
+
+        if HybridCareerRecommender is None:
+            try:
+                from quiz_recommender import HybridCareerRecommender as quiz_model_class
+                HybridCareerRecommender = quiz_model_class
+            except Exception as import_error:
+                print("Error importing quiz recommender module:", import_error)
+                return None
+
+        try:
+            quiz_recommender = HybridCareerRecommender(career_df, RESULT_REPORT_DIR)
+            print("Quiz recommender initialized.")
+        except Exception as recommender_error:
+            quiz_recommender = None
+            print("Quiz recommender initialization failed:", recommender_error)
+
+    return quiz_recommender
+
+
+def get_college_recommender():
+    global college_recommender
+    global CollegeRecommender
+    global recommender
+
+    if college_recommender is not None:
+        return college_recommender
+
+    with _college_recommender_lock:
+        if college_recommender is not None:
+            return college_recommender
+
+        if CollegeRecommender is None:
+            try:
+                from recommendation import CollegeRecommender as college_model_class
+                CollegeRecommender = college_model_class
+            except Exception as import_error:
+                print("Error importing recommendation module:", import_error)
+                return None
+
+        try:
+            college_recommender = CollegeRecommender(data_root_dir=PROJECT_ROOT)
+            recommender = college_recommender
+            print("Recommender initialized.")
+        except Exception as recommender_error:
+            college_recommender = None
+            recommender = None
+            print("Error initializing recommender:", recommender_error)
+
+    return college_recommender
 
 
 
@@ -119,6 +200,223 @@ def get_question(category, difficulty, asked):
     return q
 
 
+def _safe_mean(values, default=0.0):
+    clean_values = [float(v) for v in values if v is not None]
+    return (sum(clean_values) / len(clean_values)) if clean_values else default
+
+
+def _clip(value, low=0.0, high=1.0):
+    try:
+        value = float(value)
+    except Exception:
+        value = low
+    return max(low, min(high, value))
+
+
+def _priority_categories():
+    return [
+        "Logical_Reasoning", "Math_Reasoning", "Analytical_Reasoning",
+        "Coding_Skill", "Coding_Int", "Data_Mining", "AI_Int",
+        "System_Opt", "DB_Design", "Web_Arch", "Low_Level",
+        "Cloud_Ops", "Design_Int", "User_Empathy", "Risk_Eval",
+        "Verbal_Reasoning", "Crypto_Focus"
+    ]
+
+
+def _assign_rank_levels(final):
+    priority = _priority_categories()
+    sorted_items = sorted(
+        final.items(),
+        key=lambda item: (
+            -item[1]["score"],
+            priority.index(item[0]) if item[0] in priority else 999
+        )
+    )
+
+    top_6 = {category for category, _ in sorted_items[:6]}
+    mid_5 = {category for category, _ in sorted_items[6:11]}
+
+    for category in final.keys():
+        if category in top_6:
+            final[category]["level"] = "High"
+        elif category in mid_5:
+            final[category]["level"] = "Medium"
+        else:
+            final[category]["level"] = "Low"
+
+    return dict(sorted(
+        final.items(),
+        key=lambda item: item[1]["score"],
+        reverse=True
+    ))
+
+
+def _fallback_career_match(final_scores):
+    if career_df is None:
+        return []
+
+    def match(user_levels, row):
+        score = 0
+        total = 0
+        lvl = {"low": 1, "medium": 2, "high": 3}
+
+        for col in career_df.columns:
+            if col == "Job":
+                continue
+
+            total += 1
+            user_level = user_levels.get(col, {"level": "Low"})["level"].lower()
+            required_level = str(row[col]).lower()
+
+            if lvl.get(user_level, 1) >= lvl.get(required_level, 1):
+                score += 1
+
+        return (score / total) * 100 if total else 0
+
+    df = career_df.copy()
+    df["score"] = df.apply(lambda row: match(final_scores, row), axis=1)
+    df = df[df["score"] > 20].sort_values("score", ascending=False)
+    return df.head(5).to_dict(orient="records")
+
+
+def _build_quiz_result_payload():
+    from ai_engine import get_skill_summary
+
+    categories = user_data.get("category_order", [])
+    answer_log = user_data.get("answer_log", [])
+    state = user_data.get("state", {})
+    skill_summary = get_skill_summary(state)
+
+    final = {}
+    time_avg = {}
+
+    for category in categories:
+        category_answers = [
+            item for item in answer_log
+            if str(item.get("category", "")).strip() == category
+        ]
+
+        telemetry = state.get("telemetry", {}).get(category, {})
+        bayesian_skill = float(skill_summary.get("categories", {}).get(category, 0.5))
+        observed_accuracy = _safe_mean(
+            [item.get("normalized_score") for item in category_answers],
+            default=0.0
+        )
+        avg_time = _safe_mean(
+            [item.get("time") for item in category_answers],
+            default=0.0
+        )
+        time_efficiency = _safe_mean(
+            [item.get("time_factor") for item in category_answers],
+            default=0.5
+        )
+        confidence_alignment = _safe_mean(
+            [item.get("confidence_alignment") for item in category_answers],
+            default=float(telemetry.get("confidence_alignment", 0.5))
+        )
+        consistency = _safe_mean(
+            [item.get("consistency") for item in category_answers],
+            default=float(telemetry.get("consistency", 0.5))
+        )
+        momentum = _safe_mean(
+            [item.get("momentum") for item in category_answers],
+            default=float(telemetry.get("momentum", 0.5))
+        )
+        uncertainty = _safe_mean(
+            [item.get("uncertainty") for item in category_answers],
+            default=float(telemetry.get("uncertainty", 0.5))
+        )
+        reliability = _safe_mean(
+            [item.get("reliability") for item in category_answers],
+            default=float(telemetry.get("reliability", 0.5))
+        )
+        challenge_index = _safe_mean(
+            [
+                (float(d_map.get(item.get("difficulty", "Medium"), 0.5)) / 0.8) *
+                float(item.get("normalized_score", 0.0))
+                for item in category_answers
+            ],
+            default=0.0
+        )
+
+        blended_score = (
+            (0.34 * bayesian_skill) +
+            (0.22 * observed_accuracy) +
+            (0.14 * confidence_alignment) +
+            (0.10 * time_efficiency) +
+            (0.08 * consistency) +
+            (0.06 * momentum) +
+            (0.06 * challenge_index)
+        )
+        blended_score = _clip(blended_score * (1.0 - (0.12 * uncertainty)))
+
+        final[category] = {
+            "score": round(blended_score, 3),
+            "level": "Low",
+            "bayesian_skill": round(bayesian_skill, 3),
+            "observed_accuracy": round(observed_accuracy, 3),
+            "time_efficiency": round(time_efficiency, 3),
+            "confidence_alignment": round(confidence_alignment, 3),
+            "consistency": round(consistency, 3),
+            "momentum": round(momentum, 3),
+            "uncertainty": round(uncertainty, 3),
+            "reliability": round(reliability, 3),
+            "challenge_index": round(challenge_index, 3),
+            "attempts": len(category_answers)
+        }
+        time_avg[category] = round(avg_time, 2)
+
+    final = _assign_rank_levels(final)
+    ordered_items = list(final.items())
+
+    summary_metrics = {
+        "questions_answered": len(answer_log),
+        "avg_skill": round(float(skill_summary.get("avg_skill", 0.0)), 3),
+        "avg_reliability": round(float(skill_summary.get("avg_reliability", 0.0)), 3),
+        "avg_uncertainty": round(float(skill_summary.get("avg_uncertainty", 0.0)), 3),
+        "avg_confidence_alignment": round(
+            _safe_mean([item["confidence_alignment"] for item in final.values()], default=0.0),
+            3
+        ),
+        "avg_time_efficiency": round(
+            _safe_mean([item["time_efficiency"] for item in final.values()], default=0.0),
+            3
+        ),
+        "top_strengths": [item[0] for item in ordered_items[:3]],
+        "growth_areas": [item[0] for item in ordered_items[-2:]] if ordered_items else []
+    }
+
+    active_quiz_recommender = get_quiz_recommender()
+
+    if active_quiz_recommender is not None:
+        recommendations = active_quiz_recommender.recommend(
+            user_scores={key: value["score"] for key, value in final.items()},
+            user_levels={key: value["level"] for key, value in final.items()},
+            category_metrics=final,
+            top_n=5
+        )
+        _, report_paths = active_quiz_recommender.build_report(
+            category_metrics=final,
+            recommendations=recommendations,
+            summary_metrics=summary_metrics
+        )
+        model_metrics = getattr(active_quiz_recommender, "model_metrics", {})
+    else:
+        recommendations = _fallback_career_match(final)
+        report_paths = {}
+        model_metrics = {}
+
+    return {
+        "result": final,
+        "rec": recommendations,
+        "time_avg": time_avg,
+        "summary_metrics": summary_metrics,
+        "report_paths": report_paths,
+        "report_file": os.path.basename(report_paths.get("latest", "")) if report_paths else "",
+        "model_metrics": model_metrics
+    }
+
+
 # =========================
 # 🚀 START QUIZ (FIXED FOR ALL 17 CATEGORIES)
 # =========================
@@ -142,7 +440,9 @@ def start_quiz():
         "time": {c: [] for c in categories},
         "last_diff": {c: "Medium" for c in categories},
         "state": {},
-        "category_order": categories
+        "category_order": categories,
+        "answer_log": [],
+        "report_paths": {}
     })
 
     questions = []
@@ -178,25 +478,37 @@ def next_question():
 
         c = str(ans.get("category", "")).strip()
         w = float(ans.get("weight", 0))
-        all_w = ans.get("all_weights", [w])
+        all_w = [
+            float(item) for item in ans.get("all_weights", [w])
+            if item is not None
+        ]
 
         time_sec = float(ans.get("time", 5))
         confidence = float(ans.get("confidence", 50)) / 100
+        question_id = str(ans.get("question_id", "")).strip()
+        question_text = str(ans.get("question_text", "")).strip()
+        difficulty = str(ans.get("difficulty", "Medium")).strip() or "Medium"
+        selected_option = str(ans.get("selected_option", "")).strip()
 
         try:
-            correct = w >= max(all_w) if all_w else False
+            max_weight = max(all_w) if all_w else (w if w > 0 else 1.0)
+            correct = w >= max_weight if all_w else False
         except:
+            max_weight = w if w > 0 else 1.0
             correct = False
+
+        normalized_score = _clip((w / max_weight) if max_weight else 0.0)
 
         prev_diff = user_data["last_diff"].get(c, "Medium")
 
         result = process_answer(
             state=user_data["state"],
             category=c,
-            score=max(0.0, min(1.0, w)),
+            score=normalized_score,
             time_taken=time_sec,
             correct=correct,
-            last_diff=prev_diff
+            last_diff=prev_diff,
+            confidence=confidence
         )
 
         user_data["state"] = result["updated_state"]
@@ -208,7 +520,28 @@ def next_question():
         user_data["last_diff"].setdefault(c, "Medium")
 
         user_data["time"][c].append(time_sec)
-        user_data["scores"][c].append(max(0.0, min(1.0, w * confidence)))
+        user_data["scores"][c].append(max(0.0, min(1.0, normalized_score * confidence)))
+        user_data.setdefault("answer_log", []).append({
+            "question_id": question_id,
+            "question_text": question_text,
+            "category": c,
+            "difficulty": difficulty,
+            "selected_option": selected_option,
+            "selected_weight": round(w, 4),
+            "max_weight": round(max_weight, 4),
+            "normalized_score": round(normalized_score, 4),
+            "correct": bool(correct),
+            "time": round(time_sec, 3),
+            "confidence": round(confidence, 4),
+            "confidence_alignment": result.get("confidence_alignment", 0.5),
+            "consistency": result.get("consistency", 0.5),
+            "momentum": result.get("momentum", 0.5),
+            "uncertainty": result.get("uncertainty", 0.5),
+            "reliability": result.get("reliability", 0.5),
+            "time_factor": result.get("time_factor", 0.5),
+            "skill": result.get("skill", 0.5),
+            "next_difficulty": next_diff
+        })
 
         q = get_question(c, next_diff, user_data["asked"])
 
@@ -237,114 +570,22 @@ def quiz_result():
     if career_df is None:
         return "Career data not loaded", 500
 
-    final = {}
-    time_avg = {}
-
-    categories = user_data.get("category_order", [])
-
-    # ---------------- STEP 1: compute scores ----------------
-    for c in categories:
-
-        vals = user_data.get("scores", {}).get(c, [])
-        times = user_data.get("time", {}).get(c, [])
-
-        avg = sum(vals) / len(vals) if vals else 0
-        tavg = sum(times) / len(times) if times else 0
-
-        final[c] = {
-            "score": round(avg, 2),
-            "level": "Low"   # temporary placeholder
-        }
-
-        time_avg[c] = round(tavg, 2)
-
-    # ---------------- STEP 2: PRIORITY ORDER ----------------
-    priority = [
-        "Logical_Reasoning","Math_Reasoning","Analytical_Reasoning",
-        "Coding_Skill","Coding_Int","Data_Mining","AI_Int",
-        "System_Opt","DB_Design","Web_Arch","Low_Level",
-        "Cloud_Ops","Design_Int","User_Empathy","Risk_Eval",
-        "Verbal_Reasoning","Crypto_Focus"
-    ]
-
-    # ---------------- STEP 3: SORT ----------------
-    sorted_items = sorted(
-        final.items(),
-        key=lambda x: (
-            -x[1]["score"],  # primary: high score first
-            priority.index(x[0]) if x[0] in priority else 999  # tie-break
-        )
-    )
-
-    # ---------------- STEP 4: ASSIGN LEVELS BY RANK ----------------
-    n = len(sorted_items)
-
-    top_6 = set([c for c, _ in sorted_items[:6]])
-    mid_5 = set([c for c, _ in sorted_items[6:11]])
-    low_6 = set([c for c, _ in sorted_items[11:]])
-
-    for c in final.keys():
-
-        if c in top_6:
-            final[c]["level"] = "High"
-        elif c in mid_5:
-            final[c]["level"] = "Medium"
-        else:
-            final[c]["level"] = "Low"
-
-    # ---------------- STEP 5: FINAL SORT FOR UI ----------------
-    final = dict(sorted(
-        final.items(),
-        key=lambda x: x[1]["score"],
-        reverse=True
-    ))
-
-    # ---------------- CAREER MATCH ----------------
-    def match(user_levels, row):
-
-        score = 0
-        total = 0
-        lvl = {"low": 1, "medium": 2, "high": 3}
-
-        for col in career_df.columns:
-            if col == "Job":
-                continue
-
-            total += 1
-
-            u = user_levels.get(col, {"level": "Low"})["level"].lower()
-            r = str(row[col]).lower()
-
-            if lvl.get(u, 1) >= lvl.get(r, 1):
-                score += 1
-
-        return (score / total) * 100 if total else 0
-
-    df = career_df.copy()
-    df["score"] = df.apply(lambda x: match(final, x), axis=1)
-
-    df = df[df["score"] > 20].sort_values("score", ascending=False)
-
-    rec = df.head(5).to_dict(orient="records")
+    payload = _build_quiz_result_payload()
+    user_data["report_paths"] = payload.get("report_paths", {})
 
     return render_template(
         "partials/result.html",
-        result=final,
-        rec=rec,
-        time_avg=time_avg
+        result=payload["result"],
+        rec=payload["rec"],
+        time_avg=payload["time_avg"],
+        summary_metrics=payload["summary_metrics"],
+        report_paths=payload["report_paths"],
+        report_file=payload["report_file"],
+        model_metrics=payload["model_metrics"]
     )
 
 
-# import recommender
-try:
-    from recommendation import CollegeRecommender # Attempt to import the CollegeRecommender class.
-except Exception as e:
-    CollegeRecommender = None # Set the class to None if the import fails.
-    print("Error importing recommendation module:", e) # Print the error for debugging.
-
-# initialize recommender (safe)
-recommender = None # Initialize recommender instance to None.
-if CollegeRecommender is not None: # Check if the class was successfully imported.
+if False:
     try:
         recommender = CollegeRecommender(data_root_dir=PROJECT_ROOT) # Initialize the recommender, passing the project root directory.
         print("✅ Recommender initialized.") # Print success message.
@@ -553,16 +794,17 @@ def metadata():
     Returns dropdown metadata for the frontend:
       programs, streams, quotas, categories, locations, sort options
     """
-    if recommender is None:
+    active_recommender = get_college_recommender()
+    if active_recommender is None:
         return jsonify({'error': 'Recommender not available'}), 503 # Return error if recommender is not initialized.
 
     try:
         # gather lists (they are lowercased in recommender; frontend can display them)
-        programs = sorted(recommender.master_rank_df['Program'].dropna().unique().tolist()) if not recommender.master_rank_df.empty else [] # Extract and sort unique program names.
-        streams = sorted(recommender.master_rank_df['Stream'].dropna().unique().tolist()) if not recommender.master_rank_df.empty else [] # Extract and sort unique stream names.
-        quotas = sorted(recommender.master_rank_df['Quota'].dropna().unique().tolist()) if not recommender.master_rank_df.empty else [] # Extract and sort unique quota names.
-        categories = sorted(recommender.master_rank_df['Category'].dropna().unique().tolist()) if not recommender.master_rank_df.empty else [] # Extract and sort unique category names.
-        locations = sorted(recommender.merged_df['District'].dropna().unique().tolist()) if not recommender.merged_df.empty else [] # Extract and sort unique location names.
+        programs = sorted(active_recommender.master_rank_df['Program'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique program names.
+        streams = sorted(active_recommender.master_rank_df['Stream'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique stream names.
+        quotas = sorted(active_recommender.master_rank_df['Quota'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique quota names.
+        categories = sorted(active_recommender.master_rank_df['Category'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique category names.
+        locations = sorted(active_recommender.merged_df['District'].dropna().unique().tolist()) if not active_recommender.merged_df.empty else [] # Extract and sort unique location names.
 
         sort_options = [
             {'value': 'Predicted Closing Rank', 'label': 'Predicted Closing Rank (asc)'}, # Sort option for rank.
@@ -597,7 +839,8 @@ def metadata_filtered():
     Query params: program, stream, quota, category
     Returns: { streams, quotas, categories, locations }
     """
-    if recommender is None:
+    active_recommender = get_college_recommender()
+    if active_recommender is None:
         return jsonify({'error': 'Recommender not available'}), 503
 
     program  = request.args.get('program',  '').strip().lower()
@@ -606,7 +849,7 @@ def metadata_filtered():
     category = request.args.get('category', '').strip().lower()
 
     # Work on a copy of the already-loaded, already-clean master rank dataframe
-    df = recommender.master_rank_df.copy()
+    df = active_recommender.master_rank_df.copy()
 
     # Build lowercase versions of each column for comparison (don't modify original)
     def col(name):
@@ -646,8 +889,8 @@ def metadata_filtered():
     # Locations: filter recommender.merged_df by institutes in filtered result
     locations = []
     try:
-        if institute_col and not recommender.merged_df.empty:
-            merged = recommender.merged_df
+        if institute_col and not active_recommender.merged_df.empty:
+            merged = active_recommender.merged_df
 
             # find institute + district columns in merged_df
             mcol = lambda n: next((c for c in merged.columns if c.strip().lower() == n.lower()), None)
@@ -685,7 +928,8 @@ def recommend_colleges():
       - top_n (optional int)
     Returns the dictionary result from recommender.recommend()
     """
-    if recommender is None:
+    active_recommender = get_college_recommender()
+    if active_recommender is None:
         return jsonify({'status': 'error', 'message': 'Recommender not available.'}), 503 # Return error if recommender is unavailable.
 
     try:
@@ -717,7 +961,7 @@ def recommend_colleges():
             return jsonify({'status': 'error', 'message': 'Required fields: rank and program.'}), 400 # Return 400 error for missing required fields.
 
         # call recommender
-        result = recommender.recommend( # Call the recommend method with all user inputs.
+        result = active_recommender.recommend( # Call the recommend method with all user inputs.
             user_rank=user_rank,
             user_program=user_program,
             user_stream=user_stream,

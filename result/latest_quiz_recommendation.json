@@ -1,0 +1,379 @@
+{
+  "generated_at": "2026-04-24T19:23:30.142712",
+  "model_stack": {
+    "retrieval_model": "cosine_similarity + PCA_latent_matching",
+    "reranker_model": "hybrid_ensemble",
+    "training_metrics": {
+      "training_mode": "hybrid_ensemble",
+      "synthetic_samples": 6744,
+      "top1_accuracy": 0.8962,
+      "top3_accuracy": 1.0,
+      "macro_f1": 0.8958,
+      "log_loss": 0.2251
+    }
+  },
+  "summary_metrics": {
+    "questions_answered": 17,
+    "avg_skill": 0.819,
+    "avg_reliability": 0.564,
+    "avg_uncertainty": 0.257,
+    "avg_confidence_alignment": 0.5,
+    "avg_time_efficiency": 0.559,
+    "top_strengths": [
+      "AI_Int",
+      "Low_Level",
+      "Analytical_Reasoning"
+    ],
+    "growth_areas": [
+      "Verbal_Reasoning",
+      "Web_Arch"
+    ]
+  },
+  "category_metrics": {
+    "AI_Int": {
+      "score": 0.684,
+      "level": "High",
+      "bayesian_skill": 0.854,
+      "observed_accuracy": 0.768,
+      "time_efficiency": 1.0,
+      "confidence_alignment": 0.5,
+      "consistency": 0.245,
+      "momentum": 0.541,
+      "uncertainty": 0.317,
+      "reliability": 0.466,
+      "challenge_index": 0.494,
+      "attempts": 10
+    },
+    "Low_Level": {
+      "score": 0.657,
+      "level": "High",
+      "bayesian_skill": 0.784,
+      "observed_accuracy": 0.708,
+      "time_efficiency": 1.0,
+      "confidence_alignment": 0.5,
+      "consistency": 0.395,
+      "momentum": 0.531,
+      "uncertainty": 0.349,
+      "reliability": 0.509,
+      "challenge_index": 0.508,
+      "attempts": 7
+    },
+    "Analytical_Reasoning": {
+      "score": 0.338,
+      "level": "High",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Cloud_Ops": {
+      "score": 0.338,
+      "level": "Low",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Coding_Int": {
+      "score": 0.338,
+      "level": "Medium",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Coding_Skill": {
+      "score": 0.338,
+      "level": "High",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Crypto_Focus": {
+      "score": 0.338,
+      "level": "Low",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "DB_Design": {
+      "score": 0.338,
+      "level": "Medium",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Data_Mining": {
+      "score": 0.338,
+      "level": "Medium",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Design_Int": {
+      "score": 0.338,
+      "level": "Low",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Logical_Reasoning": {
+      "score": 0.338,
+      "level": "High",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Math_Reasoning": {
+      "score": 0.338,
+      "level": "High",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Risk_Eval": {
+      "score": 0.338,
+      "level": "Low",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "System_Opt": {
+      "score": 0.338,
+      "level": "Medium",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "User_Empathy": {
+      "score": 0.338,
+      "level": "Low",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Verbal_Reasoning": {
+      "score": 0.338,
+      "level": "Low",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    },
+    "Web_Arch": {
+      "score": 0.338,
+      "level": "Medium",
+      "bayesian_skill": 0.5,
+      "observed_accuracy": 0.0,
+      "time_efficiency": 0.5,
+      "confidence_alignment": 0.5,
+      "consistency": 0.5,
+      "momentum": 0.5,
+      "uncertainty": 0.5,
+      "reliability": 0.5,
+      "challenge_index": 0.0,
+      "attempts": 0
+    }
+  },
+  "recommendations": [
+    {
+      "Job": "UI/UX Engineer",
+      "score": 76.74,
+      "match_score": 0.7674,
+      "rule_score": 0.8235,
+      "cosine_score": 0.7901,
+      "latent_score": 0.939,
+      "model_probability": 0.5713,
+      "readiness_score": 0.8546,
+      "alignment_score": 0.7585,
+      "reliability_score": 0.4991,
+      "matched_strengths": [
+        "Logical_Reasoning",
+        "Web_Arch",
+        "Analytical_Reasoning"
+      ],
+      "growth_areas": [
+        "User_Empathy",
+        "Design_Int"
+      ]
+    },
+    {
+      "Job": "Product Manager",
+      "score": 61.84,
+      "match_score": 0.6184,
+      "rule_score": 0.7647,
+      "cosine_score": 0.7891,
+      "latent_score": 0.8591,
+      "model_probability": 0.0359,
+      "readiness_score": 0.8215,
+      "alignment_score": 0.7306,
+      "reliability_score": 0.4992,
+      "matched_strengths": [
+        "Logical_Reasoning",
+        "Design_Int",
+        "System_Opt"
+      ],
+      "growth_areas": [
+        "User_Empathy",
+        "Risk_Eval"
+      ]
+    },
+    {
+      "Job": "Mobile Application Developer",
+      "score": 60.47,
+      "match_score": 0.6047,
+      "rule_score": 0.7647,
+      "cosine_score": 0.8533,
+      "latent_score": 0.7062,
+      "model_probability": 0.0312,
+      "readiness_score": 0.8084,
+      "alignment_score": 0.7484,
+      "reliability_score": 0.4996,
+      "matched_strengths": [
+        "Low_Level",
+        "Web_Arch",
+        "Design_Int"
+      ],
+      "growth_areas": [
+        "User_Empathy",
+        "Coding_Int"
+      ]
+    },
+    {
+      "Job": "Quality Assurance Engineer",
+      "score": 60.28,
+      "match_score": 0.6028,
+      "rule_score": 0.8235,
+      "cosine_score": 0.8101,
+      "latent_score": 0.4582,
+      "model_probability": 0.1321,
+      "readiness_score": 0.8568,
+      "alignment_score": 0.7659,
+      "reliability_score": 0.4991,
+      "matched_strengths": [
+        "Risk_Eval",
+        "Analytical_Reasoning",
+        "Coding_Skill"
+      ],
+      "growth_areas": [
+        "System_Opt",
+        "Logical_Reasoning"
+      ]
+    },
+    {
+      "Job": "Data Scientist",
+      "score": 56.8,
+      "match_score": 0.568,
+      "rule_score": 0.8235,
+      "cosine_score": 0.8765,
+      "latent_score": 0.3532,
+      "model_probability": 0.0526,
+      "readiness_score": 0.7626,
+      "alignment_score": 0.7128,
+      "reliability_score": 0.497,
+      "matched_strengths": [
+        "AI_Int",
+        "User_Empathy",
+        "System_Opt"
+      ],
+      "growth_areas": [
+        "Data_Mining",
+        "Analytical_Reasoning"
+      ]
+    }
+  ]
+}

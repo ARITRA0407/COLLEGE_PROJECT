@@ -12,6 +12,7 @@ import os
 import sys
 import json
 import re
+import threading
 from collections import defaultdict
 
 # optional dependency
@@ -25,6 +26,8 @@ CSV_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 COLLEGE_CSV = os.path.join(CSV_DIR, 'college.csv')
 REVIEWS_CSV = os.path.join(CSV_DIR, 'reviews.csv')
 PLACEMENT_CSV = os.path.join(CSV_DIR, 'placement.csv')
+_LOAD_LOCK = threading.Lock()
+_LOADED = False
 
 def _safe_read_csv(path):
     """Read CSV into list of dicts; use pandas if available, else fallback."""
@@ -75,48 +78,75 @@ def _parse_latlon(val):
             pass
     return None, None
 
-# Load CSVs in memory for quick responses (reloaded on import)
-_COLLEGES = _safe_read_csv(COLLEGE_CSV)
-_REVIEWS = _safe_read_csv(REVIEWS_CSV)
-_PLACEMENTS = _safe_read_csv(PLACEMENT_CSV)
+_COLLEGES = []
+_REVIEWS = []
+_PLACEMENTS = []
 
 # Create mapping by institute name (case-insensitive key)
 def _key(name):
     return (name or '').strip().lower()
 
 COLLEGE_MAP = {}
-for r in _COLLEGES:
-    name = r.get('Institute') or r.get('College') or r.get('institute_name') or r.get('Name') or r.get('institute_name')
-    if not name:
-        continue
-    keyn = _key(name)
-    COLLEGE_MAP[keyn] = r
-
-# REVIEWS: build two structures:
-#  - REVIEWS_BY: list of simplified review entries for display
-#  - REVIEWS_RAW_BY: raw rows for aggregating numeric score columns
 REVIEWS_BY = defaultdict(list)
 REVIEWS_RAW_BY = defaultdict(list)
-for r in _REVIEWS:
-    # try multiple possible columns for institute name
-    name = r.get('Institute') or r.get('College') or r.get('institute_name') or r.get('name') or r.get('college_name')
-    if not name:
-        continue
-    k = _key(name)
-    REVIEWS_RAW_BY[k].append(r)
-    REVIEWS_BY[k].append({
-        'source': r.get('source') or r.get('Source') or r.get('reviewed_by') or '',
-        'date': r.get('date') or r.get('Date') or '',
-        'rating': r.get('rating') or r.get('Rating') or '',
-        'review_text': r.get('review_text') or r.get('review') or r.get('text') or ''
-    })
-
 PLACEMENT_BY = defaultdict(list)
-for r in _PLACEMENTS:
-    name = r.get('Institute') or r.get('College') or r.get('institute_name') or r.get('name') or r.get('college_name')
-    if not name:
-        continue
-    PLACEMENT_BY[_key(name)].append(r)
+
+
+def _ensure_loaded():
+    global _LOADED
+    global _COLLEGES
+    global _REVIEWS
+    global _PLACEMENTS
+    global COLLEGE_MAP
+    global REVIEWS_BY
+    global REVIEWS_RAW_BY
+    global PLACEMENT_BY
+
+    if _LOADED:
+        return
+
+    with _LOAD_LOCK:
+        if _LOADED:
+            return
+
+        _COLLEGES = _safe_read_csv(COLLEGE_CSV)
+        _REVIEWS = _safe_read_csv(REVIEWS_CSV)
+        _PLACEMENTS = _safe_read_csv(PLACEMENT_CSV)
+
+        college_map = {}
+        for r in _COLLEGES:
+            name = r.get('Institute') or r.get('College') or r.get('institute_name') or r.get('Name') or r.get('institute_name')
+            if not name:
+                continue
+            college_map[_key(name)] = r
+
+        reviews_by = defaultdict(list)
+        reviews_raw_by = defaultdict(list)
+        for r in _REVIEWS:
+            name = r.get('Institute') or r.get('College') or r.get('institute_name') or r.get('name') or r.get('college_name')
+            if not name:
+                continue
+            key_name = _key(name)
+            reviews_raw_by[key_name].append(r)
+            reviews_by[key_name].append({
+                'source': r.get('source') or r.get('Source') or r.get('reviewed_by') or '',
+                'date': r.get('date') or r.get('Date') or '',
+                'rating': r.get('rating') or r.get('Rating') or '',
+                'review_text': r.get('review_text') or r.get('review') or r.get('text') or ''
+            })
+
+        placement_by = defaultdict(list)
+        for r in _PLACEMENTS:
+            name = r.get('Institute') or r.get('College') or r.get('institute_name') or r.get('name') or r.get('college_name')
+            if not name:
+                continue
+            placement_by[_key(name)].append(r)
+
+        COLLEGE_MAP = college_map
+        REVIEWS_BY = reviews_by
+        REVIEWS_RAW_BY = reviews_raw_by
+        PLACEMENT_BY = placement_by
+        _LOADED = True
 
 # helper aggregator for placements
 def _aggregate_placement(rows):
@@ -291,6 +321,7 @@ def register_explore(app):
 
     @app.route('/explore/api/colleges')
     def _api_colleges():
+        _ensure_loaded()
         # return alphabetically sorted list of institute names
         names = []
         for r in _COLLEGES:
@@ -302,6 +333,7 @@ def register_explore(app):
 
     @app.route('/explore/api/college')
     def _api_college():
+        _ensure_loaded()
         q = request.args.get('name', '').strip()
         if not q:
             return jsonify({'error': 'name required'}), 400
@@ -369,6 +401,7 @@ def register_explore(app):
 
     @app.route('/explore/api/reviews')
     def _api_reviews():
+        _ensure_loaded()
         from flask import request
         q = request.args.get('name', '').strip()
         if not q:
@@ -379,6 +412,7 @@ def register_explore(app):
 
     @app.route('/explore/api/placement')
     def _api_placement():
+        _ensure_loaded()
         from flask import request
         q = request.args.get('name', '').strip()
         if not q:

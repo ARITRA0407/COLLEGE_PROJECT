@@ -1,28 +1,24 @@
-# ==============================
-# 🧠 AI ENGINE - CORE MODULE (FIXED)
-# ==============================
-
 import math
-import random
 
 
-# =========================================================
-# 1. 🧠 BAYESIAN SKILL UPDATE
-# =========================================================
+def _clamp(value, low=0.0, high=1.0):
+    try:
+        value = float(value)
+    except Exception:
+        value = low
+    return max(low, min(high, value))
+
+
 def bayesian_update(prior, likelihood, alpha=0.7):
     if prior is None:
         prior = 0.5
-    prior = max(0, min(1, prior))
-    likelihood = max(0, min(1, likelihood))
+    prior = _clamp(prior)
+    likelihood = _clamp(likelihood)
     return round((alpha * prior) + ((1 - alpha) * likelihood), 4)
 
 
-# =========================================================
-# 2. 🎯 DIFFICULTY DECISION ENGINE (STABLE)
-# =========================================================
 def decide_difficulty(skill_score, streak, last_difficulty="Medium"):
-
-    skill_score = max(0, min(1, skill_score))
+    skill_score = _clamp(skill_score)
 
     if skill_score >= 0.8 and streak >= 3:
         return "Hard"
@@ -36,38 +32,33 @@ def decide_difficulty(skill_score, streak, last_difficulty="Medium"):
     return last_difficulty or "Medium"
 
 
-# =========================================================
-# 3. 🧩 EXPLAINABILITY ENGINE
-# =========================================================
 def generate_explanation(category, old_diff, new_diff, score, time_taken):
-
     if new_diff == "Hard" and old_diff != "Hard":
-        return f"🔥 High performance detected in {category}. Increasing difficulty."
+        return f"High performance detected in {category}. Increasing difficulty."
 
     if new_diff == "Easy":
-        return f"📉 Low performance in {category}. Reducing difficulty."
+        return f"Lower performance in {category}. Reducing difficulty."
 
     if time_taken > 6:
-        return f"⏱ Slow response in {category}. Adjusting difficulty."
+        return f"Slow response in {category}. Adjusting difficulty."
 
     if score >= 0.75:
-        return f"✅ Strong accuracy in {category}. Maintaining challenge level."
+        return f"Strong accuracy in {category}. Maintaining challenge level."
 
-    return f"🔄 Adaptive adjustment applied in {category}."
+    return f"Adaptive adjustment applied in {category}."
 
 
-# =========================================================
-# 4. 🔥 STREAK SYSTEM
-# =========================================================
 def update_streak(current_streak, correct):
     return current_streak + 1 if correct else 0
 
 
-# =========================================================
-# 5. 🧠 COGNITIVE LOAD DETECTION (FIXED)
-# =========================================================
-def cognitive_load(time_taken, accuracy, streak):
+def compute_confidence_alignment(confidence, correct):
+    confidence = _clamp(confidence)
+    target = 1.0 if correct else 0.0
+    return round(1.0 - abs(confidence - target), 4)
 
+
+def cognitive_load(time_taken, accuracy, streak):
     time_taken = float(time_taken)
 
     if time_taken > 6 and accuracy < 0.5:
@@ -85,75 +76,100 @@ def cognitive_load(time_taken, accuracy, streak):
     return "Medium"
 
 
-# =========================================================
-# 6. 🧠 SKILL ESTIMATOR (NORMALIZED)
-# =========================================================
-def estimate_skill(current_skill, score, time_factor=1.0):
+def compute_consistency(history, window=5):
+    recent = history[-window:] if history else []
 
-    current_skill = max(0, min(1, current_skill))
-    performance = max(0, min(1, score * time_factor))
+    if len(recent) <= 1:
+        return 0.5
+
+    scores = [float(item.get("score", 0.0)) for item in recent]
+    mean_score = sum(scores) / len(scores)
+    variance = sum((score - mean_score) ** 2 for score in scores) / len(scores)
+    std_dev = math.sqrt(max(variance, 0.0))
+
+    return round(_clamp(1.0 - min(std_dev / 0.35, 1.0)), 4)
+
+
+def compute_momentum(history, window=4):
+    recent = history[-window:] if history else []
+
+    if len(recent) <= 1:
+        return 0.5
+
+    skills = [float(item.get("skill", 0.5)) for item in recent]
+    deltas = [skills[i] - skills[i - 1] for i in range(1, len(skills))]
+    avg_delta = sum(deltas) / len(deltas) if deltas else 0.0
+
+    return round(_clamp(0.5 + (avg_delta * 3.0)), 4)
+
+
+def compute_uncertainty(skill_score, time_factor, confidence_alignment):
+    uncertainty = (
+        (1.0 - _clamp(skill_score)) * 0.45 +
+        (1.0 - _clamp(confidence_alignment)) * 0.35 +
+        (1.0 - _clamp(time_factor)) * 0.20
+    )
+
+    return round(_clamp(uncertainty), 4)
+
+
+def compute_reliability(confidence_alignment, consistency, uncertainty):
+    reliability = (
+        (_clamp(confidence_alignment) * 0.35) +
+        (_clamp(consistency) * 0.35) +
+        ((1.0 - _clamp(uncertainty)) * 0.30)
+    )
+
+    return round(_clamp(reliability), 4)
+
+
+def estimate_skill(current_skill, score, time_factor=1.0):
+    current_skill = _clamp(current_skill)
+    performance = _clamp(score * time_factor)
 
     return bayesian_update(current_skill, performance)
 
 
-# =========================================================
-# 7. ⚙️ TIME FACTOR ENGINE
-# =========================================================
 def compute_time_factor(time_taken):
-
     time_taken = float(time_taken)
 
     if time_taken <= 2:
         return 1.0
-    elif time_taken <= 4:
+    if time_taken <= 4:
         return 0.8
-    elif time_taken <= 6:
+    if time_taken <= 6:
         return 0.6
-    elif time_taken <= 10:
+    if time_taken <= 10:
         return 0.4
-    else:
-        return 0.3
+    return 0.3
 
 
-# =========================================================
-# 8. 🧠 MASTER AI PROCESSOR
-# =========================================================
-def process_answer(state, category, score, time_taken, correct, last_diff):
-
+def process_answer(state, category, score, time_taken, correct, last_diff, confidence=0.5):
     state.setdefault("skills", {})
     state.setdefault("streak", {})
     state.setdefault("history", {})
+    state.setdefault("telemetry", {})
 
     state["skills"].setdefault(category, 0.5)
     state["streak"].setdefault(category, 0)
 
-    # ---------------- STREAK ----------------
     state["streak"][category] = update_streak(
         state["streak"][category],
         correct
     )
 
-    # ---------------- TIME FACTOR ----------------
     time_factor = compute_time_factor(time_taken)
-
-    # ---------------- SKILL UPDATE ----------------
     old_skill = state["skills"][category]
-
     new_skill = estimate_skill(old_skill, score, time_factor)
-
     state["skills"][category] = new_skill
 
-    # ---------------- DIFFICULTY ----------------
     next_diff = decide_difficulty(
         new_skill,
         state["streak"][category],
         last_diff
     )
 
-    # ---------------- COGNITIVE LOAD ----------------
     load = cognitive_load(time_taken, score, state["streak"][category])
-
-    # ---------------- EXPLANATION ----------------
     explanation = generate_explanation(
         category,
         last_diff,
@@ -162,16 +178,40 @@ def process_answer(state, category, score, time_taken, correct, last_diff):
         time_taken
     )
 
-    # ---------------- HISTORY ----------------
     state["history"].setdefault(category, [])
     state["history"][category].append({
-        "score": round(score, 3),
+        "score": round(_clamp(score), 3),
         "skill": round(new_skill, 3),
         "time": float(time_taken),
-        "difficulty": next_diff
+        "difficulty": next_diff,
+        "correct": bool(correct),
+        "confidence": round(_clamp(confidence), 3),
+        "time_factor": round(time_factor, 3)
     })
 
-    # ---------------- FINAL OUTPUT ----------------
+    recent_history = state["history"][category]
+    confidence_alignment = compute_confidence_alignment(confidence, correct)
+    consistency = compute_consistency(recent_history)
+    momentum = compute_momentum(recent_history)
+    uncertainty = compute_uncertainty(new_skill, time_factor, confidence_alignment)
+    reliability = compute_reliability(confidence_alignment, consistency, uncertainty)
+
+    state["history"][category][-1].update({
+        "confidence_alignment": confidence_alignment,
+        "consistency": consistency,
+        "momentum": momentum,
+        "uncertainty": uncertainty,
+        "reliability": reliability
+    })
+
+    state["telemetry"][category] = {
+        "confidence_alignment": confidence_alignment,
+        "consistency": consistency,
+        "momentum": momentum,
+        "uncertainty": uncertainty,
+        "reliability": reliability
+    }
+
     return {
         "updated_state": state,
         "next_difficulty": next_diff,
@@ -179,26 +219,46 @@ def process_answer(state, category, score, time_taken, correct, last_diff):
         "cognitive_load": load,
         "skill": round(new_skill, 3),
         "streak": state["streak"][category],
-        "time_factor": time_factor
+        "time_factor": time_factor,
+        "confidence_alignment": confidence_alignment,
+        "consistency": consistency,
+        "momentum": momentum,
+        "uncertainty": uncertainty,
+        "reliability": reliability
     }
 
 
-# =========================================================
-# 9. 🧩 DASHBOARD SUMMARY (FIXED SAFE VERSION)
-# =========================================================
 def get_skill_summary(state):
-
     skills = state.get("skills", {})
+    telemetry = state.get("telemetry", {})
 
     if not skills:
         return {
             "categories": {},
-            "avg_skill": 0
+            "avg_skill": 0,
+            "avg_reliability": 0,
+            "avg_uncertainty": 0
         }
 
-    avg = sum(skills.values()) / max(len(skills), 1)
+    avg_skill = sum(skills.values()) / max(len(skills), 1)
+    reliability_values = [
+        float(item.get("reliability", 0.0))
+        for item in telemetry.values()
+    ]
+    uncertainty_values = [
+        float(item.get("uncertainty", 0.0))
+        for item in telemetry.values()
+    ]
 
     return {
         "categories": {k: round(v, 3) for k, v in skills.items()},
-        "avg_skill": round(avg, 3)
+        "avg_skill": round(avg_skill, 3),
+        "avg_reliability": round(
+            sum(reliability_values) / len(reliability_values),
+            3
+        ) if reliability_values else 0,
+        "avg_uncertainty": round(
+            sum(uncertainty_values) / len(uncertainty_values),
+            3
+        ) if uncertainty_values else 0
     }

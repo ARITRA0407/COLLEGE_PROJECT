@@ -34,6 +34,11 @@ RELEVANCE_THRESHOLD = 0.05
 
 # In-memory LRU cap (hot queries stay in RAM, no disk touch at all)
 LRU_MAX = 128
+_index_lock = threading.Lock()
+DOCS = None
+META = None
+VECTORIZER = None
+DOC_VECS = None
 
 CSV_FILES = [
     "college.csv",
@@ -288,8 +293,19 @@ def load_csvs_and_build_index(csv_dir, csv_files):
     print(f"ai.py: TF-IDF index built ({len(docs)} docs) ✅")
     return docs, meta, vectorizer, doc_vectors
 
+def ensure_index_loaded():
+    global DOCS
+    global META
+    global VECTORIZER
+    global DOC_VECS
 
-DOCS, META, VECTORIZER, DOC_VECS = load_csvs_and_build_index(CSV_DIR, CSV_FILES)
+    if VECTORIZER is not None and DOC_VECS is not None:
+        return
+
+    with _index_lock:
+        if VECTORIZER is not None and DOC_VECS is not None:
+            return
+        DOCS, META, VECTORIZER, DOC_VECS = load_csvs_and_build_index(CSV_DIR, CSV_FILES)
 
 
 # ======================================================================
@@ -298,6 +314,8 @@ DOCS, META, VECTORIZER, DOC_VECS = load_csvs_and_build_index(CSV_DIR, CSV_FILES)
 def retrieve_top_rows(query, top_k=5):
     if not query.strip():
         return []
+
+    ensure_index_loaded()
 
     qv   = VECTORIZER.transform([query])
     sims = linear_kernel(qv, DOC_VECS).flatten()
