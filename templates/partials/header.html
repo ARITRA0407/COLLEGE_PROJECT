@@ -2,114 +2,88 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Specifies the character encoding for the document -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Ensures the page is responsive and sets viewport dimensions -->
     <title>Edvance</title>
-    <!-- Sets the title of the webpage -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Includes the Tailwind CSS framework via CDN -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Links the Inter font from Google Fonts -->
-
-    <!-- Link the custom CSS file using Flask's url_for for correct path resolution -->
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/header.css') }}"
     />
   </head>
   <body class="bg-gray-100">
-    <!-- Defines the main body with a light gray background -->
 
     <!-- Header Section -->
     <header class="main-header">
-      <!-- Container for the main site navigation and branding -->
+
+      <!-- Logo -->
       <div class="logo-container">
-        <!-- Section for the logo and site name -->
-        <!-- Dynamically links the logo image using url_for -->
         <img
           src="{{ url_for('static', filename='images/logo.png') }}"
           alt="edVance Logo"
           class="logo-img"
         />
         <a href="/" class="website-name">edVance</a>
-        <!-- Link to the homepage -->
       </div>
 
+      <!-- ✅ Hamburger button (visible on mobile only, controlled by CSS) -->
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Nav -->
       <nav class="main-nav">
-        <!-- Main navigation menu -->
         <div class="nav-item dropdown">
           <span class="nav-link dropdown-toggle">Service</span>
           <div class="dropdown-menu">
-            <a href="{{ url_for('comparison') }}" class="dropdown-item"
-              >College Comparison</a
-            >
-            <a href="{{ url_for('explore_colleges') }}" class="dropdown-item"
-              >Explore College</a
-            >
-            <a href="{{ url_for('top_ranked_colleges') }}" class="dropdown-item"
-              >Top Ranked Colleges</a
-            >
+            <a href="{{ url_for('comparison') }}" class="dropdown-item">College Comparison</a>
+            <a href="{{ url_for('explore_colleges') }}" class="dropdown-item">Explore College</a>
+            <a href="{{ url_for('top_ranked_colleges') }}" class="dropdown-item">Top Ranked Colleges</a>
           </div>
         </div>
 
         <div class="nav-item dropdown">
           <span class="nav-link dropdown-toggle">Counselling</span>
           <div class="dropdown-menu">
-            <a href="{{ url_for('recommendation_page') }}" class="dropdown-item"
-              >Recommendation</a
-            >
-            <a href="{{ url_for('ai_guidance') }}" class="dropdown-item"
-              >AI Guidance</a
-            >
+            <a href="{{ url_for('recommendation_page') }}" class="dropdown-item">Recommendation</a>
+            <a href="{{ url_for('ai_guidance') }}" class="dropdown-item">AI Guidance</a>
           </div>
         </div>
       </nav>
 
+      <!-- Auth buttons -->
       <div class="auth-buttons">
-        <!-- Container for authentication buttons/status -->
         {% if logged_in %}
-        <!-- Jinja condition: checks if user is logged in -->
-        <!-- Displays a welcome message using the part of the username before '@' -->
-        <span class="welcome-text">Welcome, {{ username.split('@')[0] }}</span>
-        <!-- Logout link, dynamically linked -->
-        <a href="{{ url_for('logout') }}" class="auth-btn logout-btn">Logout</a>
+          <span class="welcome-text">Welcome, {{ username.split('@')[0] }}</span>
+          <a href="{{ url_for('logout') }}" class="auth-btn logout-btn">Logout</a>
         {% else %}
-        <!-- If user is not logged in -->
-        <button class="auth-btn login-btn">Login</button>
-        <!-- Login button -->
-        <button class="auth-btn signup-btn">Sign Up</button>
-        <!-- Sign Up button -->
+          <button class="auth-btn login-btn">Login</button>
+          <button class="auth-btn signup-btn">Sign Up</button>
         {% endif %}
       </div>
+
     </header>
 
-    <!-- Main Content Section -->
+    <!-- Main Content -->
     <main class="main-content">
-      <!-- The area for the main page content -->
-      <!-- Dynamically links the banner image using url_for -->
       <img
         src="{{ url_for('static', filename='images/body.png') }}"
         alt="Edvance campus hero"
       />
     </main>
 
-    <!-- Authentication Modal (Only rendered if user is not logged in) -->
+    <!-- Auth Modal -->
     {% if not logged_in %}
     <div id="auth-modal" class="modal">
-      <!-- Modal container -->
       <div class="modal-content">
-        <!-- Modal content area -->
         <span class="close-btn">&times;</span>
-        <!-- Close button for the modal -->
         <h2>Access edVance</h2>
-        <!-- Modal title -->
         <button class="google-auth-btn">
-          <!-- Google sign-in button -->
-          <!-- Dynamically links the Google icon image -->
           <img
             src="{{ url_for('static', filename='images/google-icon.png') }}"
             alt="Google Icon"
@@ -118,28 +92,10 @@
           Continue with Google
         </button>
         <div class="separator">OR</div>
-        <!-- Separator text -->
         <form id="auth-form">
-          <!-- Form for email/password login/signup -->
-          <input
-            type="text"
-            id="auth-username"
-            placeholder="Username/Email"
-            required
-          />
-          <!-- Username/Email input -->
-          <input
-            type="password"
-            id="auth-password"
-            placeholder="Password"
-            required
-          />
-          <!-- Password input -->
-          <button type="submit" id="auth-submit-btn" class="auth-submit-btn">
-            Login
-          </button>
-          <!-- Submit button -->
-          <!-- Toggles between login and signup views -->
+          <input type="text"     id="auth-username" placeholder="Username/Email" required />
+          <input type="password" id="auth-password" placeholder="Password"       required />
+          <button type="submit"  id="auth-submit-btn" class="auth-submit-btn">Login</button>
           <p class="toggle-auth">
             New user? <span id="toggle-to-signup">Sign Up</span>
           </p>
@@ -148,7 +104,34 @@
     </div>
     {% endif %}
 
-    <!-- Link the custom JavaScript file here for better performance -->
     <script src="{{ url_for('static', filename='js/header.js') }}"></script>
+
+    <!-- ✅ Hamburger toggle script -->
+    <script>
+    (function () {
+      const btn = document.getElementById('hamburger');
+      if (!btn) return;
+      const nav  = document.querySelector('.main-nav');
+      const auth = document.querySelector('.auth-buttons');
+
+      btn.addEventListener('click', function () {
+        const open = btn.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open);
+        nav  && nav.classList.toggle('open', open);
+        auth && auth.classList.toggle('open', open);
+      });
+
+      // Close drawer when any nav link is tapped
+      document.querySelectorAll('.nav-link, .dropdown-item, .auth-btn, .logout-btn').forEach(function (el) {
+        el.addEventListener('click', function () {
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          nav  && nav.classList.remove('open');
+          auth && auth.classList.remove('open');
+        });
+      });
+    })();
+    </script>
+
   </body>
 </html>

@@ -1,213 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Adaptive Quiz</title>
-
 <style>
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
-    margin: 0;
-    height: 100vh;
-    font-family: Arial;
-    display: flex;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: white;
-    overflow: hidden;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: white;
+  min-height: 100vh;
 }
 
-/* ================= WRAPPER ================= */
+/* Wrapper: side-by-side on desktop, stacked on mobile */
 .wrapper {
-    display: flex;
-    width: 100%;
-    height: 100vh;
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
 }
 
-/* ================= LEFT ================= */
+/* ===== LEFT ===== */
 .left {
-    width: 68%;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  flex: 1 1 65%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
 }
 
-/* ================= RIGHT ================= */
+/* ===== RIGHT ===== */
 .right {
-    width: 32%;
-    padding: 15px;
-    background: rgba(0,0,0,0.28);
-    backdrop-filter: blur(10px);
-    overflow: hidden;
+  flex: 0 0 32%;
+  max-width: 340px;
+  padding: 16px;
+  background: rgba(0,0,0,0.28);
+  backdrop-filter: blur(10px);
+  overflow-y: auto;
 }
 
-/* ================= CARDS ================= */
+/* ===== CARDS ===== */
 .card {
-    background: rgba(255,255,255,0.1);
-    padding: 10px;
-    border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  padding: 12px;
+  border-radius: 12px;
 }
 
-/* ================= TITLE ================= */
-h2 {
-    margin: 0;
-    font-size: 18px;
-}
+h2 { margin: 0; font-size: 18px; }
 
-/* ================= TOP FLOW ================= */
 .flow {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
-/* ================= TIMER ================= */
-#timer {
-    font-size: 14px;
-    text-align: right;
-}
+#timer { font-size: 14px; text-align: right; }
+#difficulty { text-align: center; font-size: 14px; font-weight: bold; }
 
-/* ================= DIFFICULTY ================= */
-#difficulty {
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-}
+#quiz { font-size: 15px; }
 
-/* ================= QUESTION ================= */
-#quiz {
-    font-size: 15px;
-}
-
-/* ================= OPTIONS ================= */
 button.opt {
-    display: block;
-    width: 100%;
-    margin: 6px 0;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    background: white;
-    color: #1e3c72;
+  display: block;
+  width: 100%;
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background: white;
+  color: #1e3c72;
+  transition: background 0.2s;
 }
+button.opt:hover { background: #e0e0e0; }
 
-button.opt:hover {
-    background: #e0e0e0;
-}
-
-/* ================= PROGRESS ================= */
 .progress {
-    height: 6px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 10px;
-    overflow: hidden;
+  height: 6px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+  overflow: hidden;
 }
-
 .progress-bar {
-    height: 100%;
-    width: 0%;
-    background: #00ffcc;
+  height: 100%;
+  width: 0%;
+  background: #00ffcc;
+  transition: width 0.3s ease;
 }
 
-/* ================= AI HINT ================= */
-#aiHint {
-    font-size: 13px;
-    color: #ddd;
-}
+#aiHint { font-size: 13px; color: #ddd; }
+#streak { font-size: 14px; font-weight: bold; }
 
-/* ================= STREAK (FIXED) ================= */
-#streak {
-    font-size: 14px;
-    font-weight: bold;
-}
+input[type="range"] { width: 100%; cursor: pointer; }
 
-/* ================= CONFIDENCE ================= */
-input[type="range"] {
-    width: 100%;
-}
-
-/* ================= RIGHT PANEL IMPROVED ================= */
-.right h3 {
-    font-size: 18px;
-    margin: 5px 0;
-}
+.right h3 { font-size: 17px; margin: 5px 0; }
 
 .category-box {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 5px;
-    font-size: 20px;   /* 🔥 increased */
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
 }
-
 .cat {
-    background: rgba(255,255,255,0.12);
-    padding: 6px;
-    border-radius: 6px;
-    font-size: 13px;   /* 🔥 increased readability */
+  background: rgba(255,255,255,0.12);
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 13px;
 }
 
-/* ================= NO SCROLL ================= */
-.left, .right {
-    overflow: hidden;
+button#stopBtn {
+  background: rgba(255,255,255,0.15);
+  color: white;
+  border: 2px solid rgba(255,255,255,0.3);
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+button#stopBtn:hover { background: rgba(255,255,255,0.25); }
+
+/* ===== TABLET ===== */
+@media (max-width: 768px) {
+  .wrapper { flex-direction: column; min-height: auto; }
+  .left { flex: 1 1 auto; padding: 12px; }
+  .right {
+    flex: none;
+    max-width: 100%;
+    width: 100%;
+    padding: 12px;
+    backdrop-filter: none;
+    background: rgba(0,0,0,0.2);
+  }
+  h2 { font-size: 16px; }
+  button.opt { font-size: 13px; padding: 9px; }
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 480px) {
+  .left, .right { padding: 10px; }
+  h2 { font-size: 15px; }
+  #quiz { font-size: 14px; }
+  button.opt { font-size: 13px; }
+  .category-box { grid-template-columns: 1fr 1fr; }
 }
 </style>
-
 </head>
 
 <body>
 
 <div class="wrapper">
 
-<!-- ================= LEFT ================= -->
-<div class="left">
+  <!-- ===== LEFT ===== -->
+  <div class="left">
 
     <div class="card">
-        <h2>Adaptive AI Quiz</h2>
-
-        <div id="timer">⏱ Time: 0.0s</div>
-
-        <div class="progress">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-
-        <div id="difficulty">Difficulty: MEDIUM</div>
+      <h2>Adaptive AI Quiz</h2>
+      <div id="timer">⏱ Time: 0.0s</div>
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div id="difficulty">Difficulty: MEDIUM</div>
     </div>
 
     <div class="card" id="quiz"></div>
 
     <div class="card">
-        <div id="aiHint"></div>
+      <div id="aiHint"></div>
     </div>
 
-    <!-- 🔥 FIXED STREAK (NO DUPLICATE TEXT) -->
     <div class="card" id="streak">🔥 Streak: 0</div>
 
     <div class="card">
-        <label>Confidence: <span id="confValue">50%</span></label>
-        <input type="range" min="0" max="100" value="50"
-               oninput="updateConfidence(this.value)">
+      <label>Confidence: <span id="confValue">50%</span></label>
+      <input type="range" min="0" max="100" value="50"
+             oninput="updateConfidence(this.value)">
     </div>
 
-    <button onclick="stopQuiz()">Stop Quiz</button>
+    <button id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
 
-</div>
+  </div>
 
-<!-- ================= RIGHT ================= -->
-<div class="right">
+  <!-- ===== RIGHT ===== -->
+  <div class="right">
 
     <div class="card">
-        <div class="flow">
-            <div id="currentCategory">Current: -</div>
-        </div>
+      <div class="flow">
+        <div id="currentCategory">Current: -</div>
+      </div>
     </div>
 
     <div class="card">
-        <h3>Skill Analytics</h3>
-        <div id="skillsBox" class="category-box"></div>
+      <h3>Skill Analytics</h3>
+      <div id="skillsBox" class="category-box"></div>
     </div>
 
-</div>
+  </div>
 
 </div>
 

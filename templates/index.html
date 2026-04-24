@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>edVance - College Recommendation</title>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow-x: hidden; }
+    html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
 
     body {
       font-family: Inter, system-ui;
@@ -15,11 +14,17 @@
       color: #1f2937;
     }
 
-    .page-wrap { width: 100%; padding: 12px; margin: 0 auto; }
+    .page-wrap {
+      width: 100%;
+      max-width: 1400px;
+      padding: 12px 16px;
+      margin: 0 auto;
+    }
 
+    /* Full-width sections (explore, top) — safe version, no vw trick */
     .explore-fullwidth {
-      width: 100vw;
-      margin-left: calc(-50vw + 50%);
+      width: 100%;
+      overflow-x: hidden;
     }
 
     .iframe-wrap {
@@ -28,7 +33,6 @@
       margin-top: 18px;
     }
 
-    /* iframe starts at 0 height, grows via JS postMessage */
     .comparison-iframe {
       width: 100%;
       height: 0;
@@ -37,25 +41,47 @@
       transition: height 0.2s ease;
     }
 
-    /* ✅ FLOATING BUTTON */
+    /* Floating AI button */
     #aiBtn {
       position: fixed;
       left: 15px;
       top: 50%;
       transform: translateY(-50%);
-      width: 60px;
-      height: 60px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       border: none;
       background: #10b981;
       color: white;
-      font-size: 24px;
+      font-size: 22px;
       cursor: pointer;
       z-index: 9999;
       box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #aiBtn:hover { background: #059669; }
+
+    @media (max-width: 768px) {
+      .page-wrap { padding: 8px 10px; }
+      .iframe-wrap { border-radius: 6px; margin-top: 10px; }
+      #aiBtn {
+        width: 46px;
+        height: 46px;
+        font-size: 18px;
+        left: 8px;
+      }
     }
 
-    #aiBtn:hover { background: #059669; }
+    @media (max-width: 480px) {
+      #aiBtn {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        left: 6px;
+      }
+    }
   </style>
 </head>
 
@@ -89,15 +115,18 @@
 {% include 'partials/ai.html' %}
 {% include 'partials/about.html' %}
 
-<!-- ✅ FLOATING BUTTON -->
-<button id="aiBtn">🧠</button>
+<button id="aiBtn" aria-label="Open AI Quiz">🧠</button>
 
 <script>
+  history.scrollRestoration = 'manual';
+  window.addEventListener('load', () => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  });
+
   document.getElementById("aiBtn").onclick = function () {
     window.location.href = "/quiz";
   };
 
-  // Auto-resize the comparison iframe to match its content height
   const iframe = document.getElementById('comparisonIframe');
 
   function resizeIframe() {
@@ -105,15 +134,11 @@
       const doc = iframe.contentDocument || iframe.contentWindow.document;
       const h = doc.documentElement.scrollHeight || doc.body.scrollHeight;
       iframe.style.height = h + 'px';
-    } catch (e) {
-      // cross-origin fallback: listen for postMessage from iframe
-    }
+    } catch (e) {}
   }
 
-  // Resize on load and whenever the iframe content changes (e.g. after Compare click)
   iframe.addEventListener('load', function () {
     resizeIframe();
-    // Poll for height changes for 5s after load (covers dynamic content injection)
     let polls = 0;
     const iv = setInterval(() => {
       resizeIframe();
@@ -121,7 +146,6 @@
     }, 250);
   });
 
-  // Also listen for postMessage from the iframe (for cross-origin or explicit signals)
   window.addEventListener('message', function (e) {
     if (e.data && e.data.type === 'iframeHeight') {
       iframe.style.height = e.data.height + 'px';
