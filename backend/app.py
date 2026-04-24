@@ -1,4 +1,6 @@
 # app.py
+from dotenv import load_dotenv
+load_dotenv()
 import os
 import sys
 from flask import Flask, render_template, request, jsonify, send_from_directory, abort
@@ -582,6 +584,93 @@ def metadata():
     except Exception as e:
         print("Error in /metadata:", e) # Log the error.
         return jsonify({'error': str(e)}), 500 # Return a JSON error response.
+    
+
+## REPLACE your existing /metadata/filtered route in app.py with this ##
+
+@app.route('/metadata/filtered', methods=['GET'])
+def metadata_filtered():
+    """
+    Returns cascaded filtered options based on current selections.
+    Uses recommender.master_rank_df (already loaded + clean) — no fresh CSV reads.
+    All comparisons are case-insensitive to avoid mismatch bugs.
+    Query params: program, stream, quota, category
+    Returns: { streams, quotas, categories, locations }
+    """
+    if recommender is None:
+        return jsonify({'error': 'Recommender not available'}), 503
+
+    program  = request.args.get('program',  '').strip().lower()
+    stream   = request.args.get('stream',   '').strip().lower()
+    quota    = request.args.get('quota',    '').strip().lower()
+    category = request.args.get('category', '').strip().lower()
+
+    # Work on a copy of the already-loaded, already-clean master rank dataframe
+    df = recommender.master_rank_df.copy()
+
+    # Build lowercase versions of each column for comparison (don't modify original)
+    def col(name):
+        """Case-insensitive column finder."""
+        for c in df.columns:
+            if c.strip().lower() == name.lower():
+                return c
+        return None
+
+    program_col  = col('program')
+    stream_col   = col('stream')
+    quota_col    = col('quota')
+    category_col = col('category')
+    institute_col = col('institute')
+
+    # Apply filters case-insensitively
+    if program and program_col:
+        df = df[df[program_col].astype(str).str.strip().str.lower() == program]
+    if stream and stream_col:
+        df = df[df[stream_col].astype(str).str.strip().str.lower() == stream]
+    if quota and quota_col:
+        df = df[df[quota_col].astype(str).str.strip().str.lower() == quota]
+    if category and category_col:
+        df = df[df[category_col].astype(str).str.strip().str.lower() == category]
+
+    def unique_sorted(dataframe, column):
+        if not column or column not in dataframe.columns:
+            return []
+        vals = dataframe[column].dropna().astype(str).str.strip()
+        vals = vals[vals != ''].unique().tolist()
+        return sorted(vals)
+
+    streams    = unique_sorted(df, stream_col)
+    quotas     = unique_sorted(df, quota_col)
+    categories = unique_sorted(df, category_col)
+
+    # Locations: filter recommender.merged_df by institutes in filtered result
+    locations = []
+    try:
+        if institute_col and not recommender.merged_df.empty:
+            merged = recommender.merged_df
+
+            # find institute + district columns in merged_df
+            mcol = lambda n: next((c for c in merged.columns if c.strip().lower() == n.lower()), None)
+            inst_col_m = mcol('institute')
+            dist_col_m = mcol('district')
+
+            if inst_col_m and dist_col_m:
+                institutes_in_filter = set(
+                    df[institute_col].dropna().astype(str).str.strip().str.lower().unique()
+                )
+                loc_df = merged[
+                    merged[inst_col_m].astype(str).str.strip().str.lower().isin(institutes_in_filter)
+                ]
+                locations = unique_sorted(loc_df, dist_col_m)
+    except Exception as e:
+        print("metadata_filtered: location lookup error:", e)
+
+    return jsonify({
+        'streams':    streams,
+        'quotas':     quotas,
+        'categories': categories,
+        'locations':  locations,
+    })
 
 @app.route('/recommend_colleges', methods=['POST'])
 def recommend_colleges():
@@ -650,8 +739,47 @@ def recommend_colleges():
         print("Error in recommendation API:", e) # Log the error.
         return jsonify({'status': 'error', 'message': str(e)}), 500 # Return a JSON error response.
 
-# if __name__ == '__main__':
-#     app.run(debug=True) # Run the Flask application in debug mode.
+@app.route('/claude-proxy', methods=['POST'])
+def claude_proxy():
+    import json
+    import urllib.request as urlreq
+    import urllib.error as urlerr
+
+    try:
+        payload = request.get_json()
+        if not payload:
+            return jsonify({'error': 'No payload'}), 400
+
+        GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+        if not GEMINI_API_KEY:
+            return jsonify({'error': 'GEMINI_API_KEY not set'}), 500
+
+        messages = payload.get('messages', [])
+        prompt = messages[0].get('content', '') if messages else ''
+        system = payload.get('system', '')
+        full_prompt = f"{system}\n\n{prompt}" if system else prompt
+
+        gemini_payload = {
+            "contents": [{"parts": [{"text": full_prompt}]}]
+        }
+
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
+
+        body = json.dumps(gemini_payload).encode('utf-8')
+        req = urlreq.Request(url, data=body,
+            headers={'Content-Type': 'application/json'}, method='POST')
+
+        with urlreq.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read())
+            text = data['candidates'][0]['content']['parts'][0]['text']
+            return jsonify({
+                "content": [{"type": "text", "text": text}]
+            })
+
+    except urlerr.HTTPError as e:
+        return app.response_class(response=e.read(), status=e.code, mimetype='application/json')
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

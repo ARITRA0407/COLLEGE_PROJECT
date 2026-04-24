@@ -4,240 +4,368 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>edVance CSV Chatbot (AI Partial)</title>
-
+  <title>edVance AI Assistant</title>
+ 
   <style>
-    /* Scoped styles: everything lives under .edv-ai-root to avoid collisions */
-    .edv-ai-root { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; margin:0; padding:12px; display:block; box-sizing:border-box; }
-
-    /* Chat container (not full viewport to avoid interfering when included) */
+    .edv-ai-root {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      margin: 0; padding: 12px;
+      display: block; box-sizing: border-box;
+    }
+ 
     .edv-ai-chat-wrap {
       margin: 0 auto;
-      width: 100%;
-      max-width: 100%;
-      height: 600px; /* default height; tweaked by page-level media queries in index.html */
-      border:1px solid #ddd;
-      border-radius:8px;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
+      width: 100%; max-width: 100%;
+      height: 600px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: flex; flex-direction: column;
+      overflow: hidden;
       background: #ffffff;
-      box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+      box-shadow: 0 6px 18px rgba(2,6,23,0.06);
       box-sizing: border-box;
     }
-
+ 
+    /* Header */
+    .edv-ai-header {
+      padding: 12px 16px;
+      background: #0b76ef;
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .edv-ai-header-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      display: inline-block;
+    }
+ 
     .edv-ai-messages {
-      padding:16px;
-      flex:1;
-      overflow:auto;
-      background:#fbfbfb;
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+      background: #f8f9fb;
     }
-
+ 
     .edv-ai-inputbar {
-      display:flex;
-      gap:8px;
-      padding:12px;
-      border-top:1px solid #eee;
-      background:white;
-      align-items:center;
-      box-sizing:border-box;
+      display: flex; gap: 8px;
+      padding: 12px;
+      border-top: 1px solid #eee;
+      background: white;
+      align-items: center;
+      box-sizing: border-box;
+      flex-shrink: 0;
     }
-
-    /* IMPORTANT: allow input to shrink in flexbox (avoids overflow in narrow containers) */
+ 
     .edv-ai-input {
-      flex:1 1 auto;
-      min-width: 0;            /* <-- prevents flex children from forcing overflow */
-      padding:10px 12px;
-      border:1px solid #ccc;
-      border-radius:6px;
-      font-size:15px;
-      box-sizing:border-box;
-      height:44px;             /* more comfortable input height */
-      line-height:20px;
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 10px 14px;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      height: 44px;
+      line-height: 20px;
+      outline: none;
+      transition: border-color 0.2s;
     }
-
-    /* Make Send button a stable size (doesn't stretch) and match input height */
+    .edv-ai-input:focus { border-color: #0b76ef; }
+ 
     .edv-ai-send-btn {
-      flex: 0 0 140px;        /* fixed width, won't stretch */
-      width: 140px;
-      height:44px;
-      padding:0 14px;
-      border-radius:6px;
-      border:none;
-      background:#0b76ef;
-      color:white;
-      cursor:pointer;
-      font-weight:600;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      box-sizing:border-box;
+      flex: 0 0 90px;
+      width: 90px; height: 44px;
+      border-radius: 8px;
+      border: none;
+      background: #0b76ef;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      box-sizing: border-box;
+      transition: background 0.2s;
     }
-
-    .edv-ai-msg { margin-bottom:12px; display:block; }
-    .edv-ai-msg-user { text-align:right; }
-
+    .edv-ai-send-btn:hover { background: #0960c8; }
+    .edv-ai-send-btn:disabled { background: #93c5fd; cursor: not-allowed; }
+ 
+    /* Messages */
+    .edv-ai-msg { margin-bottom: 14px; display: flex; flex-direction: column; }
+    .edv-ai-msg-user { align-items: flex-end; }
+    .edv-ai-msg-bot  { align-items: flex-start; }
+ 
     .edv-ai-bubble {
-      display:inline-block;
-      padding:10px 12px;
-      border-radius:10px;
-      max-width:80%;
-      box-sizing:border-box;
-      word-break:break-word;
-      white-space:pre-wrap;
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 82%;
+      box-sizing: border-box;
+      word-break: break-word;
+      white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.55;
     }
-
-    .edv-ai-bubble-user { background:#d5f0ff; }
+ 
+    .edv-ai-bubble-user {
+      background: #0b76ef;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+ 
     .edv-ai-bubble-bot {
-      background:#f1f3f5;
-      text-align:left;
-      font-family:monospace;
-      font-size:13px;
-      color:#0b1720;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      color: #111827;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
-
-    .edv-ai-meta { color:#666; font-size:12px; margin-top:4px; }
-
+ 
+    /* Thinking animation */
+    .edv-ai-bubble-thinking {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      color: #6b7280;
+      border-bottom-left-radius: 4px;
+    }
+    .edv-ai-dots span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #9ca3af;
+      margin: 0 2px;
+      animation: edv-bounce 1.2s infinite;
+    }
+    .edv-ai-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .edv-ai-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes edv-bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40%            { transform: translateY(-6px); }
+    }
+ 
+    /* Mode badge */
+    .edv-ai-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-top: 5px;
+    }
+    .edv-ai-badge-db      { background: #dcfce7; color: #166534; }
+    .edv-ai-badge-general { background: #fef3c7; color: #92400e; }
+ 
     /* Sources dropdown */
+    .edv-ai-sources {
+      margin-top: 6px;
+      max-width: 82%;
+    }
     .edv-ai-sources summary {
       cursor: pointer;
       color: #0b76ef;
       font-weight: 600;
       font-size: 12px;
-      margin-top: 6px;
+      user-select: none;
     }
     .edv-ai-sources pre {
-      background: #fafafa;
-      border: 1px solid #ddd;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
       border-radius: 6px;
       padding: 8px;
-      font-size: 12px;
+      font-size: 11px;
       white-space: pre-wrap;
       word-wrap: break-word;
       margin-top: 4px;
+      max-height: 180px;
+      overflow-y: auto;
     }
-
-    /* small screens */
-    @media (max-width:720px) {
-      .edv-ai-chat-wrap { height:520px; width:100%; padding:8px; }
-      .edv-ai-bubble { font-size:14px; }
-      .edv-ai-send-btn { flex: 0 0 110px; width:110px; height:40px; }
-      .edv-ai-input { height:40px; font-size:14px; }
+ 
+    @media (max-width: 720px) {
+      .edv-ai-chat-wrap { height: 520px; }
+      .edv-ai-bubble { font-size: 13px; max-width: 90%; }
+      .edv-ai-send-btn { flex: 0 0 72px; width: 72px; height: 40px; font-size: 13px; }
+      .edv-ai-input { height: 40px; font-size: 13px; }
     }
   </style>
 </head>
 <body>
-  <!-- Root wrapper (scoped) -->
-  <div class="edv-ai-root" role="region" aria-label="edvance CSV chatbot partial">
-    <div class="edv-ai-chat-wrap" role="application" aria-label="CSV chatbot">
+  <div class="edv-ai-root" role="region" aria-label="edVance AI assistant">
+    <div class="edv-ai-chat-wrap" role="application" aria-label="AI chatbot">
+ 
+      <div class="edv-ai-header">
+        <span class="edv-ai-header-dot"></span>
+        edVance AI Assistant
+      </div>
+ 
       <div class="edv-ai-messages" id="edv-ai-messages" aria-live="polite" aria-atomic="false"></div>
-
+ 
       <div class="edv-ai-inputbar">
         <input id="edv-ai-query" class="edv-ai-input" type="text"
-               placeholder="Ask about colleges, rankings, placements or reviews — answers come only from CSVs" aria-label="Ask a question"/>
-        <button id="edv-ai-send" class="edv-ai-send-btn" aria-label="Send question">Send</button>
+               placeholder="Ask about colleges, rankings, placements, reviews…"
+               aria-label="Ask a question" autocomplete="off"/>
+        <button id="edv-ai-send" class="edv-ai-send-btn" aria-label="Send">Send</button>
       </div>
+ 
     </div>
   </div>
-
+ 
   <script>
-    (function(){
-      const messagesEl = document.getElementById('edv-ai-messages');
-      const input = document.getElementById('edv-ai-query');
-      const btn = document.getElementById('edv-ai-send');
-
-      function appendMessage(text, who='bot', meta='') {
-        const wrap = document.createElement('div');
-        wrap.className = 'edv-ai-msg' + (who === 'user' ? ' edv-ai-msg-user' : '');
-
-        const bubble = document.createElement('div');
-        bubble.className = 'edv-ai-bubble ' + (who === 'user' ? 'edv-ai-bubble-user' : 'edv-ai-bubble-bot');
-        bubble.textContent = text;
-
-        wrap.appendChild(bubble);
-
-        if (meta) {
-          const metaEl = document.createElement('div');
-          metaEl.className = 'edv-ai-meta';
-
-          // NEW: sources dropdown
-          try {
-            const parsed = JSON.parse(meta);
-            const details = document.createElement('details');
-            details.className = 'edv-ai-sources';
-            const summary = document.createElement('summary');
-            summary.textContent = 'Sources';
-            const pre = document.createElement('pre');
-            pre.textContent = JSON.stringify(parsed, null, 2);
-            details.appendChild(summary);
-            details.appendChild(pre);
-            metaEl.appendChild(details);
-          } catch(e) {
-            metaEl.textContent = meta;
-          }
-
-          wrap.appendChild(metaEl);
-        }
-
-        messagesEl.appendChild(wrap);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
+  (function () {
+    const messagesEl = document.getElementById('edv-ai-messages');
+    const input      = document.getElementById('edv-ai-query');
+    const btn        = document.getElementById('edv-ai-send');
+ 
+    // ----------------------------------------------------------------
+    // Append a user bubble
+    // ----------------------------------------------------------------
+    function appendUser(text) {
+      const wrap = document.createElement('div');
+      wrap.className = 'edv-ai-msg edv-ai-msg-user';
+      const bubble = document.createElement('div');
+      bubble.className = 'edv-ai-bubble edv-ai-bubble-user';
+      bubble.textContent = text;
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
+      scrollBottom();
+    }
+ 
+    // ----------------------------------------------------------------
+    // Append animated thinking bubble; returns the wrapper element
+    // ----------------------------------------------------------------
+    function appendThinking() {
+      const wrap = document.createElement('div');
+      wrap.className = 'edv-ai-msg edv-ai-msg-bot';
+      const bubble = document.createElement('div');
+      bubble.className = 'edv-ai-bubble edv-ai-bubble-thinking';
+      bubble.innerHTML = '<span class="edv-ai-dots"><span></span><span></span><span></span></span>';
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
+      scrollBottom();
+      return wrap;
+    }
+ 
+    // ----------------------------------------------------------------
+    // Replace thinking wrapper with real bot answer
+    // ----------------------------------------------------------------
+    function replaceThinking(thinkingWrap, answer, mode, sources) {
+      thinkingWrap.remove();
+ 
+      const wrap = document.createElement('div');
+      wrap.className = 'edv-ai-msg edv-ai-msg-bot';
+ 
+      // Main bubble
+      const bubble = document.createElement('div');
+      bubble.className = 'edv-ai-bubble edv-ai-bubble-bot';
+      bubble.textContent = answer;
+      wrap.appendChild(bubble);
+ 
+      // Mode badge
+      const badge = document.createElement('span');
+      if (mode === 'database') {
+        badge.className = 'edv-ai-badge edv-ai-badge-db';
+        badge.textContent = '📊 From database';
+      } else {
+        badge.className = 'edv-ai-badge edv-ai-badge-general';
+        badge.textContent = '🌐 General knowledge';
       }
-
-      async function sendQuery() {
-        const q = input.value.trim();
-        if (!q) return;
-        appendMessage(q, 'user');
-        input.value = '';
-        appendMessage('Thinking...', 'bot');
-
-        try {
-          const res = await fetch('/ai/chat', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({query: q})
-          });
-
-          // attempt to parse JSON safely
-          let data;
-          try {
-            data = await res.json();
-          } catch (e) {
-            throw new Error('Server did not return JSON');
-          }
-
-          // remove the 'Thinking...' message (the last bot bubble)
-          const botBubbles = messagesEl.querySelectorAll('.edv-ai-msg .edv-ai-bubble.edv-ai-bubble-bot');
-          if (botBubbles.length) {
-            const lastBubble = botBubbles[botBubbles.length - 1];
-            if (lastBubble && lastBubble.textContent === 'Thinking...') {
-              lastBubble.parentElement.remove();
-            }
-          }
-
-          if (data.ok) {
-            appendMessage(data.answer, 'bot', JSON.stringify(data.sources));
-          } else {
-            appendMessage(data.answer || 'No answer available', 'bot');
-          }
-        } catch (e) {
-          // remove the 'Thinking...' message if present
-          const botBubbles = messagesEl.querySelectorAll('.edv-ai-msg .edv-ai-bubble.edv-ai-bubble-bot');
-          if (botBubbles.length) {
-            const lastBubble = botBubbles[botBubbles.length - 1];
-            if (lastBubble && lastBubble.textContent === 'Thinking...') {
-              lastBubble.parentElement.remove();
-            }
-          }
-          appendMessage('Error contacting server: ' + (e.message || String(e)), 'bot');
-        }
+      wrap.appendChild(badge);
+ 
+      // Sources dropdown (only when database mode and sources exist)
+      if (mode === 'database' && sources && sources.length > 0) {
+        const details = document.createElement('details');
+        details.className = 'edv-ai-sources';
+        const summary = document.createElement('summary');
+        summary.textContent = `View ${sources.length} source row(s)`;
+        const pre = document.createElement('pre');
+        pre.textContent = JSON.stringify(sources, null, 2);
+        details.appendChild(summary);
+        details.appendChild(pre);
+        wrap.appendChild(details);
       }
-
-      btn.addEventListener('click', sendQuery);
-      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendQuery(); });
-
-      // optional: small accessibility helper to focus input when the partial loads
-      try { document.getElementById('edv-ai-query').focus(); } catch (_) {}
+ 
+      messagesEl.appendChild(wrap);
+      scrollBottom();
+    }
+ 
+    // ----------------------------------------------------------------
+    // Show error message
+    // ----------------------------------------------------------------
+    function appendError(msg) {
+      const wrap = document.createElement('div');
+      wrap.className = 'edv-ai-msg edv-ai-msg-bot';
+      const bubble = document.createElement('div');
+      bubble.className = 'edv-ai-bubble edv-ai-bubble-bot';
+      bubble.style.color = '#dc2626';
+      bubble.textContent = '⚠️ ' + msg;
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
+      scrollBottom();
+    }
+ 
+    function scrollBottom() {
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+ 
+    // ----------------------------------------------------------------
+    // Send query
+    // ----------------------------------------------------------------
+    async function sendQuery() {
+      const q = input.value.trim();
+      if (!q) return;
+ 
+      appendUser(q);
+      input.value = '';
+      btn.disabled = true;
+ 
+      const thinkingWrap = appendThinking();
+ 
+      try {
+        const res = await fetch('/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: q })
+        });
+ 
+        let data;
+        try { data = await res.json(); }
+        catch (e) { throw new Error('Server did not return valid JSON'); }
+ 
+        if (data.ok) {
+          replaceThinking(thinkingWrap, data.answer, data.mode, data.sources);
+        } else {
+          thinkingWrap.remove();
+          appendError(data.answer || 'No answer available.');
+        }
+      } catch (e) {
+        thinkingWrap.remove();
+        appendError('Could not reach server: ' + (e.message || String(e)));
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    }
+ 
+    btn.addEventListener('click', sendQuery);
+    input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) sendQuery(); });
+ 
+    // Welcome message
+    (function () {
+      const wrap = document.createElement('div');
+      wrap.className = 'edv-ai-msg edv-ai-msg-bot';
+      const bubble = document.createElement('div');
+      bubble.className = 'edv-ai-bubble edv-ai-bubble-bot';
+      bubble.textContent = 'Hi! I\'m your edVance AI assistant 👋\nAsk me about college rankings, placements, reviews, or anything else about higher education.';
+      wrap.appendChild(bubble);
+      messagesEl.appendChild(wrap);
     })();
+ 
+    try { input.focus(); } catch (_) {}
+  })();
   </script>
 </body>
 </html>

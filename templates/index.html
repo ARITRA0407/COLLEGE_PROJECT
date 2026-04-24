@@ -24,15 +24,17 @@
 
     .iframe-wrap {
       width: 100%;
-      background: #fff;
       border-radius: 10px;
       margin-top: 18px;
     }
 
+    /* iframe starts at 0 height, grows via JS postMessage */
     .comparison-iframe {
       width: 100%;
-      height: 800px;
+      height: 0;
       border: 0;
+      display: block;
+      transition: height 0.2s ease;
     }
 
     /* ✅ FLOATING BUTTON */
@@ -53,9 +55,7 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.25);
     }
 
-    #aiBtn:hover {
-      background: #059669;
-    }
+    #aiBtn:hover { background: #059669; }
   </style>
 </head>
 
@@ -94,8 +94,39 @@
 
 <script>
   document.getElementById("aiBtn").onclick = function () {
-    window.location.href = "/quiz";  // ✅ opens your quiz app
+    window.location.href = "/quiz";
   };
+
+  // Auto-resize the comparison iframe to match its content height
+  const iframe = document.getElementById('comparisonIframe');
+
+  function resizeIframe() {
+    try {
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      const h = doc.documentElement.scrollHeight || doc.body.scrollHeight;
+      iframe.style.height = h + 'px';
+    } catch (e) {
+      // cross-origin fallback: listen for postMessage from iframe
+    }
+  }
+
+  // Resize on load and whenever the iframe content changes (e.g. after Compare click)
+  iframe.addEventListener('load', function () {
+    resizeIframe();
+    // Poll for height changes for 5s after load (covers dynamic content injection)
+    let polls = 0;
+    const iv = setInterval(() => {
+      resizeIframe();
+      if (++polls > 20) clearInterval(iv);
+    }, 250);
+  });
+
+  // Also listen for postMessage from the iframe (for cross-origin or explicit signals)
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.type === 'iframeHeight') {
+      iframe.style.height = e.data.height + 'px';
+    }
+  });
 </script>
 
 </body>

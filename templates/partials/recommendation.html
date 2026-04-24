@@ -9,7 +9,81 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/recommendation.css') }}"
     />
- 
+  <style>
+    /* ── Gemini button ── */
+    #gemini-btn {
+      padding: 0 18px;
+      height: 40px;
+      background: linear-gradient(135deg, #4285f4 0%, #0f9d58 40%, #f4b400 70%, #db4437 100%);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      vertical-align: middle;
+      transition: opacity .2s, transform .15s;
+      margin-left: 10px;
+    }
+    #gemini-btn:hover { opacity: .88; transform: translateY(-1px); }
+    #gemini-btn:active { opacity: 1; transform: translateY(0); }
+    #gemini-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    /* spinner inside button */
+    .g-spin {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: gspin .7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes gspin { to { transform: rotate(360deg); } }
+
+    /* ── Gemini output panel ── */
+    #gemini-output {
+      display: none;
+      margin-top: 18px;
+      padding: 20px 22px;
+      background: #f8faff;
+      border: 1.5px solid #c7d9ff;
+      border-radius: 10px;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #1a1a2e;
+      position: relative;
+    }
+    #gemini-output .g-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #2a5adb;
+    }
+    #gemini-output .g-header svg {
+      flex-shrink: 0;
+    }
+    #gemini-output .g-close {
+      position: absolute;
+      top: 12px; right: 14px;
+      background: none; border: none;
+      font-size: 18px; cursor: pointer;
+      color: #888; line-height: 1;
+    }
+    #gemini-output .g-close:hover { color: #333; }
+    #gemini-output .g-body {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    /* simple markdown-like rendering */
+    #gemini-output .g-body strong { color: #1a3a8f; }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -52,10 +126,29 @@
         </div>
       </div>
 
-      <div style="margin-top:12px;">
+      <div style="margin-top:12px; display:flex; align-items:center; flex-wrap:wrap; gap:8px;">
         <button type="submit">Get Recommendations</button>
+        <button type="button" id="gemini-btn">
+          <!-- Gemini spark icon -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C12 2 13.5 8.5 19 12C13.5 15.5 12 22 12 22C12 22 10.5 15.5 5 12C10.5 8.5 12 2 12 2Z" fill="white"/>
+          </svg>
+          Recommend via Gemini
+        </button>
       </div>
     </form>
+
+    <!-- Gemini AI output panel — appears right below the buttons -->
+    <div id="gemini-output">
+      <div class="g-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C12 2 13.5 8.5 19 12C13.5 15.5 12 22 12 22C12 22 10.5 15.5 5 12C10.5 8.5 12 2 12 2Z" fill="#4285f4"/>
+        </svg>
+        Gemini AI Recommendation
+      </div>
+      <button class="g-close" id="gemini-close" title="Close">×</button>
+      <div class="g-body" id="gemini-body"></div>
+    </div>
 
     <!-- client-side sort control (single selector) -->
     <div class="controls" style="margin-bottom:12px;">
@@ -79,7 +172,125 @@
     </div>
   </div>
 
+  <script src="{{ url_for('static', filename='js/recommendation.js') }}"></script>
 
-<script src="{{ url_for('static', filename='js/recommendation.js') }}"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function getVal(id) {
+      const el = document.getElementById(id);
+      if (!el) return '';
+      return (el.value || '').trim();
+    }
+
+    function buildPrompt() {
+      const rank     = getVal('rank');
+      const program  = getVal('program');
+      const stream   = getVal('stream');
+      const quota    = getVal('quota');
+      const category = getVal('category');
+      const location = getVal('location');
+
+      const parts = [];
+      if (rank)     parts.push(`Expected Rank: ${rank}`);
+      if (program)  parts.push(`Program: ${program}`);
+      if (stream)   parts.push(`Stream: ${stream}`);
+      if (quota)    parts.push(`Quota: ${quota}`);
+      if (category) parts.push(`Category: ${category}`);
+      if (location) parts.push(`Preferred Location: ${location}`);
+
+      return (
+        `I am a student applying for WBJEE (West Bengal Joint Entrance Examination) college admissions in West Bengal, India.\n\n` +
+        `My details are:\n${parts.join('\n')}\n\n` +
+        `Based on these details, please recommend the best WBJEE colleges in West Bengal that I should consider. ` +
+        `For each college, mention: the college name, why it suits my profile, notable programs, approximate closing rank, and any important tips. ` +
+        `Format the response clearly with numbered colleges. Focus only on West Bengal government/aided engineering colleges under WBJEE.`
+      );
+    }
+
+    // simple markdown bold (**text**) → <strong>
+    function renderMarkdown(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>');
+    }
+
+    // ── Gemini call via Anthropic API proxy ──────────────────────────────────
+    async function callGemini(prompt) {
+      const response = await fetch('/claude-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: 'You are an expert on West Bengal engineering college admissions through WBJEE. Give precise, helpful, accurate college recommendations based on the student\'s rank and preferences. Be concise but informative.',
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error?.message || `API error ${response.status}`);
+      }
+
+      const data = await response.json();
+      return (data.content || [])
+        .filter(b => b.type === 'text')
+        .map(b => b.text)
+        .join('\n');
+    }
+
+    // ── UI wiring ─────────────────────────────────────────────────────────────
+    const btn    = document.getElementById('gemini-btn');
+    const output = document.getElementById('gemini-output');
+    const body   = document.getElementById('gemini-body');
+    const closeBtn = document.getElementById('gemini-close');
+
+    closeBtn.addEventListener('click', () => {
+      output.style.display = 'none';
+      body.innerHTML = '';
+    });
+
+    btn.addEventListener('click', async () => {
+      // validate rank & program (minimum required)
+      const rank    = getVal('rank');
+      const program = getVal('program');
+
+      if (!rank) {
+        alert('Please enter your Expected Rank before using Gemini recommendation.');
+        document.getElementById('rank').focus();
+        return;
+      }
+      if (!program) {
+        alert('Please select a Program before using Gemini recommendation.');
+        document.getElementById('program').focus();
+        return;
+      }
+
+      // show loading state
+      btn.disabled = true;
+      btn.innerHTML = '<span class="g-spin"></span> Thinking…';
+      output.style.display = 'block';
+      body.innerHTML = '<em style="color:#666;">Generating recommendation…</em>';
+
+      try {
+        const prompt = buildPrompt();
+        const text   = await callGemini(prompt);
+        body.innerHTML = renderMarkdown(text);
+      } catch (err) {
+        body.innerHTML = `<span style="color:#c0392b;">⚠ Error: ${err.message}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C12 2 13.5 8.5 19 12C13.5 15.5 12 22 12 22C12 22 10.5 15.5 5 12C10.5 8.5 12 2 12 2Z" fill="white"/>
+          </svg>
+          Recommend via Gemini`;
+      }
+    });
+  })();
+  </script>
 </body>
 </html>
