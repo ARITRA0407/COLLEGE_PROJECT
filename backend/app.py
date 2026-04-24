@@ -9,7 +9,7 @@ load_dotenv()
 import os
 import sys
 import threading
-from flask import Flask, render_template, request, jsonify, send_from_directory, abort
+from flask import Flask, render_template, request, jsonify, send_from_directory, abort, current_app
 from werkzeug.utils import safe_join
 import pandas as pd
 import random
@@ -996,6 +996,7 @@ def claude_proxy():
 
         GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
         if not GEMINI_API_KEY:
+            current_app.logger.error("GEMINI_API_KEY not set")
             return jsonify({'error': 'GEMINI_API_KEY not set'}), 500
 
         messages = payload.get('messages', [])
