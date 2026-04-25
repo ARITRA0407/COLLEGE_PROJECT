@@ -10,6 +10,7 @@ let timerInterval = null;
 let isLoadingNext = false;
 let pendingStop = false;
 let isOpeningResult = false;
+const RESULT_REQUEST_TIMEOUT_MS = 4500;
 
 let skillState = {
     AI_Int: 0,
@@ -81,6 +82,21 @@ function setStopLoadingState(message) {
     });
 }
 
+async function postWithTimeout(url, options = {}, timeoutMs = RESULT_REQUEST_TIMEOUT_MS) {
+    const controller = new AbortController();
+    const timerId = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        return await fetch(url, {
+            cache: "no-store",
+            ...options,
+            signal: controller.signal
+        });
+    } finally {
+        clearTimeout(timerId);
+    }
+}
+
 async function openResultPage() {
     if (isOpeningResult) return;
     isOpeningResult = true;
@@ -98,7 +114,7 @@ async function openResultPage() {
             pendingBatchAnswers = [];
         }
 
-        await fetch("/quiz-finalize", { method: "POST" });
+        await postWithTimeout("/quiz-finalize", { method: "POST" });
     } catch (err) {
         console.error("Quiz finalize error:", err);
     }

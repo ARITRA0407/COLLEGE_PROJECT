@@ -24,6 +24,16 @@ def _env_flag(name, default=False):
     return str(raw_value).strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_float(name, default=0.0):
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return default
+    try:
+        return float(raw_value)
+    except Exception:
+        return default
+
+
 # ensure backend module path is available for imports
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory of the current file (app.py).
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR) # Get the parent directory, which is the project root.
@@ -55,10 +65,13 @@ _ai_module_lock = threading.Lock()
 _quiz_payload_lock = threading.Lock()
 _quiz_payload_prefetch_lock = threading.Lock()
 _warmup_lock = threading.Lock()
+_quiz_model_warmup_lock = threading.Lock()
 _quiz_payload_cache = {"signature": None, "payload": None}
 _quiz_payload_prefetch_state = {"signature": None, "event": None}
 _warmup_started = False
+_quiz_model_warmup_started = False
 AUTO_MODEL_WARMUP = _env_flag("ENABLE_MODEL_WARMUP", False)
+QUIZ_RESULT_WAIT_TIMEOUT = _env_float("QUIZ_RESULT_WAIT_TIMEOUT", 4.5)
 
 try:
     q_df = pd.read_csv(os.path.join(CSV_FOLDER, "QUESTIONS.csv"), encoding="latin1")
@@ -118,6 +131,38 @@ def get_quiz_recommender():
             print("Quiz recommender initialization failed:", recommender_error)
 
     return quiz_recommender
+
+
+def _start_quiz_model_warmup():
+    global _quiz_model_warmup_started
+
+    if career_df is None or quiz_recommender is not None:
+        return
+
+    with _quiz_model_warmup_lock:
+        if _quiz_model_warmup_started or quiz_recommender is not None or career_df is None:
+            return
+        _quiz_model_warmup_started = True
+
+    def _warmup_task():
+        global _quiz_model_warmup_started
+
+        try:
+            if get_quiz_recommender() is not None:
+                print("Quiz recommender quiz-session warmup complete.")
+                return
+        except Exception as exc:
+            print("Quiz recommender quiz-session warmup failed:", exc)
+
+        with _quiz_model_warmup_lock:
+            if quiz_recommender is None:
+                _quiz_model_warmup_started = False
+
+    threading.Thread(
+        target=_warmup_task,
+        name="quiz-recommender-session-warmup",
+        daemon=True
+    ).start()
 
 
 def get_college_recommender():
@@ -221,26 +266,58 @@ def _store_cached_quiz_payload(signature, payload):
         _quiz_payload_cache["payload"] = payload
 
 
-def _refresh_quiz_payload_cache(persist_report=False, store_history=False):
+def _attach_quiz_report(payload, store_history=False):
+    if not payload:
+        return payload
+
+    if payload.get("report_paths"):
+        return payload
+
+    report_paths = {}
+    active_quiz_recommender = get_quiz_recommender()
+    if active_quiz_recommender is not None:
+        _, report_paths = active_quiz_recommender.build_report(
+            category_metrics=payload.get("result", {}),
+            recommendations=payload.get("rec", []),
+            summary_metrics=payload.get("summary_metrics", {}),
+            store_history=store_history
+        )
+
+    hydrated_payload = dict(payload)
+    hydrated_payload["report_paths"] = report_paths
+    hydrated_payload["report_file"] = (
+        os.path.basename(report_paths.get("latest", ""))
+        if report_paths else ""
+    )
+    return hydrated_payload
+
+
+def _refresh_quiz_payload_cache(persist_report=False, store_history=False, wait_timeout=2.5):
     signature = _quiz_payload_signature()
     cached_payload = _get_cached_quiz_payload(signature)
     if cached_payload is not None:
         has_report = bool(cached_payload.get("report_paths"))
         if not persist_report or has_report:
             return cached_payload
+        cached_payload = _attach_quiz_report(cached_payload, store_history=store_history)
+        _store_cached_quiz_payload(signature, cached_payload)
+        return cached_payload
 
     wait_event = None
     with _quiz_payload_prefetch_lock:
         if _quiz_payload_prefetch_state.get("signature") == signature:
             wait_event = _quiz_payload_prefetch_state.get("event")
 
-    if wait_event is not None:
-        wait_event.wait(timeout=2.5)
+    if wait_event is not None and wait_timeout > 0:
+        wait_event.wait(timeout=wait_timeout)
         cached_payload = _get_cached_quiz_payload(signature)
         if cached_payload is not None:
             has_report = bool(cached_payload.get("report_paths"))
             if not persist_report or has_report:
                 return cached_payload
+            cached_payload = _attach_quiz_report(cached_payload, store_history=store_history)
+            _store_cached_quiz_payload(signature, cached_payload)
+            return cached_payload
 
     payload = _build_quiz_result_payload(
         persist_report=persist_report,
@@ -617,6 +694,8 @@ def start_quiz():
         "report_paths": {}
     })
 
+    _start_quiz_model_warmup()
+
     questions = []
 
     for c in categories:
@@ -732,22 +811,10 @@ def next_question():
             new_questions.append(q)
 
     answer_count = len(user_data.get("answer_log", []))
-    ready_for_result = answer_count >= 17
-    if ready_for_result and answer_count == 17:
-        try:
-            _refresh_quiz_payload_cache(
-                persist_report=True,
-                store_history=False
-            )
-        except Exception as exc:
-            print("Initial quiz-result precompute failed:", exc)
-            _schedule_quiz_payload_refresh(
-                persist_report=True,
-                store_history=False
-            )
-    elif ready_for_result:
+    if answer_count >= 15:
+        _start_quiz_model_warmup()
         _schedule_quiz_payload_refresh(
-            persist_report=True,
+            persist_report=False,
             store_history=False
         )
 
@@ -763,9 +830,15 @@ def quiz_finalize():
     if not user_data.get("answer_log"):
         return jsonify({"status": "error", "message": "No quiz progress found"}), 400
 
+    _start_quiz_model_warmup()
+    _schedule_quiz_payload_refresh(
+        persist_report=False,
+        store_history=False
+    )
     payload = _refresh_quiz_payload_cache(
         persist_report=True,
-        store_history=False
+        store_history=False,
+        wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT
     )
     user_data["report_paths"] = payload.get("report_paths", {})
 
@@ -784,9 +857,15 @@ def quiz_result():
     if career_df is None:
         return "Career data not loaded", 500
 
+    _start_quiz_model_warmup()
+    _schedule_quiz_payload_refresh(
+        persist_report=False,
+        store_history=False
+    )
     payload = _refresh_quiz_payload_cache(
         persist_report=True,
-        store_history=False
+        store_history=False,
+        wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT
     )
     user_data["report_paths"] = payload.get("report_paths", {})
 
