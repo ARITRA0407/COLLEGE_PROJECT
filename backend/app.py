@@ -17,6 +17,13 @@ import pandas as pd
 import random
 
 
+def _env_flag(name, default=False):
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return default
+    return str(raw_value).strip().lower() in {"1", "true", "yes", "on"}
+
+
 # ensure backend module path is available for imports
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory of the current file (app.py).
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR) # Get the parent directory, which is the project root.
@@ -51,6 +58,7 @@ _warmup_lock = threading.Lock()
 _quiz_payload_cache = {"signature": None, "payload": None}
 _quiz_payload_prefetch_state = {"signature": None, "event": None}
 _warmup_started = False
+AUTO_MODEL_WARMUP = _env_flag("ENABLE_MODEL_WARMUP", False)
 
 try:
     q_df = pd.read_csv(os.path.join(CSV_FOLDER, "QUESTIONS.csv"), encoding="latin1")
@@ -287,9 +295,13 @@ def _schedule_quiz_payload_refresh(persist_report=False, store_history=False):
     ).start()
 
 
-if hasattr(app, "before_serving"):
+if hasattr(app, "before_serving") and AUTO_MODEL_WARMUP:
     @app.before_serving
     def _before_serving_warmup():
+        _start_background_warmup()
+elif AUTO_MODEL_WARMUP:
+    @app.before_request
+    def _before_request_warmup():
         _start_background_warmup()
 
 
@@ -584,8 +596,6 @@ def start_quiz():
 
     if q_df is None:
         return jsonify([])
-
-    get_quiz_recommender()
 
     q_df["Category"] = q_df["Category"].astype(str).str.strip()
 
@@ -1229,8 +1239,8 @@ def claude_proxy():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-_start_background_warmup()
-
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    debug_mode = _env_flag("FLASK_DEBUG", False)
+    use_reloader = debug_mode and _env_flag("FLASK_USE_RELOADER", False)
+    app.run(host='0.0.0.0', port=port, debug=debug_mode, use_reloader=use_reloader)

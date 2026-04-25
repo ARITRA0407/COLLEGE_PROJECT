@@ -4,28 +4,24 @@
   "stack": {
     "association_rules": true,
     "hybrid_models": [
-      "heuristic",
       "decision_tree",
       "random_forest",
-      "extra_trees",
       "gradient_boosting"
     ],
     "hybrid_weights": {
-      "heuristic": 0.076851,
-      "decision_tree": 0.22402,
-      "random_forest": 0.241261,
-      "extra_trees": 0.234257,
-      "gradient_boosting": 0.223612
+      "decision_tree": 0.368249,
+      "random_forest": 0.269446,
+      "gradient_boosting": 0.362305
     },
     "cache_loaded": true
   },
   "type": "regressor",
   "metrics": {
     "samples": 358,
-    "mae": 17701.1834,
-    "rmse": 76442.2878,
-    "r2": 0.85,
-    "median_ae": 3200.4637,
-    "mape": 0.280659
+    "mae": 17764.6951,
+    "rmse": 71214.3677,
+    "r2": 0.8698,
+    "median_ae": 4240.7129,
+    "mape": 0.529835
   }
 }

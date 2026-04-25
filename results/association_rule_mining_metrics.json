@@ -1,0 +1,152 @@
+{
+  "model_name": "association_rule_mining",
+  "saved_from_cache": false,
+  "stack": {
+    "association_rules": true,
+    "hybrid_models": [
+      "decision_tree",
+      "random_forest",
+      "gradient_boosting"
+    ],
+    "hybrid_weights": {
+      "decision_tree": 0.368249,
+      "random_forest": 0.269446,
+      "gradient_boosting": 0.362305
+    },
+    "cache_loaded": false
+  },
+  "type": "association_rule_mining",
+  "algorithm": "apriori_style_pair_rules",
+  "rules_version": 2,
+  "metrics": {
+    "transactions": 13477,
+    "unique_items": 152,
+    "frequent_itemsets": 97,
+    "rules_generated": 79,
+    "rules_saved": 79,
+    "avg_support": 0.115592,
+    "avg_confidence": 0.724435,
+    "avg_lift": 1.28905,
+    "max_support": 0.608296,
+    "max_confidence": 1.0,
+    "max_lift": 6.291783
+  },
+  "configuration": {
+    "min_support": 0.03,
+    "max_itemset_size": 2,
+    "min_confidence": 0.18,
+    "max_rules_per_antecedent": 6
+  },
+  "top_rules": [
+    {
+      "antecedent": "program=computer science & engineering - tfw",
+      "consequent": "category=tuition fee waiver",
+      "antecedent_support": 0.0373230017721653,
+      "consequent_support": 0.158937007188797,
+      "support": 0.0373230017721653,
+      "confidence": 1.0,
+      "lift": 6.291782855987549,
+      "leverage": 0.031390998512506485,
+      "conviction": null
+    },
+    {
+      "antecedent": "quota=all india",
+      "consequent": "category=open",
+      "antecedent_support": 0.38524898886680603,
+      "consequent_support": 0.4423829913139343,
+      "support": 0.38524898886680603,
+      "confidence": 1.0,
+      "lift": 2.2604830265045166,
+      "leverage": 0.214820995926857,
+      "conviction": null
+    },
+    {
+      "antecedent": "category=tuition fee waiver",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.158937007188797,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.158937007188797,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.061230000108480453,
+      "conviction": null
+    },
+    {
+      "antecedent": "category=sc",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.10187699645757675,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.10187699645757675,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.03924800083041191,
+      "conviction": null
+    },
+    {
+      "antecedent": "category=obc - a",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.07442300021648407,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.07442300021648407,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.02867100015282631,
+      "conviction": null
+    },
+    {
+      "antecedent": "category=obc - b",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.07093600183725357,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.07093600183725357,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.027327999472618103,
+      "conviction": null
+    },
+    {
+      "antecedent": "category=st",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.06299600005149841,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.06299600005149841,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.024268999695777893,
+      "conviction": null
+    },
+    {
+      "antecedent": "category=ews",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.04704299941658974,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.04704299941658974,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.018123000860214233,
+      "conviction": null
+    },
+    {
+      "antecedent": "district=jalpaiguri",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.04199700057506561,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.04199700057506561,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.016178999096155167,
+      "conviction": null
+    },
+    {
+      "antecedent": "program=computer science & engineering - tfw",
+      "consequent": "quota=home state",
+      "antecedent_support": 0.0373230017721653,
+      "consequent_support": 0.6147509813308716,
+      "support": 0.0373230017721653,
+      "confidence": 1.0,
+      "lift": 1.626675009727478,
+      "leverage": 0.014379000291228294,
+      "conviction": null
+    }
+  ]
+}

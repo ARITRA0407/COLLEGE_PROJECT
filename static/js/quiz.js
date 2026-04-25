@@ -1,5 +1,6 @@
 let questions = JSON.parse(localStorage.getItem("questions")) || [];
 let answers = [];
+let pendingBatchAnswers = [];
 
 let totalAnswered = 0;
 let streak = 0;
@@ -88,6 +89,15 @@ async function openResultPage() {
     setStopLoadingState("The timer is stopped. Opening the result page now.");
 
     try {
+        if (pendingBatchAnswers.length > 0) {
+            await fetch("/next", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(pendingBatchAnswers)
+            });
+            pendingBatchAnswers = [];
+        }
+
         await fetch("/quiz-finalize", { method: "POST" });
     } catch (err) {
         console.error("Quiz finalize error:", err);
@@ -98,6 +108,7 @@ async function openResultPage() {
 }
 
 function startQuiz() {
+    pendingBatchAnswers = [];
     fetch("/start", { method: "POST" })
         .then(res => res.json())
         .then(data => {
@@ -204,6 +215,7 @@ function selectOption(btn, weight, w1, w2, w3) {
         confidence: confidence,
         streak: streak
     });
+    pendingBatchAnswers.push(answers[answers.length - 1]);
 
     totalAnswered++;
     updateProgressBar();
@@ -211,19 +223,33 @@ function selectOption(btn, weight, w1, w2, w3) {
 }
 
 function goNext() {
+    questions.shift();
+    updateSkill();
+    showAIHint();
+
+    if (pendingStop) {
+        localStorage.setItem("questions", JSON.stringify(questions));
+        isLoadingNext = false;
+        openResultPage();
+        return;
+    }
+
+    if (questions.length > 0) {
+        localStorage.setItem("questions", JSON.stringify(questions));
+        isLoadingNext = false;
+        showQuestion();
+        return;
+    }
+
     fetch("/next", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify([answers[answers.length - 1]])
+        body: JSON.stringify(pendingBatchAnswers)
     })
         .then(res => res.json())
         .then(data => {
+            pendingBatchAnswers = [];
             isLoadingNext = false;
-
-            if (pendingStop) {
-                openResultPage();
-                return;
-            }
 
             if (!Array.isArray(data) || data.length === 0) {
                 document.getElementById("quiz").innerHTML =
@@ -233,10 +259,7 @@ function goNext() {
 
             questions = data;
             localStorage.setItem("questions", JSON.stringify(data));
-
             showQuestion();
-            updateSkill();
-            showAIHint();
         })
         .catch(err => {
             console.error("Next error:", err);

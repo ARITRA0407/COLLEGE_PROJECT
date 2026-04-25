@@ -9,7 +9,6 @@ import pandas as pd
 
 try:
     from sklearn.ensemble import (
-        ExtraTreesRegressor,
         GradientBoostingRegressor,
         RandomForestRegressor,
     )
@@ -25,7 +24,6 @@ try:
     from sklearn.tree import DecisionTreeRegressor
     SKLEARN_AVAILABLE = True
 except Exception:
-    ExtraTreesRegressor = None
     GradientBoostingRegressor = None
     RandomForestRegressor = None
     mean_absolute_error = None
@@ -48,17 +46,22 @@ class CollegeRecommender:
     - quality metrics such as CTC and reviews
     """
 
-    CACHE_VERSION = 3
+    CACHE_VERSION = 4
+    ASSOCIATION_RULES_VERSION = 2
     RULES_FILENAME = "association_rules.csv"
     CACHE_FILENAME = "college_recommender_cache.pkl"
     METRICS_FILENAMES = {
-        "heuristic": "heuristic_metrics.json",
+        "association_rule_mining": "association_rule_mining_metrics.json",
         "decision_tree": "decision_tree_metrics.json",
         "random_forest": "random_forest_metrics.json",
-        "extra_trees": "extra_trees_metrics.json",
         "gradient_boosting": "gradient_boosting_metrics.json",
         "hybrid_ensemble": "hybrid_ensemble_metrics.json",
     }
+    STALE_METRICS_FILENAMES = (
+        "heuristic_metrics.json",
+        "extra_trees_metrics.json",
+        "apriori_metrics.json",
+    )
     MODEL_FEATURE_CATEGORICAL = ["Institute", "Program", "Stream", "Quota", "Category"]
     MODEL_FEATURE_NUMERIC = [
         "Predicted Closing Rank",
@@ -84,6 +87,7 @@ class CollegeRecommender:
         self.label_encoders = {}
         self.trained_models = {}
         self.model_metrics = {}
+        self.association_rule_metrics = {}
         self.hybrid_model_weights = {}
         self.training_feature_columns = list(self.MODEL_FEATURE_CATEGORICAL + self.MODEL_FEATURE_NUMERIC)
         self.model_stack = {
@@ -101,12 +105,22 @@ class CollegeRecommender:
         self._load_all_data()
         self._prepare_master_rank_df()
         self._prepare_quality_data()
+        self.dataframes = {}
 
         try:
             self._ensure_rules()
         except Exception as exc:
             print("Warning: association rules generation failed:", exc)
-            self.assoc_rules_df = pd.DataFrame()
+            self.assoc_rules_df = self._empty_rules_frame()
+            self.association_rule_metrics = {
+                "type": "association_rule_mining",
+                "algorithm": "apriori_style_pair_rules",
+                "rules_version": self.ASSOCIATION_RULES_VERSION,
+                "reason": str(exc),
+                "metrics": {},
+                "top_rules": [],
+            }
+            self.model_metrics["association_rule_mining"] = self.association_rule_metrics
 
         try:
             self._prepare_ml_assets()
@@ -115,6 +129,8 @@ class CollegeRecommender:
             self.label_encoders = {}
             self.trained_models = {}
             self.model_metrics = {}
+            if self.association_rule_metrics:
+                self.model_metrics["association_rule_mining"] = self.association_rule_metrics
             self.hybrid_model_weights = {}
 
         try:
@@ -141,6 +157,76 @@ class CollegeRecommender:
             os.path.join(self.data_root_dir, "csv", self.RULES_FILENAME),
             os.path.join(self.data_root_dir, "csv", "associates_rules.csv"),
         ]
+
+    def _empty_rules_frame(self):
+        return pd.DataFrame(
+            columns=[
+                "antecedent",
+                "consequent",
+                "antecedent_support",
+                "consequent_support",
+                "support",
+                "confidence",
+                "lift",
+                "leverage",
+                "conviction",
+            ]
+        )
+
+    def _load_saved_association_rule_metrics(self):
+        metrics_path = os.path.join(
+            self.results_dir,
+            self.METRICS_FILENAMES["association_rule_mining"],
+        )
+        if not os.path.exists(metrics_path):
+            return None
+
+        try:
+            with open(metrics_path, "r", encoding="utf-8") as file_obj:
+                return json.load(file_obj)
+        except Exception:
+            return None
+
+    def _load_rules_frame(self, path):
+        if not os.path.exists(path):
+            return None
+
+        try:
+            rules_df = pd.read_csv(
+                path,
+                dtype={
+                    "antecedent": "string",
+                    "consequent": "string",
+                    "antecedent_support": "float32",
+                    "consequent_support": "float32",
+                    "support": "float32",
+                    "confidence": "float32",
+                    "lift": "float32",
+                    "leverage": "float32",
+                    "conviction": "float32",
+                },
+            )
+        except Exception:
+            return None
+
+        expected_columns = set(self._empty_rules_frame().columns)
+        if not expected_columns.issubset(set(rules_df.columns)):
+            return None
+
+        return rules_df.reindex(columns=list(self._empty_rules_frame().columns))
+
+    def _json_safe(self, value):
+        if isinstance(value, dict):
+            return {key: self._json_safe(item) for key, item in value.items()}
+        if isinstance(value, list):
+            return [self._json_safe(item) for item in value]
+        if pd.isna(value):
+            return None
+        if isinstance(value, np.integer):
+            return int(value)
+        if isinstance(value, np.floating):
+            return float(value)
+        return value
 
     def _cache_signature(self):
         source_files = [
@@ -195,6 +281,7 @@ class CollegeRecommender:
         self.label_encoders = payload.get("label_encoders", {})
         self.trained_models = payload.get("trained_models", {})
         self.model_metrics = payload.get("model_metrics", {})
+        self.association_rule_metrics = self._json_safe(payload.get("association_rule_metrics", {}))
         self.hybrid_model_weights = payload.get("hybrid_model_weights", {})
         self.training_feature_columns = payload.get(
             "training_feature_columns",
@@ -220,6 +307,7 @@ class CollegeRecommender:
             "label_encoders": self.label_encoders,
             "trained_models": self.trained_models,
             "model_metrics": self.model_metrics,
+            "association_rule_metrics": self.association_rule_metrics,
             "hybrid_model_weights": self.hybrid_model_weights,
             "training_feature_columns": self.training_feature_columns,
             "model_stack": self.model_stack,
@@ -727,31 +815,70 @@ class CollegeRecommender:
     # -------------------------
     def _ensure_rules(self):
         loaded_rules = None
-        for path in [self.rules_path] + self._legacy_rule_paths():
-            if not os.path.exists(path):
-                continue
-            try:
-                loaded_rules = pd.read_csv(path, dtype="object")
-                break
-            except Exception:
-                continue
+        saved_metrics = self._load_saved_association_rule_metrics()
+        metrics_current = bool(saved_metrics) and (
+            int(saved_metrics.get("rules_version", 0)) == self.ASSOCIATION_RULES_VERSION
+        )
+
+        if metrics_current:
+            for path in [self.rules_path] + self._legacy_rule_paths():
+                loaded_rules = self._load_rules_frame(path)
+                if loaded_rules is not None:
+                    break
 
         if loaded_rules is None:
-            loaded_rules = self._generate_association_rules()
+            loaded_rules, assoc_metrics = self._generate_association_rules()
+            self.association_rule_metrics = assoc_metrics
+        else:
+            self.association_rule_metrics = saved_metrics
 
-        self.assoc_rules_df = loaded_rules
+        self.association_rule_metrics = self._json_safe(self.association_rule_metrics)
+        self.assoc_rules_df = loaded_rules if loaded_rules is not None else self._empty_rules_frame()
+        self.model_metrics["association_rule_mining"] = self.association_rule_metrics
         try:
             self.assoc_rules_df.to_csv(self.rules_path, index=False)
         except Exception as exc:
             print("Warning: failed to save association rules to results folder:", exc)
 
-    def _generate_association_rules(self, min_support=0.02, max_itemset_size=3):
-        df = getattr(self, "merged_df", pd.DataFrame()).copy()
+    def _generate_association_rules(
+        self,
+        min_support=0.03,
+        max_itemset_size=2,
+        min_confidence=0.18,
+        max_rules_per_antecedent=6,
+    ):
+        df = getattr(self, "merged_df", pd.DataFrame())
         if df.empty:
-            return pd.DataFrame(columns=["antecedent", "consequent", "support", "confidence", "lift"])
+            empty_metrics = {
+                "type": "association_rule_mining",
+                "algorithm": "apriori_style_pair_rules",
+                "rules_version": self.ASSOCIATION_RULES_VERSION,
+                "metrics": {
+                    "transactions": 0,
+                    "unique_items": 0,
+                    "frequent_itemsets": 0,
+                    "rules_generated": 0,
+                    "rules_saved": 0,
+                    "avg_support": 0.0,
+                    "avg_confidence": 0.0,
+                    "avg_lift": 0.0,
+                    "max_support": 0.0,
+                    "max_confidence": 0.0,
+                    "max_lift": 0.0,
+                },
+                "configuration": {
+                    "min_support": min_support,
+                    "max_itemset_size": max_itemset_size,
+                    "min_confidence": min_confidence,
+                    "max_rules_per_antecedent": max_rules_per_antecedent,
+                },
+                "top_rules": [],
+            }
+            return self._empty_rules_frame(), empty_metrics
 
         attributes = ["Program", "Stream", "Quota", "Category", "District"]
         transactions = []
+        unique_items = set()
         for _, row in df.iterrows():
             items = set()
             for attribute in attributes:
@@ -759,11 +886,38 @@ class CollegeRecommender:
                 if value:
                     items.add(f"{attribute.lower()}={value}")
             if items:
-                transactions.append(sorted(items))
+                ordered_items = sorted(items)
+                transactions.append(ordered_items)
+                unique_items.update(ordered_items)
 
         total_transactions = len(transactions)
         if total_transactions == 0:
-            return pd.DataFrame(columns=["antecedent", "consequent", "support", "confidence", "lift"])
+            empty_metrics = {
+                "type": "association_rule_mining",
+                "algorithm": "apriori_style_pair_rules",
+                "rules_version": self.ASSOCIATION_RULES_VERSION,
+                "metrics": {
+                    "transactions": 0,
+                    "unique_items": int(len(unique_items)),
+                    "frequent_itemsets": 0,
+                    "rules_generated": 0,
+                    "rules_saved": 0,
+                    "avg_support": 0.0,
+                    "avg_confidence": 0.0,
+                    "avg_lift": 0.0,
+                    "max_support": 0.0,
+                    "max_confidence": 0.0,
+                    "max_lift": 0.0,
+                },
+                "configuration": {
+                    "min_support": min_support,
+                    "max_itemset_size": max_itemset_size,
+                    "min_confidence": min_confidence,
+                    "max_rules_per_antecedent": max_rules_per_antecedent,
+                },
+                "top_rules": [],
+            }
+            return self._empty_rules_frame(), empty_metrics
 
         itemset_counts = Counter()
         for transaction in transactions:
@@ -795,21 +949,115 @@ class CollegeRecommender:
                 support_a = support_map[antecedent]
                 support_b = support_map[consequent]
                 confidence = support_ab / support_a if support_a else 0.0
+                if confidence < min_confidence:
+                    continue
                 lift = confidence / support_b if support_b else 0.0
+                leverage = support_ab - (support_a * support_b)
+                conviction = None
+                if support_b < 1.0 and confidence < 1.0:
+                    conviction = (1.0 - support_b) / max(1.0 - confidence, 1e-9)
                 rules.append(
                     {
                         "antecedent": ";".join(sorted(list(antecedent))),
                         "consequent": ";".join(sorted(list(consequent))),
+                        "antecedent_support": round(support_a, 6),
+                        "consequent_support": round(support_b, 6),
                         "support": round(support_ab, 6),
                         "confidence": round(confidence, 6),
                         "lift": round(lift, 6),
+                        "leverage": round(leverage, 6),
+                        "conviction": round(float(conviction), 6) if conviction is not None else None,
                     }
                 )
 
         rules_df = pd.DataFrame(rules)
         if rules_df.empty:
-            return pd.DataFrame(columns=["antecedent", "consequent", "support", "confidence", "lift"])
-        return rules_df.sort_values(by=["confidence", "support"], ascending=[False, False]).reset_index(drop=True)
+            empty_metrics = {
+                "type": "association_rule_mining",
+                "algorithm": "apriori_style_pair_rules",
+                "rules_version": self.ASSOCIATION_RULES_VERSION,
+                "metrics": {
+                    "transactions": int(total_transactions),
+                    "unique_items": int(len(unique_items)),
+                    "frequent_itemsets": int(len(frequent_itemsets)),
+                    "rules_generated": 0,
+                    "rules_saved": 0,
+                    "avg_support": 0.0,
+                    "avg_confidence": 0.0,
+                    "avg_lift": 0.0,
+                    "max_support": 0.0,
+                    "max_confidence": 0.0,
+                    "max_lift": 0.0,
+                },
+                "configuration": {
+                    "min_support": min_support,
+                    "max_itemset_size": max_itemset_size,
+                    "min_confidence": min_confidence,
+                    "max_rules_per_antecedent": max_rules_per_antecedent,
+                },
+                "top_rules": [],
+            }
+            return self._empty_rules_frame(), empty_metrics
+
+        rules_df = rules_df.sort_values(
+            by=["confidence", "lift", "support"],
+            ascending=[False, False, False],
+        ).reset_index(drop=True)
+        rules_generated = int(len(rules_df))
+        rules_df["rule_rank"] = rules_df.groupby("antecedent").cumcount() + 1
+        rules_df = rules_df[rules_df["rule_rank"] <= max_rules_per_antecedent].drop(columns=["rule_rank"])
+        rules_df = rules_df.reset_index(drop=True)
+
+        for column in [
+            "antecedent_support",
+            "consequent_support",
+            "support",
+            "confidence",
+            "lift",
+            "leverage",
+            "conviction",
+        ]:
+            rules_df[column] = pd.to_numeric(rules_df[column], errors="coerce").astype("float32")
+
+        top_rules = []
+        for record in rules_df.head(10).to_dict("records"):
+            clean_record = {}
+            for key, value in record.items():
+                if pd.isna(value):
+                    clean_record[key] = None
+                elif isinstance(value, (np.floating, np.integer)):
+                    clean_record[key] = float(value)
+                else:
+                    clean_record[key] = value
+            top_rules.append(clean_record)
+
+        metrics = {
+            "type": "association_rule_mining",
+            "algorithm": "apriori_style_pair_rules",
+            "rules_version": self.ASSOCIATION_RULES_VERSION,
+            "metrics": {
+                "transactions": int(total_transactions),
+                "unique_items": int(len(unique_items)),
+                "frequent_itemsets": int(len(frequent_itemsets)),
+                "rules_generated": rules_generated,
+                "rules_saved": int(len(rules_df)),
+                "avg_support": round(float(rules_df["support"].mean()), 6),
+                "avg_confidence": round(float(rules_df["confidence"].mean()), 6),
+                "avg_lift": round(float(rules_df["lift"].mean()), 6),
+                "max_support": round(float(rules_df["support"].max()), 6),
+                "max_confidence": round(float(rules_df["confidence"].max()), 6),
+                "max_lift": round(float(rules_df["lift"].max()), 6),
+            },
+            "configuration": {
+                "min_support": min_support,
+                "max_itemset_size": max_itemset_size,
+                "min_confidence": min_confidence,
+                "max_rules_per_antecedent": max_rules_per_antecedent,
+            },
+            "top_rules": top_rules,
+        }
+
+        return rules_df, metrics
 
     def _compute_boosts_from_rules(self, candidates_df, user_filters):
         boosts = defaultdict(float)
@@ -948,10 +1196,10 @@ class CollegeRecommender:
         encoded = pd.DataFrame(index=df.index)
         for col in self.MODEL_FEATURE_CATEGORICAL:
             source = df[col] if col in df.columns else pd.Series([""] * len(df), index=df.index)
-            encoded[col] = self._fit_or_transform_encoder(source, col, fit=fit)
+            encoded[col] = self._fit_or_transform_encoder(source, col, fit=fit).astype("int32")
         for col in self.MODEL_FEATURE_NUMERIC:
             source = df[col] if col in df.columns else pd.Series([0.0] * len(df), index=df.index)
-            encoded[col] = pd.to_numeric(source, errors="coerce").fillna(0.0)
+            encoded[col] = pd.to_numeric(source, errors="coerce").fillna(0.0).astype("float32")
         return encoded[self.training_feature_columns]
 
     def _regression_metrics(self, y_true, y_pred):
@@ -975,14 +1223,24 @@ class CollegeRecommender:
         }
 
     def _prepare_ml_assets(self):
+        association_metrics = self.model_metrics.get("association_rule_mining") or self.association_rule_metrics
         training_df = self._build_training_frame()
+        self.model_metrics = {}
+        if association_metrics:
+            self.model_metrics["association_rule_mining"] = association_metrics
+
         if training_df.empty or len(training_df) < 20:
             self.trained_models = {}
-            self.hybrid_model_weights = {"heuristic": 1.0}
-            self.model_metrics = {}
+            self.hybrid_model_weights = {}
+            self.model_metrics["hybrid_ensemble"] = {
+                "type": "weighted_regression_ensemble",
+                "reason": "Not enough training samples were available for the ML models.",
+                "weights": {},
+                "metrics": {},
+            }
             self.model_stack = {
                 "association_rules": True,
-                "hybrid_models": ["heuristic"],
+                "hybrid_models": [],
                 "hybrid_weights": self.hybrid_model_weights,
                 "cache_loaded": False,
             }
@@ -999,24 +1257,20 @@ class CollegeRecommender:
 
         heuristic_pred = pd.to_numeric(test_df["Predicted Closing Rank"], errors="coerce").fillna(0.0).to_numpy()
         y_test = pd.to_numeric(test_df["Latest Closing Rank"], errors="coerce").fillna(0.0)
-        self.model_metrics = {
-            "heuristic": {
-                "type": "historical_recent_mean",
-                "metrics": self._regression_metrics(y_test, heuristic_pred),
-            }
-        }
+        heuristic_metrics = self._regression_metrics(y_test, heuristic_pred)
 
         if not SKLEARN_AVAILABLE:
             self.trained_models = {}
-            self.hybrid_model_weights = {"heuristic": 1.0}
+            self.hybrid_model_weights = {}
             self.model_metrics["hybrid_ensemble"] = {
                 "type": "weighted_regression_ensemble",
-                "weights": self.hybrid_model_weights,
-                "metrics": self._regression_metrics(y_test, heuristic_pred),
+                "reason": "scikit-learn is not available in the current runtime; using historical predicted rank fallback.",
+                "weights": {},
+                "metrics": heuristic_metrics,
             }
             self.model_stack = {
                 "association_rules": True,
-                "hybrid_models": ["heuristic"],
+                "hybrid_models": [],
                 "hybrid_weights": self.hybrid_model_weights,
                 "cache_loaded": False,
             }
@@ -1029,24 +1283,26 @@ class CollegeRecommender:
         y_train = pd.to_numeric(train_df["Latest Closing Rank"], errors="coerce").fillna(0.0)
 
         candidate_models = {
-            "decision_tree": DecisionTreeRegressor(random_state=42, max_depth=10, min_samples_leaf=2),
+            "decision_tree": DecisionTreeRegressor(random_state=42, max_depth=10, min_samples_leaf=3),
             "random_forest": RandomForestRegressor(
-                n_estimators=180,
+                n_estimators=96,
                 random_state=42,
-                n_jobs=-1,
-                min_samples_leaf=1,
+                n_jobs=1,
+                max_depth=16,
+                min_samples_leaf=2,
+                max_features="sqrt",
             ),
-            "extra_trees": ExtraTreesRegressor(
-                n_estimators=220,
+            "gradient_boosting": GradientBoostingRegressor(
                 random_state=42,
-                n_jobs=-1,
-                min_samples_leaf=1,
+                n_estimators=120,
+                learning_rate=0.05,
+                subsample=0.9,
+                max_depth=3,
             ),
-            "gradient_boosting": GradientBoostingRegressor(random_state=42),
         }
 
         self.trained_models = {}
-        validation_predictions = {"heuristic": heuristic_pred}
+        validation_predictions = {}
 
         for model_name, model in candidate_models.items():
             try:
@@ -1070,7 +1326,20 @@ class CollegeRecommender:
             weights[model_name] = 1.0 / max(float(mae), 1e-6)
 
         if not weights:
-            weights = {"heuristic": 1.0}
+            self.hybrid_model_weights = {}
+            self.model_metrics["hybrid_ensemble"] = {
+                "type": "weighted_regression_ensemble",
+                "reason": "No ML model completed training; using historical predicted rank fallback.",
+                "weights": {},
+                "metrics": heuristic_metrics,
+            }
+            self.model_stack = {
+                "association_rules": True,
+                "hybrid_models": [],
+                "hybrid_weights": self.hybrid_model_weights,
+                "cache_loaded": False,
+            }
+            return
 
         total_weight = sum(weights.values()) or 1.0
         self.hybrid_model_weights = {
@@ -1099,6 +1368,14 @@ class CollegeRecommender:
         }
 
     def _persist_model_metrics(self):
+        for stale_file in self.STALE_METRICS_FILENAMES:
+            stale_path = os.path.join(self.results_dir, stale_file)
+            if os.path.exists(stale_path):
+                try:
+                    os.remove(stale_path)
+                except OSError:
+                    pass
+
         for model_name, file_name in self.METRICS_FILENAMES.items():
             metrics_blob = self.model_metrics.get(model_name)
             if not metrics_blob:
@@ -1111,6 +1388,7 @@ class CollegeRecommender:
                     ),
                     "metrics": {},
                 }
+            metrics_blob = self._json_safe(metrics_blob)
             path = os.path.join(self.results_dir, file_name)
             with open(path, "w", encoding="utf-8") as file_obj:
                 json.dump(
