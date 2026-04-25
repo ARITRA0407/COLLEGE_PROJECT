@@ -33,7 +33,7 @@ html, body {
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  overflow: hidden;
+  overflow: visible;
   height: fit-content;
 }
 
@@ -90,7 +90,7 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   flex-direction: column;
   gap: 16px;
   padding: 18px;
-  overflow: auto;
+  overflow: visible;
 }
 .panel-body.active { display: flex; }
 
@@ -104,12 +104,14 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
 .college-img {
   flex: 1;
   min-width: 120px;
-  height: 110px;
+  height: 180px;
   border-radius: 10px;
-  object-fit: cover;
+  object-fit: contain;
   border: 1px solid #e9eef3;
   max-width: 100%;
   display: block;
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  padding: 8px;
 }
 
 .item-row {
@@ -203,4 +205,5 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   .item-row .label { min-width: 100%; padding-top: 0; padding-bottom: 4px; }
   .stat-grid { grid-template-columns: 1fr 1fr; }
   .map-frame { height: 140px; }
+  .college-img { height: 150px; }
 }

@@ -374,7 +374,7 @@ class HybridCareerRecommender:
         recommendations.sort(key=lambda item: item["match_score"], reverse=True)
         return recommendations[:top_n]
 
-    def build_report(self, category_metrics, recommendations, summary_metrics):
+    def build_report(self, category_metrics, recommendations, summary_metrics, store_history=False):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         report = {
             "generated_at": datetime.now().isoformat(),
@@ -389,13 +389,17 @@ class HybridCareerRecommender:
         }
 
         latest_path = os.path.join(self.output_dir, "latest_quiz_recommendation.json")
-        timestamped_path = os.path.join(
-            self.output_dir,
-            f"quiz_recommendation_{timestamp}.json"
-        )
+        timestamped_path = ""
 
-        for path in (latest_path, timestamped_path):
-            with open(path, "w", encoding="utf-8") as file_obj:
+        with open(latest_path, "w", encoding="utf-8") as file_obj:
+            json.dump(report, file_obj, indent=2)
+
+        if store_history:
+            timestamped_path = os.path.join(
+                self.output_dir,
+                f"quiz_recommendation_{timestamp}.json"
+            )
+            with open(timestamped_path, "w", encoding="utf-8") as file_obj:
                 json.dump(report, file_obj, indent=2)
 
         return report, {

@@ -319,6 +319,11 @@ def _aggregate_review_scores(raw_rows):
 def register_explore(app):
     from flask import jsonify, request
 
+    # Avoid duplicate registration when the module auto-registers and the
+    # main app also calls register_explore(app) explicitly.
+    if '_api_colleges' in getattr(app, 'view_functions', {}):
+        return
+
     @app.route('/explore/api/colleges')
     def _api_colleges():
         _ensure_loaded()

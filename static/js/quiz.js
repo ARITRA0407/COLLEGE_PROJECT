@@ -7,6 +7,8 @@ let streak = 0;
 let startTime = 0;
 let timerInterval = null;
 let isLoadingNext = false;
+let pendingStop = false;
+let isOpeningResult = false;
 
 let skillState = {
     AI_Int: 0,
@@ -43,6 +45,56 @@ function updateConfidence(val) {
     confidence = Number(val);
     const el = document.getElementById("confValue");
     if (el) el.innerText = confidence + "%";
+}
+
+function freezeTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    if (!startTime) return;
+
+    const elapsed = Math.max(0, (Date.now() - startTime) / 1000);
+    const timer = document.getElementById("timer");
+    if (timer) timer.innerText = "Time: " + elapsed.toFixed(1) + "s";
+}
+
+function setStopLoadingState(message) {
+    const overlay = document.getElementById("loadingOverlay");
+    if (overlay) {
+        overlay.classList.add("active");
+        overlay.setAttribute("aria-hidden", "false");
+        const paragraph = overlay.querySelector("p");
+        if (paragraph && message) paragraph.innerText = message;
+    }
+
+    const stopBtn = document.getElementById("stopBtn");
+    if (stopBtn) {
+        stopBtn.disabled = true;
+        stopBtn.textContent = "Opening Results...";
+    }
+
+    document.querySelectorAll(".opt").forEach(button => {
+        button.disabled = true;
+    });
+}
+
+async function openResultPage() {
+    if (isOpeningResult) return;
+    isOpeningResult = true;
+
+    freezeTimer();
+    setStopLoadingState("The timer is stopped. Opening the result page now.");
+
+    try {
+        await fetch("/quiz-finalize", { method: "POST" });
+    } catch (err) {
+        console.error("Quiz finalize error:", err);
+    }
+
+    localStorage.clear();
+    window.location = "/quiz-result";
 }
 
 function startQuiz() {
@@ -95,6 +147,10 @@ function showQuestion() {
 
     updateDifficultyUI(q);
     renderSkills();
+
+    if (pendingStop) {
+        openResultPage();
+    }
 }
 
 function createOption(q, optKey, weightKey) {
@@ -164,6 +220,11 @@ function goNext() {
         .then(data => {
             isLoadingNext = false;
 
+            if (pendingStop) {
+                openResultPage();
+                return;
+            }
+
             if (!Array.isArray(data) || data.length === 0) {
                 document.getElementById("quiz").innerHTML =
                     "<h3>Quiz Completed</h3>";
@@ -180,6 +241,9 @@ function goNext() {
         .catch(err => {
             console.error("Next error:", err);
             isLoadingNext = false;
+            if (pendingStop) {
+                openResultPage();
+            }
         });
 }
 
@@ -248,6 +312,13 @@ function stopQuiz() {
         return;
     }
 
-    localStorage.clear();
-    window.location = "/quiz-result";
+    pendingStop = true;
+    freezeTimer();
+    setStopLoadingState("The timer is stopped. Preparing and opening the result page.");
+
+    if (isLoadingNext) {
+        return;
+    }
+
+    openResultPage();
 }

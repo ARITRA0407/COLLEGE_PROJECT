@@ -49,6 +49,32 @@ function getVal(row, names) {
 
 function norm(s) { return (s == null ? '' : String(s)).trim().replace(/\s+/g, ' ').toLowerCase(); }
 
+function findBestRow(rows, institute, program = '') {
+  const instituteKey = norm(institute);
+  const programKey = norm(program);
+
+  return rows.find(row => {
+    const rowInstitute = norm(getVal(row, ['Institute', 'institute', 'College', 'college', 'college_name', 'College_name', 'NAME', 'name']));
+    const rowProgram = norm(getVal(row, ['Program', 'program', 'Course', 'course']));
+    if (!rowInstitute) return false;
+
+    const instituteMatch =
+      rowInstitute === instituteKey ||
+      rowInstitute.includes(instituteKey) ||
+      instituteKey.includes(rowInstitute);
+
+    if (!instituteMatch) return false;
+    if (!programKey) return true;
+    if (!rowProgram) return true;
+
+    return (
+      rowProgram === programKey ||
+      rowProgram.includes(programKey) ||
+      programKey.includes(rowProgram)
+    );
+  }) || {};
+}
+
 // -------- GLOBAL DATA --------
 const rankData = {};
 let collegeData = [], placementData = [], reviewsData = [];
@@ -193,28 +219,29 @@ function doCompare() {
 
   renderBasicInfo('A', instA);
   renderBasicInfo('B', instB);
-  renderPlacementAndReview('A', instA);
-  renderPlacementAndReview('B', instB);
+  renderPlacementAndReview('A', instA, progA);
+  renderPlacementAndReview('B', instB, progB);
   updateChart('A', instA, progA);
   updateChart('B', instB, progB);
   // Tell parent page the new height so iframe resizes
-  setTimeout(notifyHeight, 300);
+  notifyHeightSoon();
 }
 
 // -------- BASIC INFO --------
 function renderBasicInfo(side, institute) {
-  const target = norm(institute);
-  let row = collegeData.find(r => {
-    const cand = norm(getVal(r, ['college_name', 'College_name', 'college', 'College', 'Institute', 'institute', 'name', 'Name']));
-    return cand === target || cand.includes(target) || target.includes(cand);
-  }) || {};
+  let row = findBestRow(collegeData, institute);
 
   const photo = getVal(row, ['photo', 'image', 'Image', 'picture', 'photo_url']);
   const website = getVal(row, ['Website', 'website', 'url']);
   const location = getVal(row, ['Location', 'location', 'latlong', 'lat_lon', 'latlon']);
 
   const photoEl = document.getElementById('photo' + side);
-  if (photo) { photoEl.src = photo.trim(); photoEl.style.display = 'block'; }
+  if (photo) {
+    photoEl.onload = notifyHeightSoon;
+    photoEl.onerror = notifyHeightSoon;
+    photoEl.src = photo.trim();
+    photoEl.style.display = 'block';
+  }
 
   const websiteEl = document.getElementById('website' + side);
   websiteEl.href = website || '#'; websiteEl.textContent = website || '—';
@@ -239,12 +266,13 @@ function renderBasicInfo(side, institute) {
     locText.textContent = '—';
     mapDiv.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted)">No location data</div>';
   }
+  notifyHeightSoon();
 }
 
 // -------- PLACEMENT & REVIEWS --------
-function renderPlacementAndReview(side, institute) {
-  const p = placementData.find(r => getVal(r, ['Institute', 'institute', 'College', 'college', 'NAME']) === institute) || {};
-  const r = reviewsData.find(r => getVal(r, ['college_name', 'College_name', 'college', 'Institute', 'institute', 'NAME']) === institute) || {};
+function renderPlacementAndReview(side, institute, program) {
+  const p = findBestRow(placementData, institute, program);
+  const r = findBestRow(reviewsData, institute);
 
   setText('avgCtc' + side, getVal(p, ['average_ctc', 'avg_ctc', 'Average_CTC']));
   setText('medCtc' + side, getVal(p, ['median_ctc', 'median', 'Median_CTC']));
@@ -262,6 +290,7 @@ function renderPlacementAndReview(side, institute) {
   setText('overall' + side, getVal(r, ['overall_aspect_score', 'overall']));
 
   compareNumericPairs();
+  notifyHeightSoon();
 }
 
 function setText(id, val) {
@@ -301,10 +330,12 @@ function compareNumericPairs() {
 // -------- CHART --------
 function updateChart(side, institute, program) {
   const opening = [], closing = [];
+  const instituteKey = norm(institute);
+  const programKey = norm(program);
   for (const y of YEARS) {
     const rows = (rankData[y] || []).filter(r =>
-      getVal(r, ['Institute', 'institute', 'College', 'college', 'NAME']) === institute &&
-      getVal(r, ['Program', 'program', 'Course', 'course']) === program
+      norm(getVal(r, ['Institute', 'institute', 'College', 'college', 'NAME'])) === instituteKey &&
+      norm(getVal(r, ['Program', 'program', 'Course', 'course'])) === programKey
     );
     if (!rows.length) { opening.push(null); closing.push(null); continue; }
     const oVals = rows.map(r => parseFloat(getVal(r, ['Opening Rank', 'opening_rank', 'OR', 'open_rank']))).filter(x => !isNaN(x));
@@ -324,6 +355,9 @@ function updateChart(side, institute, program) {
       ]
     },
     options: {
+      animation: {
+        onComplete: notifyHeightSoon
+      },
       plugins: { title: { display: true, text: 'Opening / Closing Rank by Year' } },
       interaction: { mode: 'index' },
       scales: {
@@ -338,6 +372,11 @@ function updateChart(side, institute, program) {
 document.addEventListener('DOMContentLoaded', () => {
   loadAll().catch(e => console.warn('loadAll failed', e));
   setTimeout(notifyHeight, 200);
+  window.addEventListener('load', notifyHeightSoon);
+  if ('ResizeObserver' in window) {
+    const resizeObserver = new ResizeObserver(() => notifyHeightSoon());
+    resizeObserver.observe(document.body);
+  }
 });
 
 // -------- NOTIFY PARENT IFRAME OF HEIGHT --------
@@ -347,4 +386,10 @@ function notifyHeight() {
     document.body.scrollHeight
   );
   try { window.parent.postMessage({ type: 'iframeHeight', height: h }, '*'); } catch(e) {}
+}
+
+function notifyHeightSoon() {
+  window.requestAnimationFrame(() => {
+    setTimeout(notifyHeight, 60);
+  });
 }

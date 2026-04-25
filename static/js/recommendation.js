@@ -326,6 +326,37 @@ function renderResultsList(data) {
 
 /* ── Client-side sort ──────────────────────────────────────── */
 let LAST_RESULTS = [];
+const SORT_METRIC_ALIASES = {
+  'Predicted Closing Rank': ['Closing Rank', 'Hybrid Predicted Rank', 'Predicted Closing Rank', 'Heuristic Closing Rank'],
+  'Max Average CTC': ['average_ctc', 'Max Average CTC'],
+  'placement_score': ['placement_score', 'placements_score', 'placements_score_filter'],
+  'overall_aspect_score': ['overall_aspect_score', 'overall_aspect_score_filter'],
+  'professor_score': ['professor_score'],
+  'mess_score': ['mess_score']
+};
+
+function resolveMetricValue(item, metric) {
+  const aliases = SORT_METRIC_ALIASES[metric] || [metric];
+
+  for (const key of aliases) {
+    const candidates = [
+      key,
+      key.replaceAll(' ', '_'),
+      key.toLowerCase(),
+      key.toUpperCase()
+    ];
+
+    for (const candidate of candidates) {
+      const value = item?.[candidate];
+      if (value === undefined || value === null || value === '') continue;
+      const numeric = parseFloat(value);
+      if (!Number.isNaN(numeric)) return numeric;
+      return String(value).toLowerCase();
+    }
+  }
+
+  return null;
+}
 
 function applyClientSort(results) {
   let arr = (results || []).slice();
@@ -334,17 +365,8 @@ function applyClientSort(results) {
   const orderDesc = descendingByDefault.includes(metric);
 
   arr.sort((a, b) => {
-    const getV = (obj, key) => {
-      if (!obj) return null;
-      if (['Predicted Closing Rank','PredictedClosingRank','Closing Rank'].includes(key)) {
-        return parseFloat(obj['Predicted Closing Rank'] ?? obj['Closing Rank'] ?? obj['PredictedClosingRank'] ?? Infinity);
-      }
-      const val = obj[key] ?? obj[key.replaceAll(' ','_')] ?? obj[key.toLowerCase()] ?? obj[key.toUpperCase()];
-      if (val === undefined || val === null || val === '') return null;
-      const n = parseFloat(val);
-      return isNaN(n) ? ('' + val).toLowerCase() : n;
-    };
-    const va = getV(a, metric), vb = getV(b, metric);
+    const va = resolveMetricValue(a, metric);
+    const vb = resolveMetricValue(b, metric);
     if (va === null && vb === null) return 0;
     if (va === null) return 1;
     if (vb === null) return -1;

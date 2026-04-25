@@ -6,6 +6,8 @@ except Exception:
         return False
 
 load_dotenv()
+import hashlib
+import json
 import os
 import sys
 import threading
@@ -19,7 +21,7 @@ import random
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory of the current file (app.py).
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR) # Get the parent directory, which is the project root.
 sys.path.append(BACKEND_DIR) # Add the backend directory to the Python path for importing modules.
-RESULT_REPORT_DIR = os.path.join(PROJECT_ROOT, "result")
+RESULT_REPORT_DIR = os.path.join(PROJECT_ROOT, "results")
 os.makedirs(RESULT_REPORT_DIR, exist_ok=True)
 # ================= QUIZ SYSTEM INTEGRATION ================= #
 # template/static configuration
@@ -43,6 +45,12 @@ _quiz_recommender_lock = threading.Lock()
 _college_recommender_lock = threading.Lock()
 _top_module_lock = threading.Lock()
 _ai_module_lock = threading.Lock()
+_quiz_payload_lock = threading.Lock()
+_quiz_payload_prefetch_lock = threading.Lock()
+_warmup_lock = threading.Lock()
+_quiz_payload_cache = {"signature": None, "payload": None}
+_quiz_payload_prefetch_state = {"signature": None, "event": None}
+_warmup_started = False
 
 try:
     q_df = pd.read_csv(os.path.join(CSV_FOLDER, "QUESTIONS.csv"), encoding="latin1")
@@ -68,10 +76,10 @@ try:
     d_map = {"Easy": 0.2, "Medium": 0.5, "Hard": 0.8}
 
 
-    print("✅ Quiz CSV loaded successfully from:", CSV_FOLDER)
+    print("Quiz CSV loaded successfully from:", CSV_FOLDER)
 
 except Exception as e:
-    print("❌ Quiz CSV load error:", e)
+    print("Quiz CSV load error:", e)
     q_df, career_df = None, None
 
 
@@ -134,6 +142,155 @@ def get_college_recommender():
             print("Error initializing recommender:", recommender_error)
 
     return college_recommender
+
+
+def _start_background_warmup():
+    global _warmup_started
+
+    with _warmup_lock:
+        if _warmup_started:
+            return
+        _warmup_started = True
+
+    def _warmup_task():
+        try:
+            quiz_model = get_quiz_recommender()
+            if quiz_model is not None:
+                print("Quiz recommender warmup complete.")
+        except Exception as exc:
+            print("Quiz recommender warmup failed:", exc)
+
+        try:
+            college_model = get_college_recommender()
+            if college_model is not None:
+                print("College recommender warmup complete.")
+        except Exception as exc:
+            print("College recommender warmup failed:", exc)
+
+    threading.Thread(
+        target=_warmup_task,
+        name="recommender-warmup",
+        daemon=True
+    ).start()
+
+
+def _quiz_payload_signature():
+    snapshot = {
+        "category_order": user_data.get("category_order", []),
+        "answer_log": user_data.get("answer_log", []),
+        "state": user_data.get("state", {}),
+    }
+    try:
+        payload = json.dumps(snapshot, sort_keys=True, default=str).encode("utf-8")
+    except Exception:
+        payload = str(snapshot).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _reset_quiz_payload_cache():
+    with _quiz_payload_lock:
+        _quiz_payload_cache["signature"] = None
+        _quiz_payload_cache["payload"] = None
+
+    with _quiz_payload_prefetch_lock:
+        _quiz_payload_prefetch_state["signature"] = None
+        _quiz_payload_prefetch_state["event"] = None
+
+
+def _get_cached_quiz_payload(signature=None):
+    with _quiz_payload_lock:
+        cached_signature = _quiz_payload_cache.get("signature")
+        cached_payload = _quiz_payload_cache.get("payload")
+
+    if signature is not None and cached_signature != signature:
+        return None
+    return cached_payload
+
+
+def _store_cached_quiz_payload(signature, payload):
+    with _quiz_payload_lock:
+        _quiz_payload_cache["signature"] = signature
+        _quiz_payload_cache["payload"] = payload
+
+
+def _refresh_quiz_payload_cache(persist_report=False, store_history=False):
+    signature = _quiz_payload_signature()
+    cached_payload = _get_cached_quiz_payload(signature)
+    if cached_payload is not None:
+        has_report = bool(cached_payload.get("report_paths"))
+        if not persist_report or has_report:
+            return cached_payload
+
+    wait_event = None
+    with _quiz_payload_prefetch_lock:
+        if _quiz_payload_prefetch_state.get("signature") == signature:
+            wait_event = _quiz_payload_prefetch_state.get("event")
+
+    if wait_event is not None:
+        wait_event.wait(timeout=2.5)
+        cached_payload = _get_cached_quiz_payload(signature)
+        if cached_payload is not None:
+            has_report = bool(cached_payload.get("report_paths"))
+            if not persist_report or has_report:
+                return cached_payload
+
+    payload = _build_quiz_result_payload(
+        persist_report=persist_report,
+        store_history=store_history
+    )
+    _store_cached_quiz_payload(signature, payload)
+    return payload
+
+
+def _schedule_quiz_payload_refresh(persist_report=False, store_history=False):
+    if not user_data.get("answer_log"):
+        return
+
+    signature = _quiz_payload_signature()
+    cached_payload = _get_cached_quiz_payload(signature)
+    if cached_payload is not None:
+        has_report = bool(cached_payload.get("report_paths"))
+        if not persist_report or has_report:
+            return
+
+    with _quiz_payload_prefetch_lock:
+        if _quiz_payload_prefetch_state.get("signature") == signature:
+            return
+        _quiz_payload_prefetch_state["signature"] = signature
+        _quiz_payload_prefetch_state["event"] = threading.Event()
+
+    def _prefetch_worker():
+        event = None
+        with _quiz_payload_prefetch_lock:
+            if _quiz_payload_prefetch_state.get("signature") == signature:
+                event = _quiz_payload_prefetch_state.get("event")
+        try:
+            payload = _build_quiz_result_payload(
+                persist_report=persist_report,
+                store_history=store_history
+            )
+            _store_cached_quiz_payload(signature, payload)
+        except Exception as exc:
+            print("Quiz payload prefetch failed:", exc)
+        finally:
+            if event is not None:
+                event.set()
+            with _quiz_payload_prefetch_lock:
+                if _quiz_payload_prefetch_state.get("signature") == signature:
+                    _quiz_payload_prefetch_state["signature"] = None
+                    _quiz_payload_prefetch_state["event"] = None
+
+    threading.Thread(
+        target=_prefetch_worker,
+        name="quiz-payload-prefetch",
+        daemon=True
+    ).start()
+
+
+if hasattr(app, "before_serving"):
+    @app.before_serving
+    def _before_serving_warmup():
+        _start_background_warmup()
 
 
 
@@ -279,7 +436,7 @@ def _fallback_career_match(final_scores):
     return df.head(5).to_dict(orient="records")
 
 
-def _build_quiz_result_payload():
+def _build_quiz_result_payload(persist_report=False, store_history=False):
     from ai_engine import get_skill_summary
 
     categories = user_data.get("category_order", [])
@@ -388,6 +545,7 @@ def _build_quiz_result_payload():
 
     active_quiz_recommender = get_quiz_recommender()
 
+    report_paths = {}
     if active_quiz_recommender is not None:
         recommendations = active_quiz_recommender.recommend(
             user_scores={key: value["score"] for key, value in final.items()},
@@ -395,15 +553,16 @@ def _build_quiz_result_payload():
             category_metrics=final,
             top_n=5
         )
-        _, report_paths = active_quiz_recommender.build_report(
-            category_metrics=final,
-            recommendations=recommendations,
-            summary_metrics=summary_metrics
-        )
+        if persist_report:
+            _, report_paths = active_quiz_recommender.build_report(
+                category_metrics=final,
+                recommendations=recommendations,
+                summary_metrics=summary_metrics,
+                store_history=store_history
+            )
         model_metrics = getattr(active_quiz_recommender, "model_metrics", {})
     else:
         recommendations = _fallback_career_match(final)
-        report_paths = {}
         model_metrics = {}
 
     return {
@@ -426,12 +585,15 @@ def start_quiz():
     if q_df is None:
         return jsonify([])
 
+    get_quiz_recommender()
+
     q_df["Category"] = q_df["Category"].astype(str).str.strip()
 
     # ✅ FIX: ensures ALL 17 categories are always included
     categories = sorted(q_df["Category"].unique())
 
     user_data.clear()
+    _reset_quiz_payload_cache()
 
     # 🔥 IMPORTANT: pre-initialize ALL categories safely
     user_data.update({
@@ -559,7 +721,49 @@ def next_question():
             user_data["asked"].append(q["Question ID"])
             new_questions.append(q)
 
+    answer_count = len(user_data.get("answer_log", []))
+    ready_for_result = answer_count >= 17
+    if ready_for_result and answer_count == 17:
+        try:
+            _refresh_quiz_payload_cache(
+                persist_report=True,
+                store_history=False
+            )
+        except Exception as exc:
+            print("Initial quiz-result precompute failed:", exc)
+            _schedule_quiz_payload_refresh(
+                persist_report=True,
+                store_history=False
+            )
+    elif ready_for_result:
+        _schedule_quiz_payload_refresh(
+            persist_report=True,
+            store_history=False
+        )
+
     return jsonify(new_questions)
+
+
+@app.route("/quiz-finalize", methods=["POST"])
+def quiz_finalize():
+
+    if career_df is None:
+        return jsonify({"status": "error", "message": "Career data not loaded"}), 500
+
+    if not user_data.get("answer_log"):
+        return jsonify({"status": "error", "message": "No quiz progress found"}), 400
+
+    payload = _refresh_quiz_payload_cache(
+        persist_report=True,
+        store_history=False
+    )
+    user_data["report_paths"] = payload.get("report_paths", {})
+
+    return jsonify({
+        "status": "ready",
+        "report_file": payload.get("report_file", ""),
+        "questions_answered": payload.get("summary_metrics", {}).get("questions_answered", 0)
+    })
 
 # =========================
 # 🧠 RESULT PAGE (RANK-BASED LEVEL LOGIC)
@@ -570,7 +774,10 @@ def quiz_result():
     if career_df is None:
         return "Career data not loaded", 500
 
-    payload = _build_quiz_result_payload()
+    payload = _refresh_quiz_payload_cache(
+        persist_report=True,
+        store_history=False
+    )
     user_data["report_paths"] = payload.get("report_paths", {})
 
     return render_template(
@@ -584,29 +791,7 @@ def quiz_result():
         model_metrics=payload["model_metrics"]
     )
 
-
-if False:
-    try:
-        recommender = CollegeRecommender(data_root_dir=PROJECT_ROOT) # Initialize the recommender, passing the project root directory.
-        print("✅ Recommender initialized.") # Print success message.
-    except Exception as e:
-        print("❌ Error initializing recommender:", e) # Print initialization error.
-        recommender = None # Reset recommender to None on failure.
-else:
-    print("❌ CollegeRecommender class not available (import failed).") # Print message if the class wasn't available.
-
-
-
-# --- NEW: import explore module so it can register its routes ---
-# place import here (after app exists). explore.py is written to auto-register
-# routes when it finds `app` in sys.modules as `app`.
-try:
-    import explore  # backend/explore.py — registers /explore/api/... endpoints
-except Exception as _e:
-    # avoid raising during import; surface a console message for debugging
-    print("Could not import explore module (routes may not be registered):", _e)
-
-# Explicitly register explore routes (works even when app.py runs as __main__)
+# Register explore routes explicitly.
 try:
     from explore import register_explore
     register_explore(app)
@@ -684,6 +869,25 @@ def serve_csv(filename):
         # avoid revealing internals in production, but helpful in dev
         print("Error serving csv:", e) # Log the error.
         abort(404) # Abort with a 404 response.
+
+
+@app.route('/favicon.ico')
+def favicon():
+    """
+    Serve the site favicon from the existing logo file so browsers
+    stop logging a 404 for /favicon.ico.
+    """
+    if STATIC_DIR is None:
+        return "", 204
+
+    image_dir = os.path.join(STATIC_DIR, 'images')
+    icon_name = 'logo.png'
+    icon_path = os.path.join(image_dir, icon_name)
+
+    if os.path.exists(icon_path):
+        return send_from_directory(image_dir, icon_name, mimetype='image/png')
+
+    return "", 204
 
 @app.route('/')
 def index():
@@ -1024,6 +1228,8 @@ def claude_proxy():
         return app.response_class(response=e.read(), status=e.code, mimetype='application/json')
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+_start_background_warmup()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

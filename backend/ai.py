@@ -108,7 +108,7 @@ def _db_init():
         )
         conn.commit()
         conn.close()
-    print(f"ai.py: SQLite cache ready → {DB_FILE}")
+    print(f"ai.py: SQLite cache ready -> {DB_FILE}")
 
 
 def _db_get(key: str):
@@ -248,13 +248,13 @@ def load_csvs_and_build_index(csv_dir, csv_files):
                     break
 
             if valid:
-                print("ai.py: TF-IDF index loaded from cache ✅")
+                print("ai.py: TF-IDF index loaded from cache [ok]")
                 return cache["docs"], cache["meta"], cache["vectorizer"], cache["doc_vectors"]
 
         except Exception as e:
             print("TF-IDF cache invalid, rebuilding:", e)
 
-    print("ai.py: Building TF-IDF index…")
+    print("ai.py: Building TF-IDF index...")
     docs, meta, timestamps = [], [], {}
 
     for fname in csv_files:
@@ -290,7 +290,7 @@ def load_csvs_and_build_index(csv_dir, csv_files):
             "ai_hash":     ai_hash,
         }, f)
 
-    print(f"ai.py: TF-IDF index built ({len(docs)} docs) ✅")
+    print(f"ai.py: TF-IDF index built ({len(docs)} docs) [ok]")
     return docs, meta, vectorizer, doc_vectors
 
 def ensure_index_loaded():
@@ -432,7 +432,7 @@ def register_ai(app):
         # ── Cache lookup (LRU → SQLite) ────────────────────────────────
         cached = _cache_get(key)
         if cached:
-            print(f"ai.py: [{cached.get('_cache','?')}] cache hit — {query[:60]}")
+            print(f"ai.py: [{cached.get('_cache','?')}] cache hit - {query[:60]}")
             return jsonify(cached)
 
         # ── Retrieve from CSV index ────────────────────────────────────
@@ -457,7 +457,7 @@ def register_ai(app):
 
         # ── Store in both cache layers ─────────────────────────────────
         _cache_set(key, query, payload)
-        print(f"ai.py: [new] cached [{mode}] — {query[:60]}")
+        print(f"ai.py: [new] cached [{mode}] - {query[:60]}")
 
         return jsonify(payload)
 
