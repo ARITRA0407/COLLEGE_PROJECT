@@ -1,206 +1,398 @@
 <section id="about-section" aria-labelledby="about-heading" style="scroll-margin-top: 1.5rem;">
-  <div class="about-inner">
-    <header class="about-header">
-      <h2 id="about-heading">About</h2>
-      <p class="lead">
-        Hi — I'm Aritra. This site showcases college guidance, tools and resources for prospective students.
-        If you'd like to connect or have questions, use one of the contact options below.
+  <div class="ab-inner">
+
+    <div class="ab-header">
+      <span class="ab-label">About</span>
+      <h2 id="about-heading" class="ab-title">The person behind edVance.</h2>
+      <p class="ab-lead">
+        Hi — I'm Aritra. This platform was built to bring clarity to the WBJEE counselling process
+        through real data, adaptive tools, and honest career guidance. Reach out through any channel below.
       </p>
-    </header>
-
-    <div class="about-grid" role="list">
-      <article class="card" role="listitem" aria-label="LinkedIn profile">
-        <div class="card-media">
-          <a href="https://www.linkedin.com/in/aritra0407/" target="_blank" rel="noopener noreferrer" aria-label="Open Aritra's LinkedIn (opens in new tab)" title="LinkedIn — opens in new tab">
-            <img src="{{ url_for('static', filename='images/linkedin.png') }}" alt="LinkedIn logo" class="contact-img" />
-          </a>
-        </div>
-        <div class="card-body">
-          <h3>LinkedIn</h3>
-          <p class="muted">Professional profile & posts</p>
-          <a class="btn link-btn" href="https://www.linkedin.com/in/aritra0407/" target="_blank" rel="noopener noreferrer">
-            View profile
-          </a>
-        </div>
-      </article>
-
-      <article class="card" role="listitem" aria-label="WhatsApp number">
-        <div class="card-media">
-          <!-- Using wa.me link to open chat (international format assumed +91) -->
-          <a href="https://wa.me/917278735953" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" title="Chat on WhatsApp">
-            <img src="{{ url_for('static', filename='images/whatsapp.jpg') }}" alt="WhatsApp logo" class="contact-img" />
-          </a>
-        </div>
-        <div class="card-body">
-          <h3>WhatsApp</h3>
-          <p class="muted">Quick messages on WhatsApp</p>
-          <div class="contact-row">
-            <a class="plain-link" href="https://wa.me/917278735953" target="_blank" rel="noopener noreferrer">+91 72787 35953</a>
-            <button class="icon-btn" data-copy="+917278735953" title="Copy WhatsApp number" aria-label="Copy WhatsApp number">
-              Copy
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <article class="card" role="listitem" aria-label="Contact phone">
-        <div class="card-media">
-          <a href="tel:+919874739638" aria-label="Call contact number" title="Call">
-            <img src="{{ url_for('static', filename='images/contact.png') }}" alt="Phone/contact icon" class="contact-img" />
-          </a>
-        </div>
-        <div class="card-body">
-          <h3>Phone</h3>
-          <p class="muted">Available for calls and messages</p>
-          <div class="contact-row">
-            <a class="plain-link" href="tel:+919874739638">+91 98747 39638</a>
-            <button class="icon-btn" data-copy="+919874739638" title="Copy phone number" aria-label="Copy phone number">
-              Copy
-            </button>
-          </div>
-        </div>
-      </article>
-
-      <article class="card card-email" role="listitem" aria-label="Email">
-        <div class="card-media">
-          <!-- reuse contact.png for email if no dedicated email image; alt adjusted -->
-          <img src="{{ url_for('static', filename='images/email.jpg') }}" alt="Email/contact icon" class="contact-img" />
-        </div>
-        <div class="card-body">
-          <h3>Email</h3>
-          <p class="muted">For detailed requests & collaborations</p>
-          <div class="contact-row">
-            <a class="plain-link" href="mailto:aritra0407@gmail.com">aritra0407@gmail.com</a>
-            <button class="icon-btn" data-copy="aritra0407@gmail.com" title="Copy email" aria-label="Copy email address">Copy</button>
-          </div>
-        </div>
-      </article>
     </div>
 
-    <footer class="about-footer" aria-label="Copyright">
-      <small id="copyright-line">© <span id="year-placeholder"></span> Aritra — All rights reserved.</small>
-    </footer>
+    <div class="ab-grid" role="list">
+
+      <article class="ab-card" role="listitem" aria-label="LinkedIn profile">
+        <div class="ab-card-icon ab-icon-linkedin">
+          <img src="{{ url_for('static', filename='images/linkedin.png') }}" alt="LinkedIn" />
+        </div>
+        <div class="ab-card-body">
+          <h3>LinkedIn</h3>
+          <p>Professional profile &amp; posts</p>
+          <a class="ab-btn" href="https://www.linkedin.com/in/aritra0407/" target="_blank" rel="noopener noreferrer">
+            View profile <span class="ab-btn-arrow">→</span>
+          </a>
+        </div>
+      </article>
+
+      <article class="ab-card" role="listitem" aria-label="WhatsApp">
+        <div class="ab-card-icon ab-icon-whatsapp">
+          <img src="{{ url_for('static', filename='images/whatsapp.jpg') }}" alt="WhatsApp" />
+        </div>
+        <div class="ab-card-body">
+          <h3>WhatsApp</h3>
+          <p>Quick messages &amp; chats</p>
+          <div class="ab-contact-row">
+            <a class="ab-plain-link" href="https://wa.me/917278735953" target="_blank" rel="noopener noreferrer">+91 72787 35953</a>
+            <button class="ab-copy-btn" data-copy="+917278735953" aria-label="Copy WhatsApp number">Copy</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="ab-card" role="listitem" aria-label="Phone">
+        <div class="ab-card-icon ab-icon-phone">
+          <img src="{{ url_for('static', filename='images/contact.png') }}" alt="Phone" />
+        </div>
+        <div class="ab-card-body">
+          <h3>Phone</h3>
+          <p>Available for calls</p>
+          <div class="ab-contact-row">
+            <a class="ab-plain-link" href="tel:+919874739638">+91 98747 39638</a>
+            <button class="ab-copy-btn" data-copy="+919874739638" aria-label="Copy phone number">Copy</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="ab-card" role="listitem" aria-label="Email">
+        <div class="ab-card-icon ab-icon-email">
+          <img src="{{ url_for('static', filename='images/email.jpg') }}" alt="Email" />
+        </div>
+        <div class="ab-card-body">
+          <h3>Email</h3>
+          <p>Detailed requests &amp; collaborations</p>
+          <div class="ab-contact-row">
+            <a class="ab-plain-link" href="mailto:aritra0407@gmail.com">aritra0407@gmail.com</a>
+            <button class="ab-copy-btn" data-copy="aritra0407@gmail.com" aria-label="Copy email">Copy</button>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="ab-footer">
+      <small>© <span class="ab-year"></span> Aritra — All rights reserved.</small>
+    </div>
   </div>
 
-  <!-- Embedded styles (SCOPE ALL RULES to #about-section) -->
   <style>
-    /* Scope prefix */
-    #about-section { 
-      background: #000; 
-      color: #fff; 
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
-      padding: 48px 16px; 
+    #about-section {
+      background: #07111c;
+      padding: 88px 22px 32px;
+      position: relative;
+      overflow: hidden;
     }
 
-    /* Layout */
-    #about-section .about-inner { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    #about-section .about-header { text-align: left; margin-bottom: 24px; }
-    #about-section .about-header h2 { font-size: 2rem; margin: 0 0 6px 0; letter-spacing: -0.02em; }
-    #about-section .lead { margin: 0; color: #e6e6e6; line-height: 1.45; }
-
-    /* Grid of cards */
-    #about-section .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 20px; }
-    #about-section .card { display: flex; gap: 14px; align-items: center; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.6); transition: transform 220ms ease, background 220ms ease; }
-    #about-section .card:hover { transform: translateY(-6px); background: rgba(255,255,255,0.04); }
-
-    #about-section .card-media { width: 64px; height: 64px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border-radius:10px; overflow:hidden; background: rgba(255,255,255,0.02); padding:6px; }
-    #about-section .contact-img { width: 100%; height: 100%; object-fit:contain; display:block; }
-
-    #about-section .card-body h3 { margin: 0 0 4px 0; font-size: 1.05rem; font-weight:600; }
-    #about-section .muted { margin: 0 0 10px 0; color: #cfcfcf; font-size: 0.92rem; }
-
-    #about-section .btn, #about-section .link-btn { display:inline-block; text-decoration:none; padding:8px 12px; border-radius:8px; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.12); font-weight:600; font-size:0.92rem; }
-    #about-section .btn:hover, #about-section .link-btn:hover { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.22); }
-
-    #about-section .contact-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    #about-section .plain-link { color: #fff; text-decoration: none; font-weight:600; border-bottom: 1px dashed rgba(255,255,255,0.06); padding-bottom:2px; }
-    #about-section .plain-link:focus, #about-section .plain-link:hover { outline: none; border-bottom-style: solid; }
-
-    #about-section .icon-btn { background: rgba(255,255,255,0.04); color: #fff; border: none; padding:6px 10px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85rem; }
-    #about-section .icon-btn:hover { background: rgba(255,255,255,0.07); transform: translateY(-2px); }
-    #about-section .icon-btn:active { transform: translateY(0); }
-
-    #about-section .about-footer { margin-top: 22px; text-align:center; color:#bdbdbd; font-size:0.85rem; }
-
-    /* Small screens tweak */
-    @media (max-width: 520px) {
-      #about-section .card { padding: 12px; gap: 10px; }
-      #about-section .card-media { width:54px; height:54px; }
-      #about-section .about-header h2 { font-size:1.5rem; }
+    #about-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 0% 100%, rgba(18, 184, 166, 0.1), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 100% 0%, rgba(247, 146, 50, 0.08), transparent 50%);
+      pointer-events: none;
     }
 
-    /* Focus styles (scoped) */
-    #about-section a:focus, #about-section button:focus { outline: 3px solid rgba(255,255,255,0.12); outline-offset: 3px; border-radius: 8px; }
+    .ab-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .ab-header {
+      max-width: 680px;
+      margin-bottom: 48px;
+    }
+
+    .ab-label {
+      display: inline-block;
+      margin-bottom: 14px;
+      color: #12b8a6;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    }
+
+    .ab-title {
+      margin: 0 0 16px;
+      font-family: "Sora", "Plus Jakarta Sans", sans-serif;
+      font-size: clamp(1.8rem, 3.8vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+    }
+
+    .ab-lead {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 1rem;
+      line-height: 1.78;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      font-weight: 500;
+    }
+
+    /* Grid */
+    .ab-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    /* Card */
+    .ab-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background 200ms ease,
+                  border-color 200ms ease,
+                  box-shadow 200ms ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .ab-card:hover {
+      transform: translateY(-6px);
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(18, 184, 166, 0.22);
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(18, 184, 166, 0.08);
+    }
+
+    /* Icon */
+    .ab-card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      padding: 10px;
+    }
+
+    .ab-icon-linkedin { background: rgba(10, 102, 194, 0.18); border: 1px solid rgba(10, 102, 194, 0.2); }
+    .ab-icon-whatsapp { background: rgba(37, 211, 102, 0.14); border: 1px solid rgba(37, 211, 102, 0.18); }
+    .ab-icon-phone    { background: rgba(18, 184, 166, 0.14); border: 1px solid rgba(18, 184, 166, 0.18); }
+    .ab-icon-email    { background: rgba(247, 146, 50, 0.14); border: 1px solid rgba(247, 146, 50, 0.18); }
+
+    .ab-card-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 6px;
+    }
+
+    /* Card body */
+    .ab-card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-grow: 1;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    }
+
+    .ab-card-body h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    .ab-card-body p {
+      margin: 0 0 10px;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    /* Link button */
+    .ab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: rgba(18, 184, 166, 0.12);
+      border: 1px solid rgba(18, 184, 166, 0.22);
+      color: #6ef8df;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 200ms ease, border-color 200ms ease, gap 200ms ease;
+      width: fit-content;
+    }
+
+    .ab-btn:hover {
+      background: rgba(18, 184, 166, 0.2);
+      border-color: rgba(18, 184, 166, 0.4);
+      gap: 9px;
+    }
+
+    .ab-btn-arrow {
+      transition: transform 200ms ease;
+    }
+
+    .ab-btn:hover .ab-btn-arrow {
+      transform: translateX(2px);
+    }
+
+    /* Contact row */
+    .ab-contact-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .ab-plain-link {
+      color: rgba(255, 255, 255, 0.78);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      padding-bottom: 1px;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+
+    .ab-plain-link:hover {
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.34);
+    }
+
+    .ab-copy-btn {
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      transition: background 200ms ease, color 200ms ease, border-color 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .ab-copy-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .ab-copy-btn:active {
+      transform: scale(0.96);
+    }
+
+    .ab-copy-btn.copied {
+      background: rgba(18, 184, 166, 0.18);
+      border-color: rgba(18, 184, 166, 0.34);
+      color: #6ef8df;
+    }
+
+    /* Footer */
+    .ab-footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      text-align: center;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 0.84rem;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      font-weight: 600;
+    }
+
+    /* Focus */
+    #about-section a:focus-visible,
+    #about-section button:focus-visible {
+      outline: 2px solid rgba(18, 184, 166, 0.6);
+      outline-offset: 3px;
+      border-radius: 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .ab-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      #about-section {
+        padding: 68px 16px 56px;
+      }
+
+      .ab-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ab-card {
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 20px;
+      }
+
+      .ab-card-icon {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+      }
+    }
   </style>
 
-  <!-- Embedded JS: copy-to-clipboard and year insertion -->
   <script>
     (function () {
-      // Insert current year in copyright
-      const yearEl = document.getElementById('year-placeholder');
-      if (yearEl) {
-        yearEl.textContent = new Date().getFullYear();
-      }
+      const yearEl = document.querySelector('#about-section .ab-year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-      // Copy-to-clipboard logic for copy buttons
-      function showTempMessage(button, msg) {
-        const orig = button.innerText;
-        button.innerText = msg;
-        button.disabled = true;
-        setTimeout(() => {
-          button.innerText = orig;
-          button.disabled = false;
-        }, 1400);
-      }
-
-      document.querySelectorAll('#about-section .icon-btn[data-copy]').forEach(btn => {
+      document.querySelectorAll('#about-section .ab-copy-btn[data-copy]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           const value = this.getAttribute('data-copy');
-          if (!value) return;
-          // Try modern clipboard API first
+          const button = this;
+
+          function confirm() {
+            const orig = button.textContent;
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+            button.disabled = true;
+            setTimeout(function () {
+              button.textContent = orig;
+              button.classList.remove('copied');
+              button.disabled = false;
+            }, 1400);
+          }
+
           if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(value).then(() => {
-              showTempMessage(this, 'Copied!');
-            }).catch(() => {
-              // fallback
-              fallbackCopy(value, this);
-            });
+            navigator.clipboard.writeText(value).then(confirm).catch(function () { fallback(value, confirm); });
           } else {
-            fallbackCopy(value, this);
+            fallback(value, confirm);
           }
         });
       });
 
-      function fallbackCopy(text, button) {
+      function fallback(text, cb) {
         try {
           const ta = document.createElement('textarea');
           ta.value = text;
-          // Avoid scrolling to bottom
-          ta.style.position = 'fixed';
-          ta.style.left = '-9999px';
+          ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px';
           document.body.appendChild(ta);
           ta.select();
           const ok = document.execCommand('copy');
           document.body.removeChild(ta);
-          if (ok) showTempMessage(button, 'Copied!');
-          else showTempMessage(button, 'Copy failed');
-        } catch (e) {
-          showTempMessage(button, 'Copy failed');
-        }
+          if (ok) cb();
+        } catch (e) {}
       }
-
-      // Improve keyboard accessibility: allow Enter on cards to follow primary link
-      document.querySelectorAll('#about-section .card').forEach(card => {
-        card.tabIndex = 0;
-        card.addEventListener('keypress', function (e) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            const link = card.querySelector('a[href]');
-            if (link) {
-              link.click();
-            }
-          }
-        });
-      });
     })();
   </script>
 </section>

@@ -26,9 +26,9 @@
           loop
           playsinline
           preload="auto"
-          poster="{{ hero_poster_url }}"
+          poster="{{ url_for('static', filename='images/FrontVideoPoster.png') }}"
         >
-          <source src="{{ hero_video_url }}" type="video/mp4" />
+          <source src="{{ url_for('static', filename='videos/FrontVideo.mp4') }}" type="video/mp4" />
         </video>
         <div class="hero-overlay"></div>
         <div class="hero-grain"></div>
@@ -49,14 +49,29 @@
           </p>
 
           <div class="hero-buttons">
-            <a href="{{ url_for('recommendation_page') }}" class="hero-btn hero-btn-solid">Get Recommendations</a>
-            <a href="{{ url_for('quiz_page') }}" class="hero-btn hero-btn-light">Take the Skill Quiz</a>
+            <a href="{{ url_for('recommendation_page') }}" class="hero-btn hero-btn-solid">
+              <span class="btn-icon">✦</span>
+              Get Recommendations
+            </a>
+            <a href="{{ url_for('quiz_page') }}" class="hero-btn hero-btn-light">
+              Take the Skill Quiz
+              <span class="btn-arrow">→</span>
+            </a>
           </div>
 
           <div class="hero-inline-metrics">
-            <div class="hero-chip">3-model hybrid recommender</div>
-            <div class="hero-chip">{{ home_metrics.rank_rows_display }} rank records</div>
-            <div class="hero-chip">{{ home_metrics.skill_category_display }} adaptive skill categories</div>
+            <div class="hero-chip">
+              <span class="chip-dot chip-teal"></span>
+              3-model hybrid recommender
+            </div>
+            <div class="hero-chip">
+              <span class="chip-dot chip-amber"></span>
+              {{ home_metrics.rank_rows_display }} rank records
+            </div>
+            <div class="hero-chip">
+              <span class="chip-dot chip-sky"></span>
+              {{ home_metrics.skill_category_display }} adaptive skill categories
+            </div>
           </div>
         </div>
 
@@ -82,7 +97,9 @@
               Matches rank, program, quota, and location preferences against historical closing ranks, review scores, and placement signals.
             </p>
             <div class="feature-meta">Association rules + hybrid ranking ensemble</div>
-            <a href="{{ url_for('recommendation_page') }}" class="feature-link">Open recommendations</a>
+            <a href="{{ url_for('recommendation_page') }}" class="feature-link">
+              Open recommendations <span>→</span>
+            </a>
           </article>
 
           <article class="feature-card reveal">
@@ -92,7 +109,9 @@
               Answers college, placement, and admission questions with Gemini-backed responses grounded in the same project datasets.
             </p>
             <div class="feature-meta">Conversational guidance on demand</div>
-            <a href="{{ url_for('ai_guidance') }}" class="feature-link">Talk to AI</a>
+            <a href="{{ url_for('ai_guidance') }}" class="feature-link">
+              Talk to AI <span>→</span>
+            </a>
           </article>
 
           <article class="feature-card reveal">
@@ -102,7 +121,9 @@
               Measures performance across logical, coding, analytical, design, and systems categories while adapting question difficulty in real time.
             </p>
             <div class="feature-meta">Bayesian skill estimation + career matching</div>
-            <a href="{{ url_for('quiz_page') }}" class="feature-link">Start the quiz</a>
+            <a href="{{ url_for('quiz_page') }}" class="feature-link">
+              Start the quiz <span>→</span>
+            </a>
           </article>
         </div>
       </section>
@@ -175,35 +196,15 @@
         </div>
       </section>
     </main>
+
+    {% include 'partials/about.html' %}
+
   </div>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <div class="footer-logo">
-          <img src="{{ url_for('static', filename='images/logo.png') }}" alt="edVance logo" />
-          <span>edVance</span>
-        </div>
-        <p>
-          College recommendation, AI counselling, and adaptive skill analysis built for students working through WBJEE-era admission choices.
-        </p>
-      </div>
-
-      <div class="footer-links">
-        <a href="https://www.linkedin.com/in/aritra0407/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        <a href="https://wa.me/917278735953" target="_blank" rel="noopener noreferrer">WhatsApp</a>
-        <a href="tel:+919874739638">Phone</a>
-        <a href="mailto:aritra0407@gmail.com">Email</a>
-      </div>
-
-      <div class="footer-meta">
-        <span>{{ home_metrics.rank_year_range or "2021-2025" }} dataset window</span>
-        <span>{{ home_metrics.rank_rows_display }} historical rows</span>
-      </div>
-    </div>
-  </footer>
-
-  <button id="aiBtn" aria-label="Open adaptive quiz">Quiz</button>
+  <button id="aiBtn" aria-label="Open adaptive quiz">
+    <span class="ai-btn-label">Quiz</span>
+    <span class="ai-btn-ring"></span>
+  </button>
 
   <script src="{{ url_for('static', filename='js/header.js') }}"></script>
   <script>
