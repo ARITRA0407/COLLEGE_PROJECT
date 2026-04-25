@@ -1465,8 +1465,14 @@ def claude_proxy():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     debug_mode = _env_flag("FLASK_DEBUG", False)
     use_reloader = debug_mode and _env_flag("FLASK_USE_RELOADER", False)
     app.run(host='0.0.0.0', port=port, debug=debug_mode, use_reloader=use_reloader)
+
+# ADD THESE 3 LINES — runs regardless of how the file is invoked
+else:
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
