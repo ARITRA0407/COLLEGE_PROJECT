@@ -39,7 +39,9 @@ BACKEND_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory of 
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR) # Get the parent directory, which is the project root.
 sys.path.append(BACKEND_DIR) # Add the backend directory to the Python path for importing modules.
 RESULT_REPORT_DIR = os.path.join(PROJECT_ROOT, "results")
+VIDEO_DIR = os.path.join(PROJECT_ROOT, "videos")
 os.makedirs(RESULT_REPORT_DIR, exist_ok=True)
+os.makedirs(VIDEO_DIR, exist_ok=True)
 # ================= QUIZ SYSTEM INTEGRATION ================= #
 # template/static configuration
 TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates') # Define the path to the templates folder.
@@ -72,6 +74,8 @@ _warmup_started = False
 _quiz_model_warmup_started = False
 AUTO_MODEL_WARMUP = _env_flag("ENABLE_MODEL_WARMUP", False)
 QUIZ_RESULT_WAIT_TIMEOUT = _env_float("QUIZ_RESULT_WAIT_TIMEOUT", 4.5)
+QUIZ_MODEL_WARMUP_ON_BOOT = _env_flag("ENABLE_QUIZ_MODEL_WARMUP", True)
+QUIZ_PERSIST_REPORTS = _env_flag("ENABLE_QUIZ_REPORT_PERSISTENCE", False)
 
 try:
     q_df = pd.read_csv(os.path.join(CSV_FOLDER, "QUESTIONS.csv"), encoding="latin1")
@@ -102,6 +106,89 @@ try:
 except Exception as e:
     print("Quiz CSV load error:", e)
     q_df, career_df = None, None
+
+
+def _format_compact_number(value):
+    try:
+        value = int(value)
+    except Exception:
+        return "0"
+
+    if value >= 1_000_000:
+        return f"{value / 1_000_000:.1f}M+"
+    if value >= 1_000:
+        return f"{value / 1_000:.1f}K+"
+    return str(value)
+
+
+def _count_csv_rows(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as file_obj:
+            return max(sum(1 for _ in file_obj) - 1, 0)
+    except Exception:
+        return 0
+
+
+def _build_homepage_metrics():
+    metrics = {
+        "college_count": 0,
+        "college_display": "0",
+        "rank_rows_count": 0,
+        "rank_rows_display": "0",
+        "rank_year_count": 0,
+        "rank_years_display": "0 Years",
+        "rank_year_range": "",
+        "skill_category_count": 0,
+        "skill_category_display": "0",
+        "ml_model_count": 3,
+        "ml_model_display": "3",
+    }
+
+    try:
+        college_path = os.path.join(CSV_FOLDER, "college.csv")
+        college_df = pd.read_csv(
+            college_path,
+            usecols=lambda col: str(col).strip().lower() == "institute",
+            encoding="latin1"
+        )
+        if not college_df.empty:
+            institute_col = college_df.columns[0]
+            metrics["college_count"] = int(
+                college_df[institute_col].dropna().astype(str).str.strip().nunique()
+            )
+            metrics["college_display"] = str(metrics["college_count"])
+    except Exception:
+        pass
+
+    rank_files = sorted(
+        file_name for file_name in os.listdir(CSV_FOLDER)
+        if file_name.startswith("rank_") and file_name.endswith(".csv")
+    )
+    metrics["rank_year_count"] = len(rank_files)
+    metrics["rank_years_display"] = f"{len(rank_files)} Years" if rank_files else "0 Years"
+
+    rank_years = []
+    for file_name in rank_files:
+        metrics["rank_rows_count"] += _count_csv_rows(os.path.join(CSV_FOLDER, file_name))
+        try:
+            rank_years.append(int(file_name.split("_")[-1].split(".")[0]))
+        except Exception:
+            continue
+
+    metrics["rank_rows_display"] = _format_compact_number(metrics["rank_rows_count"])
+    if rank_years:
+        metrics["rank_year_range"] = f"{min(rank_years)}-{max(rank_years)}"
+
+    if q_df is not None and "Category" in q_df.columns:
+        metrics["skill_category_count"] = int(
+            q_df["Category"].astype(str).str.strip().nunique()
+        )
+        metrics["skill_category_display"] = str(metrics["skill_category_count"])
+
+    return metrics
+
+
+HOME_PAGE_METRICS = _build_homepage_metrics()
 
 
 def get_quiz_recommender():
@@ -227,6 +314,17 @@ def _start_background_warmup():
     ).start()
 
 
+def _warm_quiz_model_on_boot():
+    if not QUIZ_MODEL_WARMUP_ON_BOOT or career_df is None or quiz_recommender is not None:
+        return
+
+    try:
+        if get_quiz_recommender() is not None:
+            print("Quiz recommender boot warmup complete.")
+    except Exception as exc:
+        print("Quiz recommender boot warmup failed:", exc)
+
+
 def _quiz_payload_signature():
     snapshot = {
         "category_order": user_data.get("category_order", []),
@@ -272,6 +370,12 @@ def _attach_quiz_report(payload, store_history=False):
 
     if payload.get("report_paths"):
         return payload
+
+    if not QUIZ_PERSIST_REPORTS:
+        hydrated_payload = dict(payload)
+        hydrated_payload["report_paths"] = {}
+        hydrated_payload["report_file"] = ""
+        return hydrated_payload
 
     report_paths = {}
     active_quiz_recommender = get_quiz_recommender()
@@ -380,6 +484,9 @@ elif AUTO_MODEL_WARMUP:
     @app.before_request
     def _before_request_warmup():
         _start_background_warmup()
+
+
+_warm_quiz_model_on_boot()
 
 
 
@@ -836,7 +943,7 @@ def quiz_finalize():
         store_history=False
     )
     payload = _refresh_quiz_payload_cache(
-        persist_report=True,
+        persist_report=QUIZ_PERSIST_REPORTS,
         store_history=False,
         wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT
     )
@@ -863,7 +970,7 @@ def quiz_result():
         store_history=False
     )
     payload = _refresh_quiz_payload_cache(
-        persist_report=True,
+        persist_report=QUIZ_PERSIST_REPORTS,
         store_history=False,
         wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT
     )
@@ -960,6 +1067,18 @@ def serve_csv(filename):
         abort(404) # Abort with a 404 response.
 
 
+@app.route('/videos/<path:filename>')
+def serve_video(filename):
+    try:
+        requested = safe_join(VIDEO_DIR, filename)
+        if not requested or not os.path.exists(requested):
+            return "Not found", 404
+        return send_from_directory(VIDEO_DIR, filename, conditional=True)
+    except Exception as e:
+        print("Error serving video:", e)
+        abort(404)
+
+
 @app.route('/favicon.ico')
 def favicon():
     """
@@ -984,7 +1103,35 @@ def index():
     Render the main page. Expects PROJECT_ROOT/templates/index.html to exist.
     """
     try:
-        return render_template('index.html') # Render the main index page.
+        home_stats = [
+            {
+                "value": HOME_PAGE_METRICS.get("college_display", "0"),
+                "label": "Colleges Profiled",
+            },
+            {
+                "value": HOME_PAGE_METRICS.get("rank_rows_display", "0"),
+                "label": "WBJEE Rank Records",
+            },
+            {
+                "value": HOME_PAGE_METRICS.get("rank_years_display", "0 Years"),
+                "label": "Admission Trend Window",
+            },
+            {
+                "value": HOME_PAGE_METRICS.get("skill_category_display", "0"),
+                "label": "Skill Categories",
+            },
+            {
+                "value": HOME_PAGE_METRICS.get("ml_model_display", "3"),
+                "label": "Hybrid ML Models",
+            },
+        ]
+        return render_template(
+            'index.html',
+            home_metrics=HOME_PAGE_METRICS,
+            home_stats=home_stats,
+            hero_video_url='/videos/FrontVideo.mp4',
+            hero_poster_url='/videos/FrontVideoPoster.png'
+        ) # Render the main index page.
     except Exception as e:
         # Helpful error if template missing
         return f"<h2>Template error</h2><pre>{e}</pre>", 500 # Return an error message if the template is missing.

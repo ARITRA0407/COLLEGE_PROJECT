@@ -46,13 +46,15 @@ if (signupBtn) {
 }
 
 // This closes the modal when the close button is clicked.
-closeBtn.addEventListener('click', function() {
-    modal.style.display = 'none';
-});
+if (closeBtn && modal) {
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+}
 
 // This closes the modal when the user clicks outside of the content.
 window.addEventListener('click', function(e) {
-    if (e.target === modal) {
+    if (modal && e.target === modal) {
         modal.style.display = 'none';
     }
 });
