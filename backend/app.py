@@ -68,6 +68,7 @@ _quiz_payload_lock = threading.Lock()
 _quiz_payload_prefetch_lock = threading.Lock()
 _warmup_lock = threading.Lock()
 _quiz_model_warmup_lock = threading.Lock()
+_home_metrics_lock = threading.Lock()
 _quiz_payload_cache = {"signature": None, "payload": None}
 _quiz_payload_prefetch_state = {"signature": None, "event": None}
 _warmup_started = False
@@ -188,7 +189,19 @@ def _build_homepage_metrics():
     return metrics
 
 
-HOME_PAGE_METRICS = _build_homepage_metrics()
+HOME_PAGE_METRICS = None
+
+
+def get_homepage_metrics():
+    global HOME_PAGE_METRICS
+    if HOME_PAGE_METRICS is not None:
+        return HOME_PAGE_METRICS
+
+    with _home_metrics_lock:
+        if HOME_PAGE_METRICS is None:
+            HOME_PAGE_METRICS = _build_homepage_metrics()
+
+    return HOME_PAGE_METRICS
 
 
 def get_quiz_recommender():
@@ -1103,31 +1116,32 @@ def index():
     Render the main page. Expects PROJECT_ROOT/templates/index.html to exist.
     """
     try:
+        home_page_metrics = get_homepage_metrics()
         home_stats = [
             {
-                "value": HOME_PAGE_METRICS.get("college_display", "0"),
+                "value": home_page_metrics.get("college_display", "0"),
                 "label": "Colleges Profiled",
             },
             {
-                "value": HOME_PAGE_METRICS.get("rank_rows_display", "0"),
+                "value": home_page_metrics.get("rank_rows_display", "0"),
                 "label": "WBJEE Rank Records",
             },
             {
-                "value": HOME_PAGE_METRICS.get("rank_years_display", "0 Years"),
+                "value": home_page_metrics.get("rank_years_display", "0 Years"),
                 "label": "Admission Trend Window",
             },
             {
-                "value": HOME_PAGE_METRICS.get("skill_category_display", "0"),
+                "value": home_page_metrics.get("skill_category_display", "0"),
                 "label": "Skill Categories",
             },
             {
-                "value": HOME_PAGE_METRICS.get("ml_model_display", "3"),
+                "value": home_page_metrics.get("ml_model_display", "3"),
                 "label": "Hybrid ML Models",
             },
         ]
         return render_template(
             'index.html',
-            home_metrics=HOME_PAGE_METRICS,
+            home_metrics=home_page_metrics,
             home_stats=home_stats,
             hero_video_url='/videos/FrontVideo.mp4',
             hero_poster_url='/videos/FrontVideoPoster.png'
