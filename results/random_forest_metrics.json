@@ -1,6 +1,6 @@
 {
   "model_name": "random_forest",
-  "saved_from_cache": true,
+  "saved_from_cache": false,
   "stack": {
     "association_rules": true,
     "hybrid_models": [
@@ -9,19 +9,19 @@
       "gradient_boosting"
     ],
     "hybrid_weights": {
-      "decision_tree": 0.368249,
-      "random_forest": 0.269446,
-      "gradient_boosting": 0.362305
+      "decision_tree": 0.356015,
+      "random_forest": 0.283741,
+      "gradient_boosting": 0.360244
     },
-    "cache_loaded": true
+    "cache_loaded": false
   },
   "type": "regressor",
   "metrics": {
     "samples": 358,
-    "mae": 23886.95,
-    "rmse": 74593.8168,
-    "r2": 0.8572,
-    "median_ae": 3477.8238,
-    "mape": 0.282306
+    "mae": 22314.2494,
+    "rmse": 69475.8991,
+    "r2": 0.8761,
+    "median_ae": 3127.7399,
+    "mape": 0.259063
   }
 }

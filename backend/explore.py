@@ -13,6 +13,7 @@ import sys
 import json
 import re
 import threading
+import subprocess
 from collections import defaultdict
 
 # optional dependency
@@ -434,6 +435,38 @@ def register_explore(app):
             'job_profiles': lists['job_profiles']
         })
         return jsonify(agg)
+
+    @app.route('/explore/api/reviews/refresh', methods=['POST'])
+    def _api_refresh_reviews():
+        payload = request.get_json(silent=True) or {}
+        name = (payload.get('name') or '').strip()
+        if not name:
+            return jsonify({'error': 'name required'}), 400
+
+        backend_dir = os.path.dirname(os.path.abspath(__file__))
+        collect_cmd = [
+            sys.executable,
+            os.path.join(backend_dir, 'reviewCollection.py'),
+            '--provider', 'serper',
+            '--max-snippets', '8',
+            '--mode', 'replace',
+            '--college-name', name,
+        ]
+        try:
+            subprocess.run(collect_cmd, check=True, cwd=os.path.dirname(backend_dir), capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            return jsonify({'error': f"reviewCollection failed: {(e.stderr or e.stdout or '').strip()}"}), 500
+
+        update_cmd = [sys.executable, os.path.join(backend_dir, 'reviewUpdate.py')]
+        try:
+            subprocess.run(update_cmd, check=True, cwd=os.path.dirname(backend_dir), capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            return jsonify({'error': f"reviewUpdate failed: {(e.stderr or e.stdout or '').strip()}"}), 500
+
+        global _LOADED
+        _LOADED = False
+        _ensure_loaded()
+        return jsonify({'ok': True, 'message': 'Reviews and scores refreshed'})
 
 # auto-register if possible
 try:

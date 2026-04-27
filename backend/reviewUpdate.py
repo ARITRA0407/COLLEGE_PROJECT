@@ -18,8 +18,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_FILE_PATH = os.path.join(BASE_DIR, '..', 'csv', 'reviews.csv')
 CSV_FILE_PATH = os.path.normpath(CSV_FILE_PATH)
 
-ASPECT_MAX_SCORE = 10.0
-SCORE_SCALING_FACTOR = 0.5  # Controls how quickly aspect scores rise (adjust as needed)
+ASPECT_MAX_SCORE = 5.0
+KEYWORD_STRENGTH = 0.65
+SENTIMENT_STRENGTH = 0.85
 
 # Download necessary NLTK resources (VADER and stopwords) if not already present
 try:
@@ -64,11 +65,48 @@ ASPECT_KEYWORDS = {
 
 # --- 2. CORE PROCESSING FUNCTION ---
 
+def normalize_review_text_for_scoring(review_text):
+    if review_text is None:
+        return ""
+    text = str(review_text).strip()
+    if not text:
+        return ""
+
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    kept = []
+    for line in lines:
+        lower = line.lower()
+        if lower.startswith("collected online review snippets for"):
+            continue
+        if set(line) == {"-"} and len(line) >= 10:
+            continue
+        if lower.startswith("no reliable public review snippets were found online for"):
+            continue
+        if lower.startswith("could not collect online reviews for"):
+            continue
+        if line.startswith("- "):
+            kept.append(line[2:].strip())
+        else:
+            kept.append(line)
+    return " ".join(kept).strip()
+
+
+def sigmoid(x):
+    return 1.0 / (1.0 + np.exp(-x))
+
+
+def aspect_score_from_raw(raw_score, sentiment_compound):
+    base = ASPECT_MAX_SCORE * sigmoid(KEYWORD_STRENGTH * raw_score)
+    adjusted = base + (sentiment_compound * SENTIMENT_STRENGTH)
+    return float(np.clip(adjusted, 0.0, ASPECT_MAX_SCORE))
+
+
 def analyze_review(review_text):
     """
     Performs text cleaning and aspect-based scoring on a single review text.
     """
-    if pd.isna(review_text) or review_text == "":
+    normalized = normalize_review_text_for_scoring(review_text)
+    if pd.isna(review_text) or normalized == "":
         # Return default zero scores for missing or empty reviews
         return {
             'word_count': 0,
@@ -83,14 +121,13 @@ def analyze_review(review_text):
         }
 
     # 2.1 Text Cleaning
-    text = str(review_text).lower()
-    # Remove punctuation for basic tokenization, but keep it for VADER's sentiment analysis if needed
+    text = normalized.lower()
     clean_text = re.sub(r'[^\w\s]', '', text)
     tokens = [word for word in clean_text.split() if word not in stop_words and len(word) > 2]
     word_count = len(tokens)
 
     # 2.2 General Sentiment (VADER)
-    sentiment_score = sid.polarity_scores(review_text)['compound']
+    sentiment_score = float(sid.polarity_scores(normalized)['compound'])
 
     # 2.3 Aspect-Based Scoring
     aspect_scores = {}
@@ -118,34 +155,25 @@ def analyze_review(review_text):
                         else:
                             total_neg_weight += weight
 
-        # Calculate raw difference and scale it to a 0-10 score
         raw_score = total_pos_weight - total_neg_weight
-        
-        # Scale the score: A simple way to map raw_score to 0-10 range is to add a base value (5)
-        # and limit the influence of the raw score via the scaling factor.
-        # This prevents wildly fluctuating scores while reflecting the sentiment.
-        final_score = 5 + (raw_score * SCORE_SCALING_FACTOR)
-        
-        # Clamp the score between 0 and 10
-        final_score = np.clip(final_score, 1, ASPECT_MAX_SCORE)
-
-        aspect_scores[f'{aspect}_score'] = round(final_score, 1)
+        final_score = aspect_score_from_raw(raw_score, sentiment_score)
+        aspect_scores[f'{aspect}_score'] = round(final_score, 2)
 
     # 2.4 Overall Score Calculation
     scores_list = [v for k, v in aspect_scores.items() if 'score' in k]
     if scores_list:
-        overall_aspect_score = round(np.mean(scores_list), 1)
+        overall_aspect_score = round(float(np.mean(scores_list)), 2)
     else:
         overall_aspect_score = 0.0
 
-    # 2.5 Rating Calculation (Based on Overall Score)
-    if overall_aspect_score >= 8.5:
+    # 2.5 Rating Calculation (Based on Overall Score in 0..5 range)
+    if overall_aspect_score >= 4.5:
         rating = 5
-    elif overall_aspect_score >= 6.5:
+    elif overall_aspect_score >= 3.5:
         rating = 4
-    elif overall_aspect_score >= 4.5:
-        rating = 3
     elif overall_aspect_score >= 2.5:
+        rating = 3
+    elif overall_aspect_score >= 1.5:
         rating = 2
     else:
         rating = 1

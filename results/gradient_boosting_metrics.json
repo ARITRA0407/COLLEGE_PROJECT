@@ -1,6 +1,6 @@
 {
   "model_name": "gradient_boosting",
-  "saved_from_cache": true,
+  "saved_from_cache": false,
   "stack": {
     "association_rules": true,
     "hybrid_models": [
@@ -9,19 +9,19 @@
       "gradient_boosting"
     ],
     "hybrid_weights": {
-      "decision_tree": 0.368249,
-      "random_forest": 0.269446,
-      "gradient_boosting": 0.362305
+      "decision_tree": 0.356015,
+      "random_forest": 0.283741,
+      "gradient_boosting": 0.360244
     },
-    "cache_loaded": true
+    "cache_loaded": false
   },
   "type": "regressor",
   "metrics": {
     "samples": 358,
-    "mae": 17764.6951,
-    "rmse": 71214.3677,
-    "r2": 0.8698,
-    "median_ae": 4240.7129,
-    "mape": 0.529835
+    "mae": 17575.506,
+    "rmse": 72082.0689,
+    "r2": 0.8666,
+    "median_ae": 4038.1919,
+    "mape": 0.510737
   }
 }

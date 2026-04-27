@@ -1,6 +1,8 @@
 (function () {
   const select = document.getElementById("college-select");
   const btn = document.getElementById("load-btn");
+  const refreshBtn = document.getElementById("refresh-btn");
+  const refreshStatus = document.getElementById("refresh-status");
   const selName = document.getElementById("selected-name");
   const detailGrid = document.getElementById("detail-grid");
 
@@ -112,6 +114,23 @@
     });
   }
 
+  function cleanReviewTextForUI(rawText) {
+    const text = String(rawText || "").trim();
+    if (!text) return "";
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    const kept = [];
+    for (const line of lines) {
+      const lower = line.toLowerCase();
+      if (lower.startsWith("collected online review snippets for")) continue;
+      if (line.startsWith("===== URL:")) continue;
+      if (/^-{8,}$/.test(line)) continue;
+      if (lower.startsWith("no reliable public review snippets were found online for")) continue;
+      if (lower.startsWith("could not collect online reviews for")) continue;
+      kept.push(line.startsWith("- ") ? line.slice(2).trim() : line);
+    }
+    return kept.join("\n").trim();
+  }
+
   async function loadDetails(name) {
     if (!name) return;
     clearDetails();
@@ -200,7 +219,9 @@
           const dstr = rv.date ? ` • ${rv.date}` : "";
           const ratingText = rv.rating ? ` • ${rv.rating}` : "";
           meta.innerHTML = `<strong>${rv.source || "Unknown"}</strong>${dstr}${ratingText}`;
-          const txt = document.createElement("div"); txt.textContent = rv.review_text || "";
+          const txt = document.createElement("div");
+          const cleaned = cleanReviewTextForUI(rv.review_text || "");
+          txt.textContent = cleaned || "No usable review text.";
           item.appendChild(meta); item.appendChild(txt);
           ids.reviewsList.appendChild(item);
         });
@@ -208,6 +229,32 @@
     } catch (e) {
       console.error("error loading details", e);
       ids.reviewsList.innerHTML = '<div class="muted">Could not load data for this institute.</div>';
+    }
+  }
+
+  async function refreshSelectedCollege() {
+    if (!refreshBtn || !refreshStatus) return;
+    const name = select.value;
+    if (!name) return alert("Pick an institute first");
+    refreshBtn.disabled = true;
+    refreshStatus.textContent = "Collecting new reviews and recalculating scores...";
+    try {
+      const res = await fetch("/explore/api/reviews/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Refresh failed");
+      refreshStatus.textContent = "Updated successfully.";
+      await loadDetails(name);
+      setTimeout(() => {
+        refreshStatus.textContent = "";
+      }, 4000);
+    } catch (e) {
+      refreshStatus.textContent = e.message || "Refresh failed";
+    } finally {
+      refreshBtn.disabled = false;
     }
   }
 
@@ -220,9 +267,13 @@
   select.addEventListener("change", (ev) => {
     const v = ev.target.value || "";
     selName.textContent = v || "No institute selected";
+    if (refreshBtn) refreshBtn.style.display = v ? "inline-block" : "none";
   });
 
   select.addEventListener("keydown", (ev) => { if (ev.key === "Enter") btn.click(); });
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", refreshSelectedCollege);
+  }
 
   loadCollegeList();
 })();

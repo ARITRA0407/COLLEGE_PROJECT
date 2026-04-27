@@ -1,6 +1,6 @@
 {
   "model_name": "hybrid_ensemble",
-  "saved_from_cache": true,
+  "saved_from_cache": false,
   "stack": {
     "association_rules": true,
     "hybrid_models": [
@@ -9,24 +9,24 @@
       "gradient_boosting"
     ],
     "hybrid_weights": {
-      "decision_tree": 0.368249,
-      "random_forest": 0.269446,
-      "gradient_boosting": 0.362305
+      "decision_tree": 0.356015,
+      "random_forest": 0.283741,
+      "gradient_boosting": 0.360244
     },
-    "cache_loaded": true
+    "cache_loaded": false
   },
   "type": "weighted_regression_ensemble",
   "weights": {
-    "decision_tree": 0.368249,
-    "random_forest": 0.269446,
-    "gradient_boosting": 0.362305
+    "decision_tree": 0.356015,
+    "random_forest": 0.283741,
+    "gradient_boosting": 0.360244
   },
   "metrics": {
     "samples": 358,
-    "mae": 17968.1409,
-    "rmse": 71301.5829,
-    "r2": 0.8695,
-    "median_ae": 2718.1735,
-    "mape": 0.319302
+    "mae": 17592.0891,
+    "rmse": 70480.3371,
+    "r2": 0.8725,
+    "median_ae": 2443.9193,
+    "mape": 0.305322
   }
 }

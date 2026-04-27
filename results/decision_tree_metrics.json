@@ -1,6 +1,6 @@
 {
   "model_name": "decision_tree",
-  "saved_from_cache": true,
+  "saved_from_cache": false,
   "stack": {
     "association_rules": true,
     "hybrid_models": [
@@ -9,19 +9,19 @@
       "gradient_boosting"
     ],
     "hybrid_weights": {
-      "decision_tree": 0.368249,
-      "random_forest": 0.269446,
-      "gradient_boosting": 0.362305
+      "decision_tree": 0.356015,
+      "random_forest": 0.283741,
+      "gradient_boosting": 0.360244
     },
-    "cache_loaded": true
+    "cache_loaded": false
   },
   "type": "regressor",
   "metrics": {
     "samples": 358,
-    "mae": 17477.9627,
-    "rmse": 81691.9406,
-    "r2": 0.8287,
-    "median_ae": 2320.4583,
-    "mape": 0.18889
+    "mae": 17784.2671,
+    "rmse": 82531.55,
+    "r2": 0.8252,
+    "median_ae": 2049.25,
+    "mape": 0.187607
   }
 }
