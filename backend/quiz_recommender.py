@@ -7,6 +7,32 @@ import numpy as np
 import pandas as pd
 
 try:
+    from calibrated_weights import get_weight_vector
+except Exception:
+    def get_weight_vector(weight_key, names=None, data_root_dir=None):
+        defaults = {
+            "quiz_model_ensemble": {
+                "random_forest": 0.55,
+                "gradient_boosting": 0.45,
+            },
+            "career_recommendation_score": {
+                "rule": 0.24,
+                "cosine": 0.19,
+                "latent": 0.15,
+                "model_probability": 0.22,
+                "readiness": 0.15,
+                "reliability": 0.05,
+            },
+        }
+        weights = defaults.get(weight_key, {})
+        if names is not None:
+            names = list(names)
+            weights = {name: float(weights.get(name, 0.0)) for name in names}
+            total = sum(weights.values()) or 1.0
+            return {name: value / total for name, value in weights.items()}
+        return weights
+
+try:
     from sklearn.decomposition import PCA
     from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
     from sklearn.metrics import accuracy_score, f1_score, log_loss, top_k_accuracy_score
@@ -50,6 +76,7 @@ class HybridCareerRecommender:
 
     def __init__(self, career_df, output_dir):
         self.output_dir = os.path.abspath(output_dir)
+        self.data_root_dir = os.path.dirname(self.output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
         self.cache_path = os.path.join(self.output_dir, self.CACHE_FILENAME)
 
@@ -105,8 +132,11 @@ class HybridCareerRecommender:
 
     def _cache_signature(self):
         career_hash = pd.util.hash_pandas_object(self.career_df, index=True).sum()
+        weights_path = os.path.join(self.data_root_dir, "results", "calibrated_weights.json")
         return {
             "module_mtime": os.path.getmtime(__file__) if os.path.exists(__file__) else 0,
+            "calibrated_weights_module_mtime": os.path.getmtime(os.path.join(os.path.dirname(__file__), "calibrated_weights.py")),
+            "calibrated_weights_mtime": os.path.getmtime(weights_path) if os.path.exists(weights_path) else 0,
             "career_hash": str(int(career_hash)),
             "sklearn_available": bool(SKLEARN_AVAILABLE),
         }
@@ -157,6 +187,27 @@ class HybridCareerRecommender:
         }
         with open(self.cache_path, "wb") as cache_file:
             pickle.dump(payload, cache_file, protocol=pickle.HIGHEST_PROTOCOL)
+
+    def _quiz_model_weights(self):
+        return get_weight_vector(
+            "quiz_model_ensemble",
+            names=["random_forest", "gradient_boosting"],
+            data_root_dir=self.data_root_dir,
+        )
+
+    def _career_score_weights(self):
+        return get_weight_vector(
+            "career_recommendation_score",
+            names=["rule", "cosine", "latent", "model_probability", "readiness", "reliability"],
+            data_root_dir=self.data_root_dir,
+        )
+
+    def _blend_model_probabilities(self, rf_probs, gb_probs):
+        weights = self._quiz_model_weights()
+        return (
+            (float(weights.get("random_forest", 0.0)) * np.asarray(rf_probs, dtype=float))
+            + (float(weights.get("gradient_boosting", 0.0)) * np.asarray(gb_probs, dtype=float))
+        )
 
     def _normalize_rows(self, matrix):
         matrix = np.asarray(matrix, dtype=float)
@@ -231,12 +282,13 @@ class HybridCareerRecommender:
 
             rf_probs = self.rf_model.predict_proba(X_test)
             gb_probs = self.gb_model.predict_proba(X_test)
-            ensemble_probs = (0.55 * rf_probs) + (0.45 * gb_probs)
+            ensemble_probs = self._blend_model_probabilities(rf_probs, gb_probs)
             ensemble_pred = np.argmax(ensemble_probs, axis=1)
 
             self.model_metrics = {
                 "training_mode": "hybrid_ensemble",
                 "synthetic_samples": int(len(X)),
+                "ensemble_weights": self._quiz_model_weights(),
                 "top1_accuracy": round(float(accuracy_score(y_test, ensemble_pred)), 4),
                 "top3_accuracy": round(
                     float(top_k_accuracy_score(y_test, ensemble_probs, k=3, labels=np.arange(len(self.job_names)))),
@@ -275,7 +327,7 @@ class HybridCareerRecommender:
 
         rf_probs = self.rf_model.predict_proba([user_vector])[0]
         gb_probs = self.gb_model.predict_proba([user_vector])[0]
-        ensemble_probs = (0.55 * rf_probs) + (0.45 * gb_probs)
+        ensemble_probs = self._blend_model_probabilities(rf_probs, gb_probs)
         return np.clip(ensemble_probs, 0.0, 1.0)
 
     def _rule_score(self, user_levels, role_vector):
@@ -346,14 +398,15 @@ class HybridCareerRecommender:
             alignment_score = self._alignment_score(user_vector, role_vector)
             reliability_score = self._career_reliability(category_metrics, role_vector)
             strengths, growth_areas = self._strengths_and_gaps(user_vector, role_vector)
+            score_weights = self._career_score_weights()
 
             final_score = (
-                (0.24 * rule_score) +
-                (0.19 * float(cosine_scores[idx])) +
-                (0.15 * float(latent_scores[idx])) +
-                (0.22 * float(ensemble_probs[idx])) +
-                (0.15 * readiness_score) +
-                (0.05 * reliability_score)
+                (float(score_weights.get("rule", 0.0)) * rule_score) +
+                (float(score_weights.get("cosine", 0.0)) * float(cosine_scores[idx])) +
+                (float(score_weights.get("latent", 0.0)) * float(latent_scores[idx])) +
+                (float(score_weights.get("model_probability", 0.0)) * float(ensemble_probs[idx])) +
+                (float(score_weights.get("readiness", 0.0)) * readiness_score) +
+                (float(score_weights.get("reliability", 0.0)) * reliability_score)
             )
 
             recommendations.append({
@@ -382,6 +435,10 @@ class HybridCareerRecommender:
                 "retrieval_model": "cosine_similarity + PCA_latent_matching",
                 "reranker_model": self.model_metrics.get("training_mode", "hybrid_fallback"),
                 "training_metrics": self.model_metrics,
+                "runtime_weights": {
+                    "quiz_model_ensemble": self._quiz_model_weights(),
+                    "career_recommendation_score": self._career_score_weights(),
+                },
             },
             "summary_metrics": summary_metrics,
             "category_metrics": category_metrics,

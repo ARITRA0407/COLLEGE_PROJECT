@@ -42,6 +42,30 @@ RESULT_REPORT_DIR = os.path.join(PROJECT_ROOT, "results")
 VIDEO_DIR = os.path.join(PROJECT_ROOT, "videos")
 os.makedirs(RESULT_REPORT_DIR, exist_ok=True)
 os.makedirs(VIDEO_DIR, exist_ok=True)
+
+try:
+    from calibrated_weights import get_weight_vector
+except Exception:
+    def get_weight_vector(weight_key, names=None, data_root_dir=None):
+        defaults = {
+            "skill_assessment_score": {
+                "bayesian_skill": 0.34,
+                "observed_accuracy": 0.22,
+                "confidence_alignment": 0.14,
+                "time_efficiency": 0.10,
+                "consistency": 0.08,
+                "momentum": 0.06,
+                "challenge_index": 0.06,
+            }
+        }
+        weights = defaults.get(weight_key, {})
+        if names is not None:
+            names = list(names)
+            weights = {name: float(weights.get(name, 0.0)) for name in names}
+            total = sum(weights.values()) or 1.0
+            return {name: value / total for name, value in weights.items()}
+        return weights
+
 # ================= QUIZ SYSTEM INTEGRATION ================= #
 # template/static configuration
 TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates') # Define the path to the templates folder.
@@ -705,14 +729,27 @@ def _build_quiz_result_payload(persist_report=False, store_history=False):
             default=0.0
         )
 
+        skill_weights = get_weight_vector(
+            "skill_assessment_score",
+            names=[
+                "bayesian_skill",
+                "observed_accuracy",
+                "confidence_alignment",
+                "time_efficiency",
+                "consistency",
+                "momentum",
+                "challenge_index",
+            ],
+            data_root_dir=PROJECT_ROOT,
+        )
         blended_score = (
-            (0.34 * bayesian_skill) +
-            (0.22 * observed_accuracy) +
-            (0.14 * confidence_alignment) +
-            (0.10 * time_efficiency) +
-            (0.08 * consistency) +
-            (0.06 * momentum) +
-            (0.06 * challenge_index)
+            (float(skill_weights.get("bayesian_skill", 0.0)) * bayesian_skill) +
+            (float(skill_weights.get("observed_accuracy", 0.0)) * observed_accuracy) +
+            (float(skill_weights.get("confidence_alignment", 0.0)) * confidence_alignment) +
+            (float(skill_weights.get("time_efficiency", 0.0)) * time_efficiency) +
+            (float(skill_weights.get("consistency", 0.0)) * consistency) +
+            (float(skill_weights.get("momentum", 0.0)) * momentum) +
+            (float(skill_weights.get("challenge_index", 0.0)) * challenge_index)
         )
         blended_score = _clip(blended_score * (1.0 - (0.12 * uncertainty)))
 

@@ -1,0 +1,353 @@
+Weighted Sum Calibration Report
+Generated at: 2026-05-09T18:58:34
+Project root: C:\Users\clayj\OneDrive\Documents\COLLEGE_PROJECT
+
+The JSON file is loaded automatically by app.py and backend modules.
+If scikit-learn is missing, ML ensemble sections are skipped instead of writing fake weights.
+
+1. Hybrid Recommendation Score: DT/RF/GB rank ensemble
+------------------------------------------------------
+Tested cases: 231
+Selection metric: lowest validation RMSE, then MAE
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  decision_tree=0.050, random_forest=0.650, gradient_boosting=0.300                                67843.858212  20092.47615  0.881861                                
+   2  decision_tree=0.050, random_forest=0.600, gradient_boosting=0.350                                67848.841758  19818.716752  0.881843                                
+   3  decision_tree=0.100, random_forest=0.650, gradient_boosting=0.250                                67854.890914  19985.256469  0.881822                                
+   4  decision_tree=0.100, random_forest=0.600, gradient_boosting=0.300                                67869.592567  19711.511449  0.881771                                
+   5  decision_tree=0.000, random_forest=0.600, gradient_boosting=0.400                                67881.949978  19943.540388  0.881728                                
+   6  decision_tree=0.000, random_forest=0.650, gradient_boosting=0.350                                67886.685334  20215.877417  0.881712                                
+   7  decision_tree=0.050, random_forest=0.700, gradient_boosting=0.250                                67895.12879  20369.282444  0.881682                                
+   8  decision_tree=0.100, random_forest=0.700, gradient_boosting=0.200                                67896.439478  20263.046251  0.881678                                
+   9  decision_tree=0.050, random_forest=0.550, gradient_boosting=0.400                                67910.067043  19550.383983   0.88163                                
+  10  decision_tree=0.150, random_forest=0.650, gradient_boosting=0.200                                67919.757193  19887.886888  0.881596                                
+  11  decision_tree=0.000, random_forest=0.550, gradient_boosting=0.450                                67933.437033  19676.057365  0.881549                                
+  12  decision_tree=0.100, random_forest=0.550, gradient_boosting=0.350                                67940.507922  19442.201238  0.881524                                
+  13  decision_tree=0.150, random_forest=0.600, gradient_boosting=0.250                                67944.15306  19612.066104  0.881511                                
+  14  decision_tree=0.000, random_forest=0.700, gradient_boosting=0.300                                67947.631346  20491.098845  0.881499                                
+  15  decision_tree=0.150, random_forest=0.700, gradient_boosting=0.150                                67951.560295  20167.061319  0.881485                                
+  16  decision_tree=0.100, random_forest=0.750, gradient_boosting=0.150                                67994.135143  20547.761467  0.881337                                
+  17  decision_tree=0.050, random_forest=0.750, gradient_boosting=0.200                                68002.526254  20651.637539  0.881308                                
+  18  decision_tree=0.150, random_forest=0.550, gradient_boosting=0.300                                68024.68743  19339.772208   0.88123                                
+  19  decision_tree=0.050, random_forest=0.500, gradient_boosting=0.450                                68027.382213  19286.281958  0.881221                                
+  20  decision_tree=0.200, random_forest=0.650, gradient_boosting=0.150                                68038.303078  19800.942881  0.881183                                
+  21  decision_tree=0.150, random_forest=0.750, gradient_boosting=0.100                                68039.483559  20457.122929  0.881178                                
+  22  decision_tree=0.000, random_forest=0.500, gradient_boosting=0.500                                68041.018868  19416.815991  0.881173                                
+  23  decision_tree=0.200, random_forest=0.700, gradient_boosting=0.100                                68060.360501  20083.029208  0.881106                                
+  24  decision_tree=0.000, random_forest=0.750, gradient_boosting=0.250                                68064.637019  20770.25776  0.881091                                
+  25  decision_tree=0.100, random_forest=0.500, gradient_boosting=0.400                                68067.461281  19176.507515  0.881081                                
+  26  decision_tree=0.200, random_forest=0.600, gradient_boosting=0.200                                68072.34642  19525.175788  0.881064                                
+  27  decision_tree=0.200, random_forest=0.750, gradient_boosting=0.050                                68138.464207  20374.856893  0.880833                                
+  28  decision_tree=0.100, random_forest=0.800, gradient_boosting=0.100                                68147.736433  20840.052977    0.8808                                
+  29  decision_tree=0.150, random_forest=0.500, gradient_boosting=0.350                                68161.161316  19071.290755  0.880753                                
+  30  decision_tree=0.200, random_forest=0.550, gradient_boosting=0.250                                68162.406469  19250.832036  0.880749                                
+
+2. College Aspect / Quality Score
+---------------------------------
+Tested cases: 231
+Selection metric: lowest RMSE against historical rank desirability
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  ctc=0.550, placement=0.050, overall=0.400                                                          0.265578    0.223449  -2.212326                                
+   2  ctc=0.550, placement=0.100, overall=0.350                                                           0.26567    0.223223  -2.214574                                
+   3  ctc=0.500, placement=0.100, overall=0.400                                                          0.265824     0.22442  -2.218287                                
+   4  ctc=0.500, placement=0.050, overall=0.450                                                          0.265824    0.224635  -2.218284                                
+   5  ctc=0.550, placement=0.000, overall=0.450                                                          0.265894    0.223903  -2.219981                                
+   6  ctc=0.550, placement=0.150, overall=0.300                                                          0.266172    0.223308  -2.226726                                
+   7  ctc=0.500, placement=0.000, overall=0.500                                                          0.266232    0.225163  -2.228184                                
+   8  ctc=0.500, placement=0.150, overall=0.350                                                          0.266233    0.224554  -2.228194                                
+   9  ctc=0.600, placement=0.050, overall=0.350                                                          0.266792    0.223851  -2.241784                                
+  10  ctc=0.600, placement=0.100, overall=0.300                                                          0.266977    0.223768  -2.246278                                
+  11  ctc=0.600, placement=0.000, overall=0.400                                                          0.267015    0.224214  -2.247194                                
+  12  ctc=0.500, placement=0.200, overall=0.300                                                          0.267048    0.225005  -2.248004                                
+  13  ctc=0.550, placement=0.200, overall=0.250                                                           0.26708    0.223637  -2.248781                                
+  14  ctc=0.450, placement=0.100, overall=0.450                                                          0.267435     0.22687  -2.257416                                
+  15  ctc=0.450, placement=0.050, overall=0.500                                                          0.267527    0.226996  -2.259658                                
+  16  ctc=0.600, placement=0.150, overall=0.250                                                          0.267569    0.223946  -2.260675                                
+  17  ctc=0.450, placement=0.150, overall=0.400                                                          0.267749    0.227077  -2.265078                                
+  18  ctc=0.450, placement=0.000, overall=0.550                                                          0.268025    0.227441  -2.271803                                
+  19  ctc=0.500, placement=0.250, overall=0.250                                                          0.268267    0.225706  -2.277717                                
+  20  ctc=0.550, placement=0.250, overall=0.200                                                          0.268391    0.224293  -2.28074                                
+  21  ctc=0.450, placement=0.200, overall=0.350                                                          0.268468    0.227677  -2.282643                                
+  22  ctc=0.600, placement=0.200, overall=0.200                                                          0.268564    0.224344  -2.284975                                
+  23  ctc=0.650, placement=0.050, overall=0.300                                                          0.269449    0.225952  -2.30666                                
+  24  ctc=0.650, placement=0.000, overall=0.350                                                          0.269578     0.22605  -2.309824                                
+  25  ctc=0.450, placement=0.250, overall=0.300                                                          0.269589    0.228605  -2.310111                                
+  26  ctc=0.650, placement=0.100, overall=0.250                                                          0.269723    0.226092  -2.313398                                
+  27  ctc=0.500, placement=0.300, overall=0.200                                                          0.269883     0.22669  -2.317334                                
+  28  ctc=0.600, placement=0.250, overall=0.150                                                          0.269958    0.225022  -2.319179                                
+  29  ctc=0.550, placement=0.300, overall=0.150                                                          0.270098    0.225301  -2.322602                                
+  30  ctc=0.650, placement=0.150, overall=0.200                                                            0.2704    0.226543  -2.33004                                
+
+3. Final College Recommendation Score
+-------------------------------------
+Tested cases: 231
+Selection metric: lowest RMSE against historical rank desirability
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  accessibility=0.000, quality=1.000, rule_boost=0.000                                               0.265578    0.223449  -2.212326                                
+   2  accessibility=0.050, quality=0.950, rule_boost=0.000                                               0.273876    0.233147  -2.416225                                
+   3  accessibility=0.000, quality=0.950, rule_boost=0.050                                                0.27799    0.237003  -2.519622                                
+   4  accessibility=0.100, quality=0.900, rule_boost=0.000                                                0.28344     0.24426  -2.658969                                
+   5  accessibility=0.050, quality=0.900, rule_boost=0.050                                               0.287385    0.248048  -2.761547                                
+   6  accessibility=0.000, quality=0.900, rule_boost=0.100                                               0.291777    0.252193   -2.8774                                
+   7  accessibility=0.150, quality=0.850, rule_boost=0.000                                               0.294144    0.257122  -2.940557                                
+   8  accessibility=0.100, quality=0.850, rule_boost=0.050                                               0.297918    0.260841  -3.042317                                
+   9  accessibility=0.050, quality=0.850, rule_boost=0.100                                               0.302127    0.264977  -3.157351                                
+  10  accessibility=0.200, quality=0.800, rule_boost=0.000                                                0.30587    0.271492  -3.260988                                
+  11  accessibility=0.000, quality=0.850, rule_boost=0.150                                               0.306754    0.269383  -3.285659                                
+  12  accessibility=0.150, quality=0.800, rule_boost=0.050                                               0.309472    0.275181  -3.36193                                
+  13  accessibility=0.100, quality=0.800, rule_boost=0.100                                               0.313497    0.279304  -3.476146                                
+  14  accessibility=0.050, quality=0.800, rule_boost=0.150                                                0.31793    0.283785  -3.603636                                
+  15  accessibility=0.250, quality=0.750, rule_boost=0.000                                               0.318504    0.286888  -3.620264                                
+  16  accessibility=0.200, quality=0.750, rule_boost=0.050                                               0.321937    0.290595  -3.720388                                
+  17  accessibility=0.000, quality=0.800, rule_boost=0.200                                               0.322754    0.288374  -3.744401                                
+  18  accessibility=0.150, quality=0.750, rule_boost=0.100                                               0.325781    0.294736  -3.833785                                
+  19  accessibility=0.100, quality=0.750, rule_boost=0.150                                               0.330022     0.29923  -3.960457                                
+  20  accessibility=0.300, quality=0.700, rule_boost=0.000                                               0.331943    0.302924  -4.018384                                
+  21  accessibility=0.050, quality=0.750, rule_boost=0.200                                               0.334645    0.303846  -4.100403                                
+  22  accessibility=0.250, quality=0.700, rule_boost=0.050                                               0.335211    0.306681  -4.117689                                
+  23  accessibility=0.200, quality=0.700, rule_boost=0.100                                               0.338878    0.310805  -4.230269                                
+  24  accessibility=0.000, quality=0.750, rule_boost=0.250                                               0.339634     0.30848  -4.253624                                
+  25  accessibility=0.150, quality=0.700, rule_boost=0.150                                               0.342931    0.315298  -4.356122                                
+  26  accessibility=0.350, quality=0.650, rule_boost=0.000                                               0.346093    0.319443  -4.455348                                
+  27  accessibility=0.100, quality=0.700, rule_boost=0.200                                               0.347356    0.319922  -4.49525                                
+  28  accessibility=0.300, quality=0.650, rule_boost=0.050                                               0.349203    0.323189  -4.553835                                
+  29  accessibility=0.050, quality=0.700, rule_boost=0.250                                                0.35214     0.32457  -4.647652                                
+  30  accessibility=0.250, quality=0.650, rule_boost=0.100                                               0.352699    0.327293  -4.665596                                
+
+4. Quiz Career Model Ensemble: Random Forest / Gradient Boosting
+----------------------------------------------------------------
+Tested cases: 101
+Selection metric: highest accuracy, then lowest log loss
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  random_forest=0.950, gradient_boosting=0.050                                                                                       0.905993  0.904824    0.247782
+   2  random_forest=0.990, gradient_boosting=0.010                                                                                       0.905993  0.905181    0.250627
+   3  random_forest=0.870, gradient_boosting=0.130                                                                                       0.904818  0.903887    0.242569
+   4  random_forest=0.940, gradient_boosting=0.060                                                                                       0.904818  0.903582    0.247096
+   5  random_forest=0.960, gradient_boosting=0.040                                                                                       0.904818  0.903622    0.248478
+   6  random_forest=0.980, gradient_boosting=0.020                                                                                       0.904818  0.903999    0.249901
+   7  random_forest=0.800, gradient_boosting=0.200                                                                                       0.903643  0.902746    0.238519
+   8  random_forest=0.810, gradient_boosting=0.190                                                                                       0.903643  0.902746    0.239068
+   9  random_forest=0.880, gradient_boosting=0.120                                                                                       0.903643  0.902493    0.243186
+  10  random_forest=0.890, gradient_boosting=0.110                                                                                       0.903643  0.902644    0.243813
+  11  random_forest=0.900, gradient_boosting=0.100                                                                                       0.903643  0.902734     0.24445
+  12  random_forest=0.910, gradient_boosting=0.090                                                                                       0.903643  0.902407    0.245097
+  13  random_forest=0.920, gradient_boosting=0.080                                                                                       0.903643  0.902319    0.245753
+  14  random_forest=0.930, gradient_boosting=0.070                                                                                       0.903643  0.902319     0.24642
+  15  random_forest=0.970, gradient_boosting=0.030                                                                                       0.903643  0.902725    0.249184
+  16  random_forest=1.000, gradient_boosting=0.000                                                                                       0.903643  0.902799    0.251364
+  17  random_forest=0.770, gradient_boosting=0.230                                                                                       0.902468  0.901434    0.236929
+  18  random_forest=0.780, gradient_boosting=0.220                                                                                       0.902468  0.901434    0.237449
+  19  random_forest=0.790, gradient_boosting=0.210                                                                                       0.902468  0.901434    0.237979
+  20  random_forest=0.860, gradient_boosting=0.140                                                                                       0.902468  0.901419    0.241961
+  21  random_forest=0.820, gradient_boosting=0.180                                                                                       0.901293  0.900347    0.239627
+  22  random_forest=0.830, gradient_boosting=0.170                                                                                       0.901293  0.900224    0.240196
+  23  random_forest=0.850, gradient_boosting=0.150                                                                                       0.901293  0.900175    0.241363
+  24  random_forest=0.380, gradient_boosting=0.620                                                                                       0.900118  0.899558    0.225364
+  25  random_forest=0.440, gradient_boosting=0.560                                                                                       0.900118  0.899558    0.225842
+  26  random_forest=0.460, gradient_boosting=0.540                                                                                       0.900118  0.899474    0.226129
+  27  random_forest=0.470, gradient_boosting=0.530                                                                                       0.900118  0.899474    0.226294
+  28  random_forest=0.480, gradient_boosting=0.520                                                                                       0.900118  0.899474    0.226474
+  29  random_forest=0.840, gradient_boosting=0.160                                                                                       0.900118  0.899051    0.240775
+  30  random_forest=0.370, gradient_boosting=0.630                                                                                       0.898942  0.898385    0.225345
+
+5. Career Recommendation Score
+------------------------------
+Tested cases: 3003
+Selection metric: highest top-1 accuracy, then lowest log loss
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  rule=0.100, cosine=0.000, latent=0.100, model_probability=0.800, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.470324
+   2  rule=0.100, cosine=0.000, latent=0.200, model_probability=0.700, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.474188
+   3  rule=0.200, cosine=0.000, latent=0.200, model_probability=0.600, readiness=0.000, reliability=0.000                                    0.907168  0.906263     2.52715
+   4  rule=0.100, cosine=0.100, latent=0.100, model_probability=0.700, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.534029
+   5  rule=0.100, cosine=0.100, latent=0.200, model_probability=0.600, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.538033
+   6  rule=0.100, cosine=0.000, latent=0.200, model_probability=0.600, readiness=0.100, reliability=0.000                                    0.907168  0.906263    2.540497
+   7  rule=0.100, cosine=0.000, latent=0.100, model_probability=0.700, readiness=0.000, reliability=0.100                                    0.907168  0.906263    2.541464
+   8  rule=0.100, cosine=0.000, latent=0.200, model_probability=0.600, readiness=0.000, reliability=0.100                                    0.907168  0.905986    2.545401
+   9  rule=0.200, cosine=0.100, latent=0.200, model_probability=0.500, readiness=0.000, reliability=0.000                                    0.907168  0.906263    2.591371
+  10  rule=0.100, cosine=0.200, latent=0.100, model_probability=0.600, readiness=0.000, reliability=0.000                                    0.907168  0.906263    2.598206
+  11  rule=0.200, cosine=0.000, latent=0.200, model_probability=0.500, readiness=0.000, reliability=0.100                                    0.907168  0.906263    2.598768
+  12  rule=0.100, cosine=0.200, latent=0.200, model_probability=0.500, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.602345
+  13  rule=0.100, cosine=0.100, latent=0.200, model_probability=0.500, readiness=0.100, reliability=0.000                                    0.907168  0.906263      2.6048
+  14  rule=0.100, cosine=0.100, latent=0.100, model_probability=0.600, readiness=0.000, reliability=0.100                                    0.907168  0.906263    2.605661
+  15  rule=0.000, cosine=0.300, latent=0.000, model_probability=0.700, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.605851
+  16  rule=0.100, cosine=0.000, latent=0.200, model_probability=0.500, readiness=0.200, reliability=0.000                                    0.907168  0.906263    2.607284
+  17  rule=0.100, cosine=0.100, latent=0.200, model_probability=0.500, readiness=0.000, reliability=0.100                                    0.907168  0.905986    2.609733
+  18  rule=0.100, cosine=0.000, latent=0.200, model_probability=0.500, readiness=0.100, reliability=0.100                                    0.907168  0.906263     2.61221
+  19  rule=0.100, cosine=0.000, latent=0.100, model_probability=0.600, readiness=0.000, reliability=0.200                                    0.907168  0.906263    2.613142
+  20  rule=0.000, cosine=0.100, latent=0.100, model_probability=0.600, readiness=0.200, reliability=0.000                                    0.907168  0.905986    2.614246
+  21  rule=0.100, cosine=0.000, latent=0.200, model_probability=0.500, readiness=0.000, reliability=0.200                                    0.907168  0.906263    2.617147
+  22  rule=0.200, cosine=0.200, latent=0.200, model_probability=0.400, readiness=0.000, reliability=0.000                                    0.907168  0.906263    2.656037
+  23  rule=0.100, cosine=0.300, latent=0.100, model_probability=0.500, readiness=0.000, reliability=0.000                                    0.907168  0.906263    2.662825
+  24  rule=0.200, cosine=0.100, latent=0.200, model_probability=0.400, readiness=0.000, reliability=0.100                                    0.907168  0.906263    2.663452
+  25  rule=0.100, cosine=0.200, latent=0.100, model_probability=0.500, readiness=0.100, reliability=0.000                                    0.907168  0.906263    2.665306
+  26  rule=0.100, cosine=0.300, latent=0.200, model_probability=0.400, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.667097
+  27  rule=0.100, cosine=0.200, latent=0.200, model_probability=0.400, readiness=0.100, reliability=0.000                                    0.907168  0.906263    2.669542
+  28  rule=0.100, cosine=0.200, latent=0.100, model_probability=0.500, readiness=0.000, reliability=0.100                                    0.907168  0.906263    2.670299
+  29  rule=0.000, cosine=0.400, latent=0.000, model_probability=0.600, readiness=0.000, reliability=0.000                                    0.907168  0.905986    2.670429
+  30  rule=0.100, cosine=0.200, latent=0.200, model_probability=0.400, readiness=0.000, reliability=0.100                                    0.907168  0.906263    2.674503
+
+6. Skill Assessment Total Score
+-------------------------------
+Tested cases: 8008
+Selection metric: lowest RMSE against simulated skill ability
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  bayesian_skill=0.200, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.000    0.123484    0.095179  0.691712                                
+   2  bayesian_skill=0.100, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.200, challenge_index=0.000    0.123863    0.095693  0.689819                                
+   3  bayesian_skill=0.000, observed_accuracy=0.700, confidence_alignment=0.000, time_efficiency=0.000, consistency=0.000, momentum=0.300, challenge_index=0.000    0.123908    0.095989   0.68959                                
+   4  bayesian_skill=0.300, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.000    0.123967    0.095936  0.689298                                
+   5  bayesian_skill=0.100, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.100     0.12431    0.095944  0.687574                                
+   6  bayesian_skill=0.200, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.200, challenge_index=0.000    0.124367    0.096661  0.687285                                
+   7  bayesian_skill=0.100, observed_accuracy=0.700, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.000    0.124642    0.096063  0.685903                                
+   8  bayesian_skill=0.300, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.000, challenge_index=0.000    0.124677    0.095615  0.685729                                
+   9  bayesian_skill=0.000, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.200, challenge_index=0.100    0.124762    0.096738  0.685299                                
+  10  bayesian_skill=0.000, observed_accuracy=0.700, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.100    0.124954     0.09612  0.684326                                
+  11  bayesian_skill=0.100, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.000, consistency=0.000, momentum=0.300, challenge_index=0.000     0.12499    0.097551  0.684147                                
+  12  bayesian_skill=0.000, observed_accuracy=0.700, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.200, challenge_index=0.000    0.124993    0.096422  0.684129                                
+  13  bayesian_skill=0.400, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.000, challenge_index=0.000    0.125131    0.096365  0.683435                                
+  14  bayesian_skill=0.100, observed_accuracy=0.700, confidence_alignment=0.000, time_efficiency=0.000, consistency=0.000, momentum=0.200, challenge_index=0.000    0.125199    0.096618  0.683091                                
+  15  bayesian_skill=0.000, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.000, consistency=0.000, momentum=0.400, challenge_index=0.000    0.125286    0.098218   0.68265                                
+  16  bayesian_skill=0.200, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.100    0.125296    0.097538  0.682599                                
+  17  bayesian_skill=0.200, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.000, challenge_index=0.100    0.125419    0.096265  0.681972                                
+  18  bayesian_skill=0.200, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.200, consistency=0.000, momentum=0.000, challenge_index=0.100    0.125648    0.097039  0.680813                                
+  19  bayesian_skill=0.400, observed_accuracy=0.400, confidence_alignment=0.000, time_efficiency=0.200, consistency=0.000, momentum=0.000, challenge_index=0.000     0.12574    0.097502  0.680343                                
+  20  bayesian_skill=0.100, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.200, challenge_index=0.100    0.125767    0.098463  0.680205                                
+  21  bayesian_skill=0.000, observed_accuracy=0.800, confidence_alignment=0.000, time_efficiency=0.000, consistency=0.000, momentum=0.200, challenge_index=0.000     0.12577    0.096806  0.680192                                
+  22  bayesian_skill=0.000, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.300, challenge_index=0.000    0.125798    0.097414   0.68005                                
+  23  bayesian_skill=0.300, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.200, consistency=0.000, momentum=0.000, challenge_index=0.000    0.125838    0.097244  0.679847                                
+  24  bayesian_skill=0.200, observed_accuracy=0.700, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.000, challenge_index=0.000    0.125847    0.096697  0.679801                                
+  25  bayesian_skill=0.300, observed_accuracy=0.400, confidence_alignment=0.000, time_efficiency=0.200, consistency=0.000, momentum=0.000, challenge_index=0.100    0.126053    0.098039  0.678749                                
+  26  bayesian_skill=0.000, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.200    0.126062    0.097767  0.678703                                
+  27  bayesian_skill=0.400, observed_accuracy=0.400, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.100, challenge_index=0.000    0.126071    0.098605  0.678662                                
+  28  bayesian_skill=0.100, observed_accuracy=0.700, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.000, challenge_index=0.100    0.126082    0.096651  0.678605                                
+  29  bayesian_skill=0.200, observed_accuracy=0.600, confidence_alignment=0.000, time_efficiency=0.000, consistency=0.000, momentum=0.200, challenge_index=0.000    0.126246    0.097954  0.677767                                
+  30  bayesian_skill=0.100, observed_accuracy=0.500, confidence_alignment=0.000, time_efficiency=0.100, consistency=0.000, momentum=0.300, challenge_index=0.000    0.126318    0.098601  0.677397                                
+
+7. Skill Uncertainty Score
+--------------------------
+Tested cases: 231
+Selection metric: lowest RMSE against simulated uncertainty
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  skill_gap=0.000, confidence_gap=0.000, time_gap=1.000                                              0.073107    0.055179  -0.221645                                
+   2  skill_gap=0.000, confidence_gap=0.050, time_gap=0.950                                              0.077984    0.060176  -0.390084                                
+   3  skill_gap=0.050, confidence_gap=0.000, time_gap=0.950                                              0.081353    0.063421  -0.51279                                
+   4  skill_gap=0.000, confidence_gap=0.100, time_gap=0.900                                              0.085136    0.067942  -0.656718                                
+   5  skill_gap=0.050, confidence_gap=0.050, time_gap=0.900                                               0.08836     0.07104  -0.784575                                
+   6  skill_gap=0.100, confidence_gap=0.000, time_gap=0.900                                              0.093413    0.076225  -0.994541                                
+   7  skill_gap=0.000, confidence_gap=0.150, time_gap=0.850                                              0.094043    0.077586  -1.021547                                
+   8  skill_gap=0.050, confidence_gap=0.100, time_gap=0.850                                              0.097088    0.080809  -1.154555                                
+   9  skill_gap=0.100, confidence_gap=0.050, time_gap=0.850                                              0.101819    0.085505  -1.369671                                
+  10  skill_gap=0.000, confidence_gap=0.200, time_gap=0.800                                              0.104259    0.088645  -1.484573                                
+  11  skill_gap=0.050, confidence_gap=0.150, time_gap=0.800                                              0.107118    0.091933  -1.62273                                
+  12  skill_gap=0.150, confidence_gap=0.000, time_gap=0.850                                              0.108016    0.091354  -1.666896                                
+  13  skill_gap=0.100, confidence_gap=0.100, time_gap=0.800                                              0.111526    0.096362  -1.842997                                
+  14  skill_gap=0.000, confidence_gap=0.250, time_gap=0.750                                              0.115435     0.10043  -2.045793                                
+  15  skill_gap=0.150, confidence_gap=0.050, time_gap=0.800                                              0.117307    0.101717  -2.145372                                
+  16  skill_gap=0.050, confidence_gap=0.200, time_gap=0.750                                              0.118119    0.103931  -2.189102                                
+  17  skill_gap=0.100, confidence_gap=0.150, time_gap=0.750                                              0.122223    0.108278  -2.414518                                
+  18  skill_gap=0.200, confidence_gap=0.000, time_gap=0.800                                               0.12427    0.107748  -2.529856                                
+  19  skill_gap=0.000, confidence_gap=0.300, time_gap=0.700                                              0.127319    0.112599  -2.70521                                
+  20  skill_gap=0.150, confidence_gap=0.100, time_gap=0.750                                              0.127608    0.113201  -2.722044                                
+  21  skill_gap=0.050, confidence_gap=0.250, time_gap=0.700                                              0.129845    0.116318  -2.853668                                
+  22  skill_gap=0.100, confidence_gap=0.200, time_gap=0.700                                              0.133672    0.120724  -3.084235                                
+  23  skill_gap=0.200, confidence_gap=0.050, time_gap=0.750                                              0.134121    0.118718  -3.111678                                
+  24  skill_gap=0.150, confidence_gap=0.150, time_gap=0.700                                              0.138695    0.125549  -3.396911                                
+  25  skill_gap=0.000, confidence_gap=0.350, time_gap=0.650                                              0.139731    0.125114  -3.462822                                
+  26  skill_gap=0.250, confidence_gap=0.000, time_gap=0.750                                              0.141606    0.124708  -3.58342                                
+  27  skill_gap=0.050, confidence_gap=0.300, time_gap=0.650                                              0.142115    0.128952  -3.616431                                
+  28  skill_gap=0.200, confidence_gap=0.100, time_gap=0.700                                              0.144788    0.130639  -3.791695                                
+  29  skill_gap=0.100, confidence_gap=0.250, time_gap=0.650                                              0.145698    0.133405  -3.852148                                
+  30  skill_gap=0.150, confidence_gap=0.200, time_gap=0.650                                              0.150394    0.138188  -4.169974                                
+
+8. Skill Reliability / Confidence Score
+---------------------------------------
+Tested cases: 231
+Selection metric: lowest RMSE against simulated reliability
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  confidence_alignment=0.050, consistency=0.000, certainty=0.950                                     0.378787    0.365492  -15.554505                                
+   2  confidence_alignment=0.000, consistency=0.000, certainty=1.000                                     0.378827    0.365075  -15.558035                                
+   3  confidence_alignment=0.100, consistency=0.000, certainty=0.900                                     0.378859    0.365908  -15.560883                                
+   4  confidence_alignment=0.150, consistency=0.000, certainty=0.850                                     0.379046    0.366325  -15.577168                                
+   5  confidence_alignment=0.200, consistency=0.000, certainty=0.800                                     0.379345    0.366742  -15.603362                                
+   6  confidence_alignment=0.250, consistency=0.000, certainty=0.750                                     0.379757    0.367159  -15.639463                                
+   7  confidence_alignment=0.300, consistency=0.000, certainty=0.700                                     0.380282    0.367576  -15.685471                                
+   8  confidence_alignment=0.350, consistency=0.000, certainty=0.650                                     0.380919    0.367993  -15.741388                                
+   9  confidence_alignment=0.400, consistency=0.000, certainty=0.600                                     0.381667    0.368411  -15.807211                                
+  10  confidence_alignment=0.000, consistency=0.050, certainty=0.950                                     0.382196    0.369122  -15.853836                                
+  11  confidence_alignment=0.050, consistency=0.050, certainty=0.900                                     0.382242    0.369531  -15.857926                                
+  12  confidence_alignment=0.100, consistency=0.050, certainty=0.850                                     0.382401    0.369947  -15.871924                                
+  13  confidence_alignment=0.450, consistency=0.000, certainty=0.550                                     0.382526    0.368834  -15.882943                                
+  14  confidence_alignment=0.150, consistency=0.050, certainty=0.800                                     0.382672    0.370363  -15.89583                                
+  15  confidence_alignment=0.200, consistency=0.050, certainty=0.750                                     0.383054     0.37078  -15.929643                                
+  16  confidence_alignment=0.500, consistency=0.000, certainty=0.500                                     0.383495    0.369258  -15.968582                                
+  17  confidence_alignment=0.250, consistency=0.050, certainty=0.700                                     0.383549    0.371197  -15.973364                                
+  18  confidence_alignment=0.300, consistency=0.050, certainty=0.650                                     0.384154    0.371614  -16.026993                                
+  19  confidence_alignment=0.550, consistency=0.000, certainty=0.450                                     0.384573    0.369686  -16.064129                                
+  20  confidence_alignment=0.350, consistency=0.050, certainty=0.600                                      0.38487    0.372031  -16.090529                                
+  21  confidence_alignment=0.400, consistency=0.050, certainty=0.550                                     0.385696     0.37245  -16.163973                                
+  22  confidence_alignment=0.600, consistency=0.000, certainty=0.400                                     0.385759    0.370114  -16.169584                                
+  23  confidence_alignment=0.000, consistency=0.100, certainty=0.900                                     0.386215    0.373234  -16.210172                                
+  24  confidence_alignment=0.050, consistency=0.100, certainty=0.850                                     0.386346    0.373637  -16.221882                                
+  25  confidence_alignment=0.100, consistency=0.100, certainty=0.800                                     0.386589     0.37404  -16.2435                                
+  26  confidence_alignment=0.450, consistency=0.050, certainty=0.500                                     0.386632    0.372872  -16.247325                                
+  27  confidence_alignment=0.150, consistency=0.100, certainty=0.750                                     0.386942    0.374443  -16.275026                                
+  28  confidence_alignment=0.650, consistency=0.000, certainty=0.350                                     0.387053    0.370546  -16.284946                                
+  29  confidence_alignment=0.200, consistency=0.100, certainty=0.700                                     0.387406    0.374845  -16.316459                                
+  30  confidence_alignment=0.500, consistency=0.050, certainty=0.450                                     0.387675    0.373294  -16.340584                                
+
+9. Bayesian Skill Update Blend
+------------------------------
+Tested cases: 101
+Selection metric: lowest RMSE against simulated skill ability
+
+rank  weights                                                                                                rmse         mae        r2       acc        f1     logloss
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+   1  prior=0.740, likelihood=0.260                                                                      0.156628    0.127133  0.507521                                
+   2  prior=0.730, likelihood=0.270                                                                      0.156642    0.127052  0.507434                                
+   3  prior=0.750, likelihood=0.250                                                                      0.156648    0.127233  0.507399                                
+   4  prior=0.720, likelihood=0.280                                                                      0.156689    0.126993  0.507139                                
+   5  prior=0.760, likelihood=0.240                                                                        0.1567    0.127353  0.507068                                
+   6  prior=0.710, likelihood=0.290                                                                      0.156769    0.126951  0.506634                                
+   7  prior=0.770, likelihood=0.230                                                                      0.156786    0.127491  0.506527                                
+   8  prior=0.700, likelihood=0.300                                                                      0.156883    0.126923   0.50592                                
+   9  prior=0.780, likelihood=0.220                                                                      0.156905    0.127644  0.505778                                
+  10  prior=0.690, likelihood=0.310                                                                      0.157029    0.126909  0.504998                                
+  11  prior=0.790, likelihood=0.210                                                                      0.157057    0.127812   0.50482                                
+  12  prior=0.680, likelihood=0.320                                                                      0.157208    0.126916  0.503866                                
+  13  prior=0.800, likelihood=0.200                                                                      0.157242    0.127994  0.503652                                
+  14  prior=0.670, likelihood=0.330                                                                      0.157421     0.12694  0.502525                                
+  15  prior=0.810, likelihood=0.190                                                                       0.15746    0.128193  0.502276                                
+  16  prior=0.660, likelihood=0.340                                                                      0.157666    0.126987  0.500975                                
+  17  prior=0.820, likelihood=0.180                                                                      0.157711    0.128407   0.50069                                
+  18  prior=0.650, likelihood=0.350                                                                      0.157943    0.127052  0.499217                                
+  19  prior=0.830, likelihood=0.170                                                                      0.157994    0.128632  0.498896                                
+  20  prior=0.640, likelihood=0.360                                                                      0.158253    0.127133  0.497249                                
+  21  prior=0.840, likelihood=0.160                                                                      0.158309    0.128873  0.496893                                
+  22  prior=0.630, likelihood=0.370                                                                      0.158595    0.127231  0.495072                                
+  23  prior=0.850, likelihood=0.150                                                                      0.158657    0.129131   0.49468                                
+  24  prior=0.620, likelihood=0.380                                                                       0.15897    0.127347  0.492686                                
+  25  prior=0.860, likelihood=0.140                                                                      0.159037    0.129408  0.492259                                
+  26  prior=0.610, likelihood=0.390                                                                      0.159376    0.127478  0.490092                                
+  27  prior=0.870, likelihood=0.130                                                                      0.159448    0.129703  0.489629                                
+  28  prior=0.600, likelihood=0.400                                                                      0.159813    0.127624  0.487288                                
+  29  prior=0.880, likelihood=0.120                                                                      0.159891    0.130017  0.486789                                
+  30  prior=0.590, likelihood=0.410                                                                      0.160282    0.127787  0.484275                                
+
+Untuned standard formulas
+------------------------
+Cosine similarity, TF-IDF, accuracy, precision, recall, F1, and normalization are mathematical definitions, not arbitrary project weight vectors.
+Review keyword weights are lexicon scores rather than normalized weighted-sum coefficients, so they are not changed by this calibration file.

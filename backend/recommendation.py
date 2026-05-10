@@ -8,6 +8,36 @@ import numpy as np
 import pandas as pd
 
 try:
+    from calibrated_weights import (
+        get_saved_weight_vector,
+        get_weight_vector,
+    )
+except Exception:
+    def get_saved_weight_vector(*args, **kwargs):
+        return None
+
+    def get_weight_vector(weight_key, names=None, data_root_dir=None):
+        defaults = {
+            "college_quality_score": {
+                "ctc": 0.45,
+                "placement": 0.25,
+                "overall": 0.30,
+            },
+            "college_recommendation_score": {
+                "accessibility": 0.46,
+                "quality": 0.28,
+                "rule_boost": 0.26,
+            },
+        }
+        weights = defaults.get(weight_key, {})
+        if names is not None:
+            names = list(names)
+            weights = {name: float(weights.get(name, 0.0)) for name in names}
+            total = sum(weights.values()) or 1.0
+            return {name: value / total for name, value in weights.items()}
+        return weights
+
+try:
     from sklearn.ensemble import (
         GradientBoostingRegressor,
         RandomForestRegressor,
@@ -239,6 +269,8 @@ class CollegeRecommender:
             self._get_file_path("placement.csv"),
             self._get_file_path("reviews.csv"),
             __file__,
+            os.path.join(os.path.dirname(__file__), "calibrated_weights.py"),
+            os.path.join(self.results_dir, "calibrated_weights.json"),
         ]
         signature = {
             "cache_version": self.CACHE_VERSION,
@@ -1317,13 +1349,26 @@ class CollegeRecommender:
             except Exception as exc:
                 print(f"Warning: {model_name} training failed:", exc)
 
+        saved_weights = get_saved_weight_vector(
+            "college_model_ensemble",
+            names=list(validation_predictions.keys()),
+            data_root_dir=self.data_root_dir,
+        )
+        weight_source = "calibrated_weights.json" if saved_weights else "inverse_validation_mae"
+
         weights = {}
-        for model_name, info in self.model_metrics.items():
-            metrics_blob = info.get("metrics", {})
-            mae = metrics_blob.get("mae")
-            if mae is None:
-                continue
-            weights[model_name] = 1.0 / max(float(mae), 1e-6)
+        if saved_weights:
+            weights = {
+                model_name: float(saved_weights.get(model_name, 0.0))
+                for model_name in validation_predictions.keys()
+            }
+        else:
+            for model_name, info in self.model_metrics.items():
+                metrics_blob = info.get("metrics", {})
+                mae = metrics_blob.get("mae")
+                if mae is None:
+                    continue
+                weights[model_name] = 1.0 / max(float(mae), 1e-6)
 
         if not weights:
             self.hybrid_model_weights = {}
@@ -1358,6 +1403,7 @@ class CollegeRecommender:
         self.model_metrics["hybrid_ensemble"] = {
             "type": "weighted_regression_ensemble",
             "weights": self.hybrid_model_weights,
+            "weight_source": weight_source,
             "metrics": self._regression_metrics(y_test, hybrid_pred),
         }
         self.model_stack = {
@@ -1468,7 +1514,16 @@ class CollegeRecommender:
         quality_overall = self._normalize_series(
             ranked_df.get("overall_aspect_score_filter", pd.Series(index=ranked_df.index, dtype=float))
         )
-        ranked_df["Quality Score"] = (0.45 * quality_ctc) + (0.25 * quality_place) + (0.30 * quality_overall)
+        quality_weights = get_weight_vector(
+            "college_quality_score",
+            names=["ctc", "placement", "overall"],
+            data_root_dir=self.data_root_dir,
+        )
+        ranked_df["Quality Score"] = (
+            (float(quality_weights.get("ctc", 0.0)) * quality_ctc)
+            + (float(quality_weights.get("placement", 0.0)) * quality_place)
+            + (float(quality_weights.get("overall", 0.0)) * quality_overall)
+        )
 
         gap = pd.to_numeric(ranked_df[effective_rank_col], errors="coerce").fillna(0.0) - float(user_rank_val)
         gap = gap.clip(lower=0.0)
@@ -1479,10 +1534,15 @@ class CollegeRecommender:
             accessibility = 1.0 - (gap / max_gap)
         ranked_df["Accessibility Score"] = accessibility
 
+        recommendation_weights = get_weight_vector(
+            "college_recommendation_score",
+            names=["accessibility", "quality", "rule_boost"],
+            data_root_dir=self.data_root_dir,
+        )
         ranked_df["Hybrid Recommendation Score"] = (
-            (0.46 * ranked_df["Accessibility Score"])
-            + (0.28 * ranked_df["Quality Score"])
-            + (0.26 * ranked_df["Rule Boost Score"])
+            (float(recommendation_weights.get("accessibility", 0.0)) * ranked_df["Accessibility Score"])
+            + (float(recommendation_weights.get("quality", 0.0)) * ranked_df["Quality Score"])
+            + (float(recommendation_weights.get("rule_boost", 0.0)) * ranked_df["Rule Boost Score"])
         )
 
         ranked_df = ranked_df.sort_values(

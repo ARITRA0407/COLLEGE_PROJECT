@@ -1,0 +1,216 @@
+{
+  "generated_at": "2026-05-09T18:58:34",
+  "project_root": "C:\\Users\\clayj\\OneDrive\\Documents\\COLLEGE_PROJECT",
+  "defaults": {
+    "college_model_ensemble": {
+      "decision_tree": 0.3333333333333333,
+      "random_forest": 0.3333333333333333,
+      "gradient_boosting": 0.3333333333333333
+    },
+    "college_quality_score": {
+      "ctc": 0.45,
+      "placement": 0.25,
+      "overall": 0.3
+    },
+    "college_recommendation_score": {
+      "accessibility": 0.46,
+      "quality": 0.28,
+      "rule_boost": 0.26
+    },
+    "quiz_model_ensemble": {
+      "random_forest": 0.55,
+      "gradient_boosting": 0.45
+    },
+    "career_recommendation_score": {
+      "rule": 0.24,
+      "cosine": 0.19,
+      "latent": 0.15,
+      "model_probability": 0.22,
+      "readiness": 0.15,
+      "reliability": 0.05
+    },
+    "skill_assessment_score": {
+      "bayesian_skill": 0.34,
+      "observed_accuracy": 0.22,
+      "confidence_alignment": 0.14,
+      "time_efficiency": 0.1,
+      "consistency": 0.08,
+      "momentum": 0.06,
+      "challenge_index": 0.06
+    },
+    "skill_uncertainty_score": {
+      "skill_gap": 0.45,
+      "confidence_gap": 0.35,
+      "time_gap": 0.2
+    },
+    "skill_reliability_score": {
+      "confidence_alignment": 0.35,
+      "consistency": 0.35,
+      "certainty": 0.3
+    },
+    "skill_bayesian_update": {
+      "prior": 0.7,
+      "likelihood": 0.3
+    }
+  },
+  "weights": {
+    "college_model_ensemble": {
+      "weights": {
+        "decision_tree": 0.05,
+        "random_forest": 0.65,
+        "gradient_boosting": 0.3
+      },
+      "metrics": {
+        "samples": 358,
+        "mae": 20092.47615,
+        "rmse": 67843.858212,
+        "median_ae": 2893.167995,
+        "r2": 0.881861
+      },
+      "selection_metric": "lowest validation RMSE, then MAE",
+      "source": "rank model validation split",
+      "tested_cases": 231
+    },
+    "college_quality_score": {
+      "weights": {
+        "ctc": 0.55,
+        "placement": 0.05,
+        "overall": 0.4
+      },
+      "metrics": {
+        "samples": 1787,
+        "mae": 0.223449,
+        "rmse": 0.265578,
+        "median_ae": 0.204669,
+        "r2": -2.212326
+      },
+      "selection_metric": "lowest RMSE against historical rank desirability",
+      "source": "college rank and quality CSVs",
+      "tested_cases": 231
+    },
+    "college_recommendation_score": {
+      "weights": {
+        "accessibility": 0.0,
+        "quality": 1.0,
+        "rule_boost": 0.0
+      },
+      "metrics": {
+        "samples": 1787,
+        "mae": 0.223449,
+        "rmse": 0.265578,
+        "median_ae": 0.204669,
+        "r2": -2.212326
+      },
+      "selection_metric": "lowest RMSE against historical rank desirability",
+      "source": "college rank, quality, and association-rule proxies",
+      "tested_cases": 231
+    },
+    "quiz_model_ensemble": {
+      "weights": {
+        "random_forest": 0.95,
+        "gradient_boosting": 0.05
+      },
+      "metrics": {
+        "samples": 851,
+        "accuracy": 0.905993,
+        "top3_accuracy": 1.0,
+        "macro_f1": 0.904824,
+        "log_loss": 0.247782
+      },
+      "selection_metric": "highest accuracy, then lowest log loss",
+      "source": "synthetic career-profile validation split",
+      "tested_cases": 101
+    },
+    "career_recommendation_score": {
+      "weights": {
+        "rule": 0.1,
+        "cosine": 0.0,
+        "latent": 0.1,
+        "model_probability": 0.8,
+        "readiness": 0.0,
+        "reliability": 0.0
+      },
+      "metrics": {
+        "samples": 851,
+        "accuracy": 0.907168,
+        "top3_accuracy": 1.0,
+        "macro_f1": 0.905986,
+        "log_loss": 2.470324
+      },
+      "selection_metric": "highest top-1 accuracy, then lowest log loss",
+      "source": "synthetic career-profile validation split",
+      "tested_cases": 3003
+    },
+    "skill_assessment_score": {
+      "weights": {
+        "bayesian_skill": 0.2,
+        "observed_accuracy": 0.6,
+        "confidence_alignment": 0.0,
+        "time_efficiency": 0.1,
+        "consistency": 0.0,
+        "momentum": 0.1,
+        "challenge_index": 0.0
+      },
+      "metrics": {
+        "samples": 1530,
+        "mae": 0.095179,
+        "rmse": 0.123484,
+        "median_ae": 0.07522,
+        "r2": 0.691712
+      },
+      "selection_metric": "lowest RMSE against simulated skill ability",
+      "source": "QUESTIONS.csv synthetic quiz sessions",
+      "tested_cases": 8008
+    },
+    "skill_uncertainty_score": {
+      "weights": {
+        "skill_gap": 0.0,
+        "confidence_gap": 0.0,
+        "time_gap": 1.0
+      },
+      "metrics": {
+        "samples": 1530,
+        "mae": 0.055179,
+        "rmse": 0.073107,
+        "median_ae": 0.042289,
+        "r2": -0.221645
+      },
+      "selection_metric": "lowest RMSE against simulated uncertainty",
+      "source": "QUESTIONS.csv synthetic quiz sessions",
+      "tested_cases": 231
+    },
+    "skill_reliability_score": {
+      "weights": {
+        "confidence_alignment": 0.05,
+        "consistency": 0.0,
+        "certainty": 0.95
+      },
+      "metrics": {
+        "samples": 1530,
+        "mae": 0.365492,
+        "rmse": 0.378787,
+        "median_ae": 0.382848,
+        "r2": -15.554505
+      },
+      "selection_metric": "lowest RMSE against simulated reliability",
+      "source": "QUESTIONS.csv synthetic quiz sessions",
+      "tested_cases": 231
+    },
+    "skill_bayesian_update": {
+      "weights": {
+        "prior": 0.74,
+        "likelihood": 0.26
+      },
+      "metrics": {
+        "samples": 11447,
+        "mae": 0.127133,
+        "rmse": 0.156628,
+        "median_ae": 0.110349,
+        "r2": 0.507521
+      },
+      "selection_metric": "lowest RMSE against simulated skill ability",
+      "source": "QUESTIONS.csv synthetic quiz answer steps",
+      "tested_cases": 101
+    }
+  }
+}

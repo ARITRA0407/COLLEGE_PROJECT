@@ -9,24 +9,25 @@
       "gradient_boosting"
     ],
     "hybrid_weights": {
-      "decision_tree": 0.356015,
-      "random_forest": 0.283741,
-      "gradient_boosting": 0.360244
+      "decision_tree": 0.05,
+      "random_forest": 0.65,
+      "gradient_boosting": 0.3
     },
     "cache_loaded": false
   },
   "type": "weighted_regression_ensemble",
   "weights": {
-    "decision_tree": 0.356015,
-    "random_forest": 0.283741,
-    "gradient_boosting": 0.360244
+    "decision_tree": 0.05,
+    "random_forest": 0.65,
+    "gradient_boosting": 0.3
   },
+  "weight_source": "calibrated_weights.json",
   "metrics": {
     "samples": 358,
-    "mae": 17592.0891,
-    "rmse": 70480.3371,
-    "r2": 0.8725,
-    "median_ae": 2443.9193,
-    "mape": 0.305322
+    "mae": 20092.4762,
+    "rmse": 67843.8582,
+    "r2": 0.8819,
+    "median_ae": 2893.168,
+    "mape": 0.32064
   }
 }

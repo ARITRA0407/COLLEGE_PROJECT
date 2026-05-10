@@ -1,5 +1,33 @@
 import math
 
+try:
+    from calibrated_weights import get_weight_vector
+except Exception:
+    def get_weight_vector(weight_key, names=None, data_root_dir=None):
+        defaults = {
+            "skill_uncertainty_score": {
+                "skill_gap": 0.45,
+                "confidence_gap": 0.35,
+                "time_gap": 0.20,
+            },
+            "skill_reliability_score": {
+                "confidence_alignment": 0.35,
+                "consistency": 0.35,
+                "certainty": 0.30,
+            },
+            "skill_bayesian_update": {
+                "prior": 0.70,
+                "likelihood": 0.30,
+            },
+        }
+        weights = defaults.get(weight_key, {})
+        if names is not None:
+            names = list(names)
+            weights = {name: float(weights.get(name, 0.0)) for name in names}
+            total = sum(weights.values()) or 1.0
+            return {name: value / total for name, value in weights.items()}
+        return weights
+
 
 def _clamp(value, low=0.0, high=1.0):
     try:
@@ -9,12 +37,22 @@ def _clamp(value, low=0.0, high=1.0):
     return max(low, min(high, value))
 
 
-def bayesian_update(prior, likelihood, alpha=0.7):
+def bayesian_update(prior, likelihood, alpha=None):
     if prior is None:
         prior = 0.5
     prior = _clamp(prior)
     likelihood = _clamp(likelihood)
-    return round((alpha * prior) + ((1 - alpha) * likelihood), 4)
+    if alpha is None:
+        weights = get_weight_vector(
+            "skill_bayesian_update",
+            names=["prior", "likelihood"],
+        )
+        prior_weight = float(weights.get("prior", 0.70))
+        likelihood_weight = float(weights.get("likelihood", 0.30))
+    else:
+        prior_weight = _clamp(alpha)
+        likelihood_weight = 1.0 - prior_weight
+    return round((prior_weight * prior) + (likelihood_weight * likelihood), 4)
 
 
 def decide_difficulty(skill_score, streak, last_difficulty="Medium"):
@@ -104,20 +142,28 @@ def compute_momentum(history, window=4):
 
 
 def compute_uncertainty(skill_score, time_factor, confidence_alignment):
+    weights = get_weight_vector(
+        "skill_uncertainty_score",
+        names=["skill_gap", "confidence_gap", "time_gap"],
+    )
     uncertainty = (
-        (1.0 - _clamp(skill_score)) * 0.45 +
-        (1.0 - _clamp(confidence_alignment)) * 0.35 +
-        (1.0 - _clamp(time_factor)) * 0.20
+        (1.0 - _clamp(skill_score)) * float(weights.get("skill_gap", 0.0)) +
+        (1.0 - _clamp(confidence_alignment)) * float(weights.get("confidence_gap", 0.0)) +
+        (1.0 - _clamp(time_factor)) * float(weights.get("time_gap", 0.0))
     )
 
     return round(_clamp(uncertainty), 4)
 
 
 def compute_reliability(confidence_alignment, consistency, uncertainty):
+    weights = get_weight_vector(
+        "skill_reliability_score",
+        names=["confidence_alignment", "consistency", "certainty"],
+    )
     reliability = (
-        (_clamp(confidence_alignment) * 0.35) +
-        (_clamp(consistency) * 0.35) +
-        ((1.0 - _clamp(uncertainty)) * 0.30)
+        (_clamp(confidence_alignment) * float(weights.get("confidence_alignment", 0.0))) +
+        (_clamp(consistency) * float(weights.get("consistency", 0.0))) +
+        ((1.0 - _clamp(uncertainty)) * float(weights.get("certainty", 0.0)))
     )
 
     return round(_clamp(reliability), 4)
