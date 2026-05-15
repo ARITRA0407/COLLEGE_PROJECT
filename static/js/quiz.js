@@ -13,142 +13,148 @@ let isOpeningResult = false;
 const RESULT_REQUEST_TIMEOUT_MS = 4500;
 
 let skillState = {
-    AI_Int: 0,
-    Coding_Int: 0,
-    Design_Int: 0,
-    Logical_Reasoning: 0,
-    Analytical_Reasoning: 0,
-    Verbal_Reasoning: 0,
-    Math_Reasoning: 0,
-    Coding_Skill: 0,
-    Web_Arch: 0,
-    Data_Mining: 0,
-    Crypto_Focus: 0,
-    Cloud_Ops: 0,
-    Low_Level: 0,
-    DB_Design: 0,
-    System_Opt: 0,
-    Risk_Eval: 0,
-    User_Empathy: 0
+  AI_Int: 0,
+  Coding_Int: 0,
+  Design_Int: 0,
+  Logical_Reasoning: 0,
+  Analytical_Reasoning: 0,
+  Verbal_Reasoning: 0,
+  Math_Reasoning: 0,
+  Coding_Skill: 0,
+  Web_Arch: 0,
+  Data_Mining: 0,
+  Crypto_Focus: 0,
+  Cloud_Ops: 0,
+  Low_Level: 0,
+  DB_Design: 0,
+  System_Opt: 0,
+  Risk_Eval: 0,
+  User_Empathy: 0
 };
 
 let skillCounts = Object.fromEntries(
-    Object.keys(skillState).map(key => [key, 0])
+  Object.keys(skillState).map(key => [key, 0])
 );
 
 let confidence = 50;
 
 window.onload = () => {
-    localStorage.removeItem("questions");
-    startQuiz();
+  localStorage.removeItem("questions");
+  startQuiz();
 };
 
 function updateConfidence(val) {
-    confidence = Number(val);
-    const el = document.getElementById("confValue");
-    if (el) el.innerText = confidence + "%";
+  confidence = Number(val);
+  const el = document.getElementById("confValue");
+  if (el) el.innerText = confidence + "%";
 }
 
 function freezeTimer() {
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 
-    if (!startTime) return;
+  if (!startTime) return;
 
-    const elapsed = Math.max(0, (Date.now() - startTime) / 1000);
-    const timer = document.getElementById("timer");
-    if (timer) timer.innerText = "Time: " + elapsed.toFixed(1) + "s";
+  const elapsed = Math.max(0, (Date.now() - startTime) / 1000);
+  const timer = document.getElementById("timer");
+  if (timer) timer.innerText = "Time: " + elapsed.toFixed(1) + "s";
 }
 
 function setStopLoadingState(message) {
-    const overlay = document.getElementById("loadingOverlay");
-    if (overlay) {
-        overlay.classList.add("active");
-        overlay.setAttribute("aria-hidden", "false");
-        const paragraph = overlay.querySelector("p");
-        if (paragraph && message) paragraph.innerText = message;
-    }
+  const overlay = document.getElementById("loadingOverlay");
+  if (overlay) {
+    overlay.classList.add("active");
+    overlay.setAttribute("aria-hidden", "false");
+    const paragraph = overlay.querySelector("p");
+    if (paragraph && message) paragraph.innerText = message;
+  }
 
-    const stopBtn = document.getElementById("stopBtn");
-    if (stopBtn) {
-        stopBtn.disabled = true;
-        stopBtn.textContent = "Opening Results...";
-    }
+  const stopBtn = document.getElementById("stopBtn");
+  if (stopBtn) {
+    stopBtn.disabled = true;
+    stopBtn.textContent = "Opening Results...";
+  }
 
-    document.querySelectorAll(".opt").forEach(button => {
-        button.disabled = true;
-    });
+  document.querySelectorAll(".opt").forEach(button => {
+    button.disabled = true;
+  });
 }
 
 async function postWithTimeout(url, options = {}, timeoutMs = RESULT_REQUEST_TIMEOUT_MS) {
-    const controller = new AbortController();
-    const timerId = setTimeout(() => controller.abort(), timeoutMs);
+  const controller = new AbortController();
+  const timerId = setTimeout(() => controller.abort(), timeoutMs);
 
-    try {
-        return await fetch(url, {
-            cache: "no-store",
-            ...options,
-            signal: controller.signal
-        });
-    } finally {
-        clearTimeout(timerId);
-    }
+  try {
+    return await fetch(url, {
+      cache: "no-store",
+      ...options,
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timerId);
+  }
 }
 
 async function openResultPage() {
-    if (isOpeningResult) return;
-    isOpeningResult = true;
+  if (isOpeningResult) return;
+  isOpeningResult = true;
 
-    freezeTimer();
-    setStopLoadingState("The timer is stopped. Opening the result page now.");
+  freezeTimer();
+  setStopLoadingState("The timer is stopped. Opening the result page now.");
 
-    try {
-        if (pendingBatchAnswers.length > 0) {
-            await fetch("/next", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(pendingBatchAnswers)
-            });
-            pendingBatchAnswers = [];
-        }
-
-        await postWithTimeout("/quiz-finalize", { method: "POST" });
-    } catch (err) {
-        console.error("Quiz finalize error:", err);
+  try {
+    if (pendingBatchAnswers.length > 0) {
+      await fetch("/next", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(pendingBatchAnswers)
+      });
+      pendingBatchAnswers = [];
     }
 
-    localStorage.clear();
-    window.location = "/quiz-result";
+    await postWithTimeout("/quiz-finalize", {
+      method: "POST"
+    });
+  } catch (err) {
+    console.error("Quiz finalize error:", err);
+  }
+
+  localStorage.clear();
+  window.location = "/quiz-result";
 }
 
 function startQuiz() {
-    pendingBatchAnswers = [];
-    fetch("/start", { method: "POST" })
-        .then(res => res.json())
-        .then(data => {
-            if (!Array.isArray(data) || data.length === 0) {
-                document.getElementById("quiz").innerHTML = "No questions";
-                return;
-            }
+  pendingBatchAnswers = [];
+  fetch("/start", {
+      method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (!Array.isArray(data) || data.length === 0) {
+        document.getElementById("quiz").innerHTML = "No questions";
+        return;
+      }
 
-            questions = data;
-            localStorage.setItem("questions", JSON.stringify(data));
-            showQuestion();
-        })
-        .catch(err => {
-            console.error("Start error:", err);
-        });
+      questions = data;
+      localStorage.setItem("questions", JSON.stringify(data));
+      showQuestion();
+    })
+    .catch(err => {
+      console.error("Start error:", err);
+    });
 }
 
 function showQuestion() {
-    const q = questions[0];
-    if (!q) return;
+  const q = questions[0];
+  if (!q) return;
 
-    const div = document.getElementById("quiz");
+  const div = document.getElementById("quiz");
 
-    div.innerHTML = `
+  div.innerHTML = `
         <h3>Question ${totalAnswered + 1}</h3>
         <p><b>${q["Question Text"]}</b></p>
 
@@ -157,36 +163,36 @@ function showQuestion() {
         ${createOption(q, "Option3", "Weight3")}
     `;
 
-    const cur = document.getElementById("currentCategory");
-    const nxt = document.getElementById("nextCategory");
+  const cur = document.getElementById("currentCategory");
+  const nxt = document.getElementById("nextCategory");
 
-    if (cur) cur.innerText = "Current: " + (q.Category || "-");
-    if (nxt) nxt.innerText = "Next: " + (questions[1]?.Category || "End");
+  if (cur) cur.innerText = "Current: " + (q.Category || "-");
+  if (nxt) nxt.innerText = "Next: " + (questions[1]?.Category || "End");
 
-    startTime = Date.now();
-    clearInterval(timerInterval);
+  startTime = Date.now();
+  clearInterval(timerInterval);
 
-    timerInterval = setInterval(() => {
-        const elapsed = (Date.now() - startTime) / 1000;
-        const timer = document.getElementById("timer");
-        if (timer) timer.innerText = "Time: " + elapsed.toFixed(1) + "s";
-    }, 100);
+  timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    const timer = document.getElementById("timer");
+    if (timer) timer.innerText = "Time: " + elapsed.toFixed(1) + "s";
+  }, 100);
 
-    updateDifficultyUI(q);
-    renderSkills();
+  updateDifficultyUI(q);
+  renderSkills();
 
-    if (pendingStop) {
-        openResultPage();
-    }
+  if (pendingStop) {
+    openResultPage();
+  }
 }
 
 function createOption(q, optKey, weightKey) {
-    const option = q?.[optKey];
-    const weight = Number(q?.[weightKey] || 0);
+  const option = q?.[optKey];
+  const weight = Number(q?.[weightKey] || 0);
 
-    if (!option || option === "undefined") return "";
+  if (!option || option === "undefined") return "";
 
-    return `
+  return `
         <button class="opt"
             onclick="selectOption(this, ${weight}, ${q.Weight1}, ${q.Weight2}, ${q.Weight3})">
             ${option}
@@ -195,169 +201,171 @@ function createOption(q, optKey, weightKey) {
 }
 
 function selectOption(btn, weight, w1, w2, w3) {
-    if (isLoadingNext) return;
-    isLoadingNext = true;
+  if (isLoadingNext) return;
+  isLoadingNext = true;
 
-    clearInterval(timerInterval);
+  clearInterval(timerInterval);
 
-    const timeTaken = (Date.now() - startTime) / 1000;
-    document.querySelectorAll(".opt").forEach(button => {
-        button.disabled = true;
-    });
+  const timeTaken = (Date.now() - startTime) / 1000;
+  document.querySelectorAll(".opt").forEach(button => {
+    button.disabled = true;
+  });
 
-    btn.style.background = "#00c853";
-    btn.style.color = "white";
+  btn.style.background = "#00c853";
+  btn.style.color = "white";
 
-    const allWeights = [w1, w2, w3];
-    const maxWeight = Math.max(...allWeights);
+  const allWeights = [w1, w2, w3];
+  const maxWeight = Math.max(...allWeights);
 
-    if (weight >= maxWeight) streak++;
-    else streak = 0;
+  if (weight >= maxWeight) streak++;
+  else streak = 0;
 
-    const streakLabel = document.getElementById("streak");
-    if (streakLabel) streakLabel.innerText = "Streak: " + streak;
+  const streakLabel = document.getElementById("streak");
+  if (streakLabel) streakLabel.innerText = "Streak: " + streak;
 
-    const currentQuestion = questions[0] || {};
+  const currentQuestion = questions[0] || {};
 
-    answers.push({
-        question_id: currentQuestion["Question ID"] || "",
-        question_text: currentQuestion["Question Text"] || "",
-        category: currentQuestion.Category || "",
-        difficulty: currentQuestion.Difficulty || "Medium",
-        selected_option: btn.innerText.trim(),
-        weight: weight,
-        all_weights: allWeights,
-        time: timeTaken,
-        confidence: confidence,
-        streak: streak
-    });
-    pendingBatchAnswers.push(answers[answers.length - 1]);
+  answers.push({
+    question_id: currentQuestion["Question ID"] || "",
+    question_text: currentQuestion["Question Text"] || "",
+    category: currentQuestion.Category || "",
+    difficulty: currentQuestion.Difficulty || "Medium",
+    selected_option: btn.innerText.trim(),
+    weight: weight,
+    all_weights: allWeights,
+    time: timeTaken,
+    confidence: confidence,
+    streak: streak
+  });
+  pendingBatchAnswers.push(answers[answers.length - 1]);
 
-    totalAnswered++;
-    updateProgressBar();
-    setTimeout(goNext, 200);
+  totalAnswered++;
+  updateProgressBar();
+  setTimeout(goNext, 200);
 }
 
 function goNext() {
-    questions.shift();
-    updateSkill();
-    showAIHint();
+  questions.shift();
+  updateSkill();
+  showAIHint();
 
-    if (pendingStop) {
-        localStorage.setItem("questions", JSON.stringify(questions));
-        isLoadingNext = false;
-        openResultPage();
-        return;
-    }
+  if (pendingStop) {
+    localStorage.setItem("questions", JSON.stringify(questions));
+    isLoadingNext = false;
+    openResultPage();
+    return;
+  }
 
-    if (questions.length > 0) {
-        localStorage.setItem("questions", JSON.stringify(questions));
-        isLoadingNext = false;
-        showQuestion();
-        return;
-    }
+  if (questions.length > 0) {
+    localStorage.setItem("questions", JSON.stringify(questions));
+    isLoadingNext = false;
+    showQuestion();
+    return;
+  }
 
-    fetch("/next", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pendingBatchAnswers)
+  fetch("/next", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(pendingBatchAnswers)
     })
-        .then(res => res.json())
-        .then(data => {
-            pendingBatchAnswers = [];
-            isLoadingNext = false;
+    .then(res => res.json())
+    .then(data => {
+      pendingBatchAnswers = [];
+      isLoadingNext = false;
 
-            if (!Array.isArray(data) || data.length === 0) {
-                document.getElementById("quiz").innerHTML =
-                    "<h3>Quiz Completed</h3>";
-                return;
-            }
+      if (!Array.isArray(data) || data.length === 0) {
+        document.getElementById("quiz").innerHTML =
+          "<h3>Quiz Completed</h3>";
+        return;
+      }
 
-            questions = data;
-            localStorage.setItem("questions", JSON.stringify(data));
-            showQuestion();
-        })
-        .catch(err => {
-            console.error("Next error:", err);
-            isLoadingNext = false;
-            if (pendingStop) {
-                openResultPage();
-            }
-        });
-}
-
-function updateSkill() {
-    const ans = answers[answers.length - 1];
-    if (!ans) return;
-
-    const speed = ans.time < 2 ? 1 : ans.time < 5 ? 0.75 : 0.5;
-    const maxWeight = Math.max(...(ans.all_weights || [ans.weight || 0, 1]));
-    const normalized = maxWeight > 0 ? (ans.weight / maxWeight) : 0;
-    const score = normalized * speed * (ans.confidence / 100);
-    const cat = ans.category;
-
-    if (skillState.hasOwnProperty(cat)) {
-        skillCounts[cat] = (skillCounts[cat] || 0) + 1;
-        skillState[cat] =
-            ((skillState[cat] * (skillCounts[cat] - 1)) + score) /
-            skillCounts[cat];
-    }
-
-    renderSkills();
-}
-
-function renderSkills() {
-    const box = document.getElementById("skillsBox");
-    if (!box) return;
-
-    box.innerHTML = "";
-
-    Object.keys(skillState).forEach(key => {
-        box.innerHTML += `<div>${key}: ${skillState[key].toFixed(2)}</div>`;
+      questions = data;
+      localStorage.setItem("questions", JSON.stringify(data));
+      showQuestion();
+    })
+    .catch(err => {
+      console.error("Next error:", err);
+      isLoadingNext = false;
+      if (pendingStop) {
+        openResultPage();
+      }
     });
 }
 
+function updateSkill() {
+  const ans = answers[answers.length - 1];
+  if (!ans) return;
+
+  const speed = ans.time < 2 ? 1 : ans.time < 5 ? 0.75 : 0.5;
+  const maxWeight = Math.max(...(ans.all_weights || [ans.weight || 0, 1]));
+  const normalized = maxWeight > 0 ? (ans.weight / maxWeight) : 0;
+  const score = normalized * speed * (ans.confidence / 100);
+  const cat = ans.category;
+
+  if (skillState.hasOwnProperty(cat)) {
+    skillCounts[cat] = (skillCounts[cat] || 0) + 1;
+    skillState[cat] =
+      ((skillState[cat] * (skillCounts[cat] - 1)) + score) /
+      skillCounts[cat];
+  }
+
+  renderSkills();
+}
+
+function renderSkills() {
+  const box = document.getElementById("skillsBox");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  Object.keys(skillState).forEach(key => {
+    box.innerHTML += `<div>${key}: ${skillState[key].toFixed(2)}</div>`;
+  });
+}
+
 function showAIHint() {
-    const ans = answers[answers.length - 1];
-    if (!ans) return;
+  const ans = answers[answers.length - 1];
+  if (!ans) return;
 
-    let hint =
-        ans.time < 2 ? "Fast" :
-        ans.time > 5 ? "Slow" :
-        "Normal";
+  let hint =
+    ans.time < 2 ? "Fast" :
+    ans.time > 5 ? "Slow" :
+    "Normal";
 
-    if (ans.confidence > 80 && ans.weight < Math.max(...ans.all_weights)) {
-        hint += " | Overconfidence detected";
-    }
+  if (ans.confidence > 80 && ans.weight < Math.max(...ans.all_weights)) {
+    hint += " | Overconfidence detected";
+  }
 
-    const hintBox = document.getElementById("aiHint");
-    if (hintBox) hintBox.innerText = hint;
+  const hintBox = document.getElementById("aiHint");
+  if (hintBox) hintBox.innerText = hint;
 }
 
 function updateDifficultyUI(q) {
-    const el = document.getElementById("difficulty");
-    if (el) el.innerText = "Difficulty: " + (q.Difficulty || "Medium");
+  const el = document.getElementById("difficulty");
+  if (el) el.innerText = "Difficulty: " + (q.Difficulty || "Medium");
 }
 
 function updateProgressBar() {
-    const percent = (totalAnswered / 17) * 100;
-    const bar = document.getElementById("progressBar");
-    if (bar) bar.style.width = Math.min(percent, 100) + "%";
+  const percent = (totalAnswered / 17) * 100;
+  const bar = document.getElementById("progressBar");
+  if (bar) bar.style.width = Math.min(percent, 100) + "%";
 }
 
 function stopQuiz() {
-    if (totalAnswered < 17) {
-        alert("Answer at least 17 questions!");
-        return;
-    }
+  if (totalAnswered < 17) {
+    alert("Answer at least 17 questions!");
+    return;
+  }
 
-    pendingStop = true;
-    freezeTimer();
-    setStopLoadingState("The timer is stopped. Preparing and opening the result page.");
+  pendingStop = true;
+  freezeTimer();
+  setStopLoadingState("The timer is stopped. Preparing and opening the result page.");
 
-    if (isLoadingNext) {
-        return;
-    }
+  if (isLoadingNext) {
+    return;
+  }
 
-    openResultPage();
+  openResultPage();
 }

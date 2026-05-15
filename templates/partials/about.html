@@ -1,80 +1,89 @@
-<section id="about-section" aria-labelledby="about-heading" style="scroll-margin-top: 1.5rem;">
-  <div class="ab-inner">
-
-    <div class="ab-header">
-      <span class="ab-label">About</span>
-      <h2 id="about-heading" class="ab-title">The person behind edVance.</h2>
-      <p class="ab-lead">
-        Hi — I'm Aritra. This platform was built to bring clarity to the WBJEE counselling process
-        through real data, adaptive tools, and honest career guidance. Reach out through any channel below.
-      </p>
+<section id="about-section"
+         aria-labelledby="about-heading"
+         style="scroll-margin-top: 1.5rem">
+    <div class="ab-inner">
+        <div class="ab-header">
+            <span class="ab-label">About</span>
+            <h2 id="about-heading" class="ab-title">The person behind EdVance.</h2>
+            <p class="ab-lead">
+                Hi — I'm Aritra. This platform was built to bring clarity to the WBJEE counselling process
+                through real data, adaptive tools, and honest career guidance. Reach out through any channel below.
+            </p>
+        </div>
+        <div class="ab-grid" role="list">
+            <article class="ab-card" role="listitem" aria-label="LinkedIn profile">
+                <div class="ab-card-icon ab-icon-linkedin">
+                    <img src="{{ url_for('static', filename='images/linkedin.png') }}"
+                         alt="LinkedIn" />
+                </div>
+                <div class="ab-card-body">
+                    <h3>LinkedIn</h3>
+                    <p>Professional profile &amp; posts</p>
+                    <a class="ab-btn"
+                       href="https://www.linkedin.com/in/aritra0407/"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        View profile <span class="ab-btn-arrow">→</span>
+                    </a>
+                </div>
+            </article>
+            <article class="ab-card" role="listitem" aria-label="WhatsApp">
+                <div class="ab-card-icon ab-icon-whatsapp">
+                    <img src="{{ url_for('static', filename='images/whatsapp.jpg') }}"
+                         alt="WhatsApp" />
+                </div>
+                <div class="ab-card-body">
+                    <h3>WhatsApp</h3>
+                    <p>Quick messages &amp; chats</p>
+                    <div class="ab-contact-row">
+                        <a class="ab-plain-link"
+                           href="https://wa.me/917278735953"
+                           target="_blank"
+                           rel="noopener noreferrer">+91 72787 35953</a>
+                        <button class="ab-copy-btn"
+                                data-copy="+917278735953"
+                                aria-label="Copy WhatsApp number">Copy</button>
+                    </div>
+                </div>
+            </article>
+            <article class="ab-card" role="listitem" aria-label="Phone">
+                <div class="ab-card-icon ab-icon-phone">
+                    <img src="{{ url_for('static', filename='images/contact.png') }}"
+                         alt="Phone" />
+                </div>
+                <div class="ab-card-body">
+                    <h3>Phone</h3>
+                    <p>Available for calls</p>
+                    <div class="ab-contact-row">
+                        <a class="ab-plain-link" href="tel:+919874739638">+91 98747 39638</a>
+                        <button class="ab-copy-btn"
+                                data-copy="+919874739638"
+                                aria-label="Copy phone number">Copy</button>
+                    </div>
+                </div>
+            </article>
+            <article class="ab-card" role="listitem" aria-label="Email">
+                <div class="ab-card-icon ab-icon-email">
+                    <img src="{{ url_for('static', filename='images/email.jpg') }}"
+                         alt="Email" />
+                </div>
+                <div class="ab-card-body">
+                    <h3>Email</h3>
+                    <p>Detailed requests &amp; collaborations</p>
+                    <div class="ab-contact-row">
+                        <a class="ab-plain-link" href="mailto:aritra0407@gmail.com">aritra0407@gmail.com</a>
+                        <button class="ab-copy-btn"
+                                data-copy="aritra0407@gmail.com"
+                                aria-label="Copy email">Copy</button>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="ab-footer">
+            <small>© <span class="ab-year"></span> Aritra — All rights reserved.</small>
+        </div>
     </div>
-
-    <div class="ab-grid" role="list">
-
-      <article class="ab-card" role="listitem" aria-label="LinkedIn profile">
-        <div class="ab-card-icon ab-icon-linkedin">
-          <img src="{{ url_for('static', filename='images/linkedin.png') }}" alt="LinkedIn" />
-        </div>
-        <div class="ab-card-body">
-          <h3>LinkedIn</h3>
-          <p>Professional profile &amp; posts</p>
-          <a class="ab-btn" href="https://www.linkedin.com/in/aritra0407/" target="_blank" rel="noopener noreferrer">
-            View profile <span class="ab-btn-arrow">→</span>
-          </a>
-        </div>
-      </article>
-
-      <article class="ab-card" role="listitem" aria-label="WhatsApp">
-        <div class="ab-card-icon ab-icon-whatsapp">
-          <img src="{{ url_for('static', filename='images/whatsapp.jpg') }}" alt="WhatsApp" />
-        </div>
-        <div class="ab-card-body">
-          <h3>WhatsApp</h3>
-          <p>Quick messages &amp; chats</p>
-          <div class="ab-contact-row">
-            <a class="ab-plain-link" href="https://wa.me/917278735953" target="_blank" rel="noopener noreferrer">+91 72787 35953</a>
-            <button class="ab-copy-btn" data-copy="+917278735953" aria-label="Copy WhatsApp number">Copy</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="ab-card" role="listitem" aria-label="Phone">
-        <div class="ab-card-icon ab-icon-phone">
-          <img src="{{ url_for('static', filename='images/contact.png') }}" alt="Phone" />
-        </div>
-        <div class="ab-card-body">
-          <h3>Phone</h3>
-          <p>Available for calls</p>
-          <div class="ab-contact-row">
-            <a class="ab-plain-link" href="tel:+919874739638">+91 98747 39638</a>
-            <button class="ab-copy-btn" data-copy="+919874739638" aria-label="Copy phone number">Copy</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="ab-card" role="listitem" aria-label="Email">
-        <div class="ab-card-icon ab-icon-email">
-          <img src="{{ url_for('static', filename='images/email.jpg') }}" alt="Email" />
-        </div>
-        <div class="ab-card-body">
-          <h3>Email</h3>
-          <p>Detailed requests &amp; collaborations</p>
-          <div class="ab-contact-row">
-            <a class="ab-plain-link" href="mailto:aritra0407@gmail.com">aritra0407@gmail.com</a>
-            <button class="ab-copy-btn" data-copy="aritra0407@gmail.com" aria-label="Copy email">Copy</button>
-          </div>
-        </div>
-      </article>
-
-    </div>
-
-    <div class="ab-footer">
-      <small>© <span class="ab-year"></span> Aritra — All rights reserved.</small>
-    </div>
-  </div>
-
-  <style>
+    <style>
     #about-section {
       background: #07111c;
       padding: 88px 22px 32px;
@@ -99,7 +108,7 @@
       margin: 0 auto;
     }
 
-    /* Header */
+
     .ab-header {
       max-width: 680px;
       margin-bottom: 48px;
@@ -135,14 +144,14 @@
       font-weight: 500;
     }
 
-    /* Grid */
+
     .ab-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
     }
 
-    /* Card */
+
     .ab-card {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -166,7 +175,7 @@
       box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32), 0 0 0 1px rgba(18, 184, 166, 0.08);
     }
 
-    /* Icon */
+
     .ab-card-icon {
       width: 56px;
       height: 56px;
@@ -192,7 +201,7 @@
       border-radius: 6px;
     }
 
-    /* Card body */
+
     .ab-card-body {
       display: flex;
       flex-direction: column;
@@ -216,7 +225,7 @@
       line-height: 1.5;
     }
 
-    /* Link button */
+
     .ab-btn {
       display: inline-flex;
       align-items: center;
@@ -247,7 +256,7 @@
       transform: translateX(2px);
     }
 
-    /* Contact row */
+
     .ab-contact-row {
       display: flex;
       align-items: center;
@@ -301,7 +310,7 @@
       color: #6ef8df;
     }
 
-    /* Footer */
+
     .ab-footer {
       margin-top: 28px;
       padding-top: 16px;
@@ -313,7 +322,7 @@
       font-weight: 600;
     }
 
-    /* Focus */
+
     #about-section a:focus-visible,
     #about-section button:focus-visible {
       outline: 2px solid rgba(18, 184, 166, 0.6);
@@ -321,7 +330,7 @@
       border-radius: 8px;
     }
 
-    /* Responsive */
+
     @media (max-width: 900px) {
       .ab-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -349,9 +358,8 @@
         flex-shrink: 0;
       }
     }
-  </style>
-
-  <script>
+    </style>
+    <script>
     (function () {
       const yearEl = document.querySelector('#about-section .ab-year');
       if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -394,5 +402,5 @@
         } catch (e) {}
       }
     })();
-  </script>
+    </script>
 </section>

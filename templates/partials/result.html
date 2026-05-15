@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Result</title>
-<style>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Result</title>
+        <style>
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
@@ -133,125 +133,96 @@ canvas {
   h2 { font-size: 16px; }
   .box, .career { font-size: 12px; padding: 10px; }
 }
-</style>
-</head>
-
-<body>
-
-<div class="wrapper">
-  <div class="left">
-    <h2>Your AI Skill Analysis</h2>
-
-    <div class="box">
-      <b>Hybrid analysis complete</b><br>
-      <span class="muted">
-        Questions answered: {{ summary_metrics.questions_answered if summary_metrics else 0 }} |
-        Avg skill: {{ summary_metrics.avg_skill if summary_metrics else 0 }} |
-        Reliability: {{ summary_metrics.avg_reliability if summary_metrics else 0 }}
-      </span>
-    </div>
-
-    {% set items = result.items() | list %}
-    {% set sorted_items = items | sort(attribute='1.score', reverse=true) %}
-
-    {% for category, values in sorted_items %}
-    <div class="box">
-      <div>
-        <b>{{ category }}</b>
-        <span class="
-          {% if values.level == 'High' %}level-high
-          {% elif values.level == 'Medium' %}level-medium
-          {% else %}level-low{% endif %}
-        ">
-          {{ values.level }}
-        </span>
-      </div>
-
-      <div class="muted">
-        Score: {{ values.score }} | Attempts: {{ values.attempts }}
-      </div>
-
-      <div class="bar">
-        <div class="bar-fill" style="width:{{ values.score * 100 }}%"></div>
-      </div>
-
-      <div class="metric-row">
-        <div class="metric-chip">Skill {{ values.bayesian_skill }}</div>
-        <div class="metric-chip">Calibration {{ values.confidence_alignment }}</div>
-        <div class="metric-chip">Reliability {{ values.reliability }}</div>
-        <div class="metric-chip">Uncertainty {{ values.uncertainty }}</div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-
-  <div class="right">
-    <h2>Top 5 Careers</h2>
-
-    {% for role in rec %}
-    <div class="career">
-      <h3>{{ role.get("Job", "Unknown") }}</h3>
-      <b>{{ role.get("score", 0) }}%</b>
-
-      {% if role.get("model_probability") is not none %}
-      <div class="muted">
-        Model probability: {{ (role.get("model_probability", 0) * 100) | round(1) }}%
-      </div>
-      {% endif %}
-
-      {% if role.get("matched_strengths") %}
-      <div class="muted">Why matched: {{ role.get("matched_strengths") | join(", ") }}</div>
-      {% endif %}
-
-      {% if role.get("growth_areas") %}
-      <div class="muted">Growth areas: {{ role.get("growth_areas") | join(", ") }}</div>
-      {% endif %}
-    </div>
-    {% endfor %}
-
-    <div class="box">
-      <h3>AI Insight</h3>
-      <div class="muted">
-        Strengths: {{ (summary_metrics.top_strengths | join(", ")) if summary_metrics else "N/A" }}
-      </div>
-      <div class="muted">
-        Growth areas: {{ (summary_metrics.growth_areas | join(", ")) if summary_metrics else "N/A" }}
-      </div>
-      <div class="muted">
-        Time efficiency: {{ summary_metrics.avg_time_efficiency if summary_metrics else 0 }} |
-        Calibration: {{ summary_metrics.avg_confidence_alignment if summary_metrics else 0 }}
-      </div>
-    </div>
-
-    <div class="box">
-      <h3>Hybrid Model</h3>
-      <div class="muted">
-        Retrieval: cosine + latent factors<br>
-        Reranker: {{ model_metrics.training_mode if model_metrics else "fallback" }}<br>
-        Top-1 accuracy: {{ model_metrics.top1_accuracy if model_metrics else 0 }}<br>
-        Top-3 accuracy: {{ model_metrics.top3_accuracy if model_metrics else 0 }}<br>
-        Macro F1: {{ model_metrics.macro_f1 if model_metrics else 0 }}
-      </div>
-
-      {% if report_file %}
-      <div class="muted" style="margin-top: 8px;">
-        Saved report: {{ report_file }}
-      </div>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-<div class="screen2">
-  <h2>Performance Graphs</h2>
-  <canvas id="skillChart"></canvas>
-  <canvas id="timeChart"></canvas>
-  <h2>Learning Curve</h2>
-  <canvas id="learningChart"></canvas>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="left">
+                <h2>Your AI Skill Analysis</h2>
+                <div class="box">
+                    <b>Hybrid analysis complete</b>
+                    <br>
+                    <span class="muted">
+                        Questions answered: {{ summary_metrics.questions_answered if summary_metrics else 0 }} |
+                        Avg skill: {{ summary_metrics.avg_skill if summary_metrics else 0 }} |
+                        Reliability: {{ summary_metrics.avg_reliability if summary_metrics else 0 }}
+                    </span>
+                </div>
+                {% set items = result.items() | list %}
+                {% set sorted_items = items | sort(attribute='1.score', reverse=true) %}
+                {% for category, values in sorted_items %}
+                    <div class="box">
+                        <div>
+                            <b>{{ category }}</b>
+                            <span class=" {% if values.level == 'High' %}level-high {% elif values.level == 'Medium' %}level-medium {% else %}level-low{% endif %} ">
+                                {{ values.level }}
+                            </span>
+                        </div>
+                        <div class="muted">Score: {{ values.score }} | Attempts: {{ values.attempts }}</div>
+                        <div class="bar">
+                            <div class="bar-fill" style="width:{{ values.score * 100 }}%"></div>
+                        </div>
+                        <div class="metric-row">
+                            <div class="metric-chip">Skill {{ values.bayesian_skill }}</div>
+                            <div class="metric-chip">Calibration {{ values.confidence_alignment }}</div>
+                            <div class="metric-chip">Reliability {{ values.reliability }}</div>
+                            <div class="metric-chip">Uncertainty {{ values.uncertainty }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="right">
+                <h2>Top 5 Careers</h2>
+                {% for role in rec %}
+                    <div class="career">
+                        <h3>{{ role.get('Job', 'Unknown') }}</h3>
+                        <b>{{ role.get('score', 0) }}%</b>
+                        {% if role.get("model_probability") is not none %}
+                            <div class="muted">Model probability: {{ (role.get('model_probability', 0) * 100) | round(1) }}%</div>
+                        {% endif %}
+                        {% if role.get("matched_strengths") %}
+                            <div class="muted">Why matched: {{ role.get("matched_strengths") | join(", ") }}</div>
+                        {% endif %}
+                        {% if role.get("growth_areas") %}
+                            <div class="muted">Growth areas: {{ role.get("growth_areas") | join(", ") }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <div class="box">
+                    <h3>AI Insight</h3>
+                    <div class="muted">Strengths: {{ (summary_metrics.top_strengths | join(", ") ) if summary_metrics else "N/A" }}</div>
+                    <div class="muted">Growth areas: {{ (summary_metrics.growth_areas | join(", ") ) if summary_metrics else "N/A" }}</div>
+                    <div class="muted">
+                        Time efficiency: {{ summary_metrics.avg_time_efficiency if summary_metrics else 0 }} |
+                        Calibration: {{ summary_metrics.avg_confidence_alignment if summary_metrics else 0 }}
+                    </div>
+                </div>
+                <div class="box">
+                    <h3>Hybrid Model</h3>
+                    <div class="muted">
+                        Retrieval: cosine + latent factors
+                        <br>
+                        Reranker: {{ model_metrics.training_mode if model_metrics else "fallback" }}
+                        <br>
+                        Top-1 accuracy: {{ model_metrics.top1_accuracy if model_metrics else 0 }}
+                        <br>
+                        Top-3 accuracy: {{ model_metrics.top3_accuracy if model_metrics else 0 }}
+                        <br>
+                        Macro F1: {{ model_metrics.macro_f1 if model_metrics else 0 }}
+                    </div>
+                    {% if report_file %}<div class="muted" style="margin-top: 8px;">Saved report: {{ report_file }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="screen2">
+            <h2>Performance Graphs</h2>
+            <canvas id="skillChart"></canvas>
+            <canvas id="timeChart"></canvas>
+            <h2>Learning Curve</h2>
+            <canvas id="learningChart"></canvas>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
 const resultData = {{ result | tojson }};
 const timeData = {{ time_avg | tojson }};
 
@@ -317,6 +288,6 @@ new Chart(document.getElementById("learningChart"), {
   },
   options: chartDefaults
 });
-</script>
-</body>
+        </script>
+    </body>
 </html>

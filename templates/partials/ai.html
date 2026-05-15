@@ -1,4 +1,3 @@
-<!-- templates/partials/ai.html -->
 <style>
   .edv-ai-root {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
@@ -12,7 +11,7 @@
     margin: 0 auto;
     width: 100%;
     max-width: 100%;
-    /* Use dvh so mobile browser chrome doesn't cut it off */
+
     height: clamp(420px, 60dvh, 640px);
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -182,14 +181,14 @@
     overflow-y: auto;
   }
 
-  /* Tablet */
+
   @media (max-width: 768px) {
     .edv-ai-root { padding: 8px; }
     .edv-ai-chat-wrap { height: clamp(380px, 55dvh, 560px); border-radius: 8px; }
     .edv-ai-bubble { font-size: 13px; max-width: 92%; }
   }
 
-  /* Mobile */
+
   @media (max-width: 480px) {
     .edv-ai-chat-wrap { height: clamp(340px, 50dvh, 500px); }
     .edv-ai-send-btn { flex: 0 0 64px; width: 64px; height: 40px; font-size: 13px; }
@@ -199,27 +198,27 @@
     .edv-ai-inputbar { padding: 8px 10px; }
   }
 </style>
-
-<div class="edv-ai-root" role="region" aria-label="edVance AI assistant">
-  <div class="edv-ai-chat-wrap" role="application" aria-label="AI chatbot">
-
-    <div class="edv-ai-header">
-      <span class="edv-ai-header-dot"></span>
-      edVance AI Assistant
+<div class="edv-ai-root" role="region" aria-label="EdVance AI assistant">
+    <div class="edv-ai-chat-wrap" role="application" aria-label="AI chatbot">
+        <div class="edv-ai-header">
+            <span class="edv-ai-header-dot"></span>
+            EdVance AI Assistant
+        </div>
+        <div class="edv-ai-messages"
+             id="edv-ai-messages"
+             aria-live="polite"
+             aria-atomic="false"></div>
+        <div class="edv-ai-inputbar">
+            <input id="edv-ai-query"
+                   class="edv-ai-input"
+                   type="text"
+                   placeholder="Ask about colleges, rankings, placements…"
+                   aria-label="Ask a question"
+                   autocomplete="off" />
+            <button id="edv-ai-send" class="edv-ai-send-btn" aria-label="Send">Send</button>
+        </div>
     </div>
-
-    <div class="edv-ai-messages" id="edv-ai-messages" aria-live="polite" aria-atomic="false"></div>
-
-    <div class="edv-ai-inputbar">
-      <input id="edv-ai-query" class="edv-ai-input" type="text"
-             placeholder="Ask about colleges, rankings, placements…"
-             aria-label="Ask a question" autocomplete="off"/>
-      <button id="edv-ai-send" class="edv-ai-send-btn" aria-label="Send">Send</button>
-    </div>
-
-  </div>
 </div>
-
 <script>
 (function () {
   const messagesEl = document.getElementById('edv-ai-messages');
@@ -324,7 +323,7 @@
       appendError('Could not reach server: ' + (e.message || String(e)));
     } finally {
       btn.disabled = false;
-      // No input.focus() here — it caused the page-jump bug
+
     }
   }
 
@@ -333,13 +332,13 @@
     if (e.key === 'Enter' && !e.shiftKey) sendQuery();
   });
 
-  // Welcome message
+
   (function () {
     const wrap = document.createElement('div');
     wrap.className = 'edv-ai-msg edv-ai-msg-bot';
     const bubble = document.createElement('div');
     bubble.className = 'edv-ai-bubble edv-ai-bubble-bot';
-    bubble.textContent = 'Hi! I\'m your edVance AI assistant 👋\nAsk me about college rankings, placements, reviews, or anything else about higher education.';
+    bubble.textContent = 'Hi! I\'m your EdVance AI assistant 👋\nAsk me about college rankings, placements, reviews, or anything else about higher education.';
     wrap.appendChild(bubble);
     messagesEl.appendChild(wrap);
   })();

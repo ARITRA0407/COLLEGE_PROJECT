@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Adaptive Quiz</title>
-<style>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Adaptive Quiz</title>
+        <style>
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
@@ -15,14 +15,14 @@ body {
   min-height: 100vh;
 }
 
-/* Wrapper: side-by-side on desktop, stacked on mobile */
+
 .wrapper {
   display: flex;
   width: 100%;
   min-height: 100vh;
 }
 
-/* ===== LEFT ===== */
+
 .left {
   flex: 1 1 65%;
   padding: 16px;
@@ -32,7 +32,7 @@ body {
   overflow-y: auto;
 }
 
-/* ===== RIGHT ===== */
+
 .right {
   flex: 0 0 32%;
   max-width: 340px;
@@ -42,7 +42,7 @@ body {
   overflow-y: auto;
 }
 
-/* ===== CARDS ===== */
+
 .card {
   background: rgba(255,255,255,0.1);
   padding: 12px;
@@ -175,7 +175,7 @@ button#stopBtn:hover { background: rgba(255,255,255,0.25); }
   to { transform: rotate(360deg); }
 }
 
-/* ===== TABLET ===== */
+
 @media (max-width: 768px) {
   .wrapper { flex-direction: column; min-height: auto; }
   .left { flex: 1 1 auto; padding: 12px; }
@@ -191,7 +191,7 @@ button#stopBtn:hover { background: rgba(255,255,255,0.25); }
   button.opt { font-size: 13px; padding: 9px; }
 }
 
-/* ===== MOBILE ===== */
+
 @media (max-width: 480px) {
   .left, .right { padding: 10px; }
   h2 { font-size: 15px; }
@@ -199,70 +199,58 @@ button#stopBtn:hover { background: rgba(255,255,255,0.25); }
   button.opt { font-size: 13px; }
   .category-box { grid-template-columns: 1fr 1fr; }
 }
-</style>
-</head>
-
-<body>
-
-<div class="wrapper">
-
-  <!-- ===== LEFT ===== -->
-  <div class="left">
-
-    <div class="card">
-      <h2>Adaptive AI Quiz</h2>
-      <div id="timer">⏱ Time: 0.0s</div>
-      <div class="progress">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-      <div id="difficulty">Difficulty: MEDIUM</div>
-    </div>
-
-    <div class="card" id="quiz"></div>
-
-    <div class="card">
-      <div id="aiHint"></div>
-    </div>
-
-    <div class="card" id="streak">🔥 Streak: 0</div>
-
-    <div class="card">
-      <label>Confidence: <span id="confValue">50%</span></label>
-      <input type="range" min="0" max="100" value="50"
-             oninput="updateConfidence(this.value)">
-    </div>
-
-    <button id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
-
-  </div>
-
-  <!-- ===== RIGHT ===== -->
-  <div class="right">
-
-    <div class="card">
-      <div class="flow">
-        <div id="currentCategory">Current: -</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Skill Analytics</h3>
-      <div id="skillsBox" class="category-box"></div>
-    </div>
-
-  </div>
-
-</div>
-
-<div id="loadingOverlay" class="loading-overlay" aria-live="polite" aria-hidden="true">
-  <div class="loading-card">
-    <div class="loading-spinner"></div>
-    <h3>Preparing your result</h3>
-    <p>The timer is stopped. Opening the result page now.</p>
-  </div>
-</div>
-
-<script src="/static/js/quiz.js" defer></script>
-
-</body>
+        </style>
+    </head>
+    <body>
+        <div class="wrapper">
+            <div class="left">
+                <div class="card">
+                    <h2>Adaptive AI Quiz</h2>
+                    <div id="timer">⏱ Time: 0.0s</div>
+                    <div class="progress">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
+                    <div id="difficulty">Difficulty: MEDIUM</div>
+                </div>
+                <div class="card" id="quiz"></div>
+                <div class="card">
+                    <div id="aiHint"></div>
+                </div>
+                <div class="card" id="streak">🔥 Streak: 0</div>
+                <div class="card">
+                    <label>
+                        Confidence: <span id="confValue">50%</span>
+                    </label>
+                    <input type="range"
+                           min="0"
+                           max="100"
+                           value="50"
+                           oninput="updateConfidence(this.value)">
+                </div>
+                <button id="stopBtn" onclick="stopQuiz()">Stop Quiz</button>
+            </div>
+            <div class="right">
+                <div class="card">
+                    <div class="flow">
+                        <div id="currentCategory">Current: -</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Skill Analytics</h3>
+                    <div id="skillsBox" class="category-box"></div>
+                </div>
+            </div>
+        </div>
+        <div id="loadingOverlay"
+             class="loading-overlay"
+             aria-live="polite"
+             aria-hidden="true">
+            <div class="loading-card">
+                <div class="loading-spinner"></div>
+                <h3>Preparing your result</h3>
+                <p>The timer is stopped. Opening the result page now.</p>
+            </div>
+        </div>
+        <script src="/static/js/quiz.js" defer></script>
+    </body>
 </html>

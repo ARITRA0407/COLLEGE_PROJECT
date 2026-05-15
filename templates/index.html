@@ -1,213 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edVance - College Recommendation Platform</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}" />
-</head>
-<body>
-  <div class="site-shell">
-    {% include 'partials/header.html' %}
-
-    <main>
-      <section class="hero" id="top">
-        <video
-          class="hero-video"
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="auto"
-          poster="{{ url_for('static', filename='images/FrontVideoPoster.png') }}"
-        >
-          <source src="{{ url_for('static', filename='videos/FrontVideo.mp4') }}" type="video/mp4" />
-        </video>
-        <div class="hero-overlay"></div>
-        <div class="hero-grain"></div>
-
-        <div class="hero-content reveal">
-          <div class="hero-badge">
-            <span class="hero-badge-dot"></span>
-            {{ home_metrics.rank_year_range or "2021-2025" }} WBJEE intelligence stack
-          </div>
-
-          <h1 class="hero-title">
-            <span class="line1">edVance</span>
-            <span class="line2">College Intelligence</span>
-          </h1>
-
-          <p class="hero-sub">
-            Navigate counselling with ranked college data, AI guidance, and an adaptive skill quiz that maps students to stronger career paths.
-          </p>
-
-          <div class="hero-buttons">
-            <a href="{{ url_for('recommendation_page') }}" class="hero-btn hero-btn-solid">
-              <span class="btn-icon">✦</span>
-              Get Recommendations
-            </a>
-            <a href="{{ url_for('quiz_page') }}" class="hero-btn hero-btn-light">
-              Take the Skill Quiz
-              <span class="btn-arrow">→</span>
-            </a>
-          </div>
-
-          <div class="hero-inline-metrics">
-            <div class="hero-chip">
-              <span class="chip-dot chip-teal"></span>
-              3-model hybrid recommender
-            </div>
-            <div class="hero-chip">
-              <span class="chip-dot chip-amber"></span>
-              {{ home_metrics.rank_rows_display }} rank records
-            </div>
-            <div class="hero-chip">
-              <span class="chip-dot chip-sky"></span>
-              {{ home_metrics.skill_category_display }} adaptive skill categories
-            </div>
-          </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>EdVance - College Recommendation Platform</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+              rel="stylesheet" />
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename='css/header.css') }}" />
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename='css/index.css') }}" />
+    </head>
+    <body>
+        <div class="site-shell">
+            {% include 'partials/header.html' %}
+            <main>
+                <section class="hero" id="top">
+                    <video class="hero-video"
+                           autoplay
+                           muted
+                           loop
+                           playsinline
+                           preload="auto"
+                           poster="{{ url_for('static', filename='images/FrontVideoPoster.png') }}">
+                        <source src="{{ url_for('static', filename='videos/FrontVideo.mp4') }}"
+                                type="video/mp4" />
+                    </video>
+                    <div class="hero-overlay"></div>
+                    <div class="hero-grain"></div>
+                    <div class="hero-content reveal">
+                        <div class="hero-badge">
+                            <span class="hero-badge-dot"></span>
+                            {{ home_metrics.rank_year_range or "2021-2025" }} WBJEE intelligence stack
+                        </div>
+                        <h1 class="hero-title">
+                            <span class="line1">EdVance</span>
+                            <span class="line2">College Intelligence</span>
+                        </h1>
+                        <p class="hero-sub">
+                            Navigate counselling with ranked college data, AI guidance, and an adaptive skill quiz that maps students to stronger career paths.
+                        </p>
+                        <div class="hero-buttons">
+                            <a href="{{ url_for('recommendation_page') }}"
+                               class="hero-btn hero-btn-solid">
+                                <span class="btn-icon">✦</span>
+                                Get Recommendations
+                            </a>
+                            <a href="{{ url_for('quiz_page') }}" class="hero-btn hero-btn-light">
+                                Take the Skill Quiz
+                                <span class="btn-arrow">→</span>
+                            </a>
+                        </div>
+                        <div class="hero-inline-metrics">
+                            <div class="hero-chip">
+                                <span class="chip-dot chip-teal"></span>
+                                3-model hybrid recommender
+                            </div>
+                            <div class="hero-chip">
+                                <span class="chip-dot chip-amber"></span>
+                                {{ home_metrics.rank_rows_display }} rank records
+                            </div>
+                            <div class="hero-chip">
+                                <span class="chip-dot chip-sky"></span>
+                                {{ home_metrics.skill_category_display }} adaptive skill categories
+                            </div>
+                        </div>
+                    </div>
+                    <a href="#features"
+                       class="hero-scroll"
+                       aria-label="Scroll to feature overview">
+                        <span class="hero-scroll-dot"></span>
+                    </a>
+                </section>
+                <section class="features-section" id="features">
+                    <div class="section-heading reveal">
+                        <span class="section-label">Platform Overview</span>
+                        <h2 class="section-title">Three decision systems, one student workflow.</h2>
+                        <p class="section-subtitle">
+                            Built around real counselling inputs: historical WBJEE rank data, college quality signals, and adaptive quiz telemetry.
+                        </p>
+                    </div>
+                    <div class="feature-grid">
+                        <article class="feature-card reveal">
+                            <div class="feature-icon feature-icon-teal">01</div>
+                            <h3>Recommendation Engine</h3>
+                            <p>
+                                Matches rank, program, quota, and location preferences against historical closing ranks, review scores, and placement signals.
+                            </p>
+                            <div class="feature-meta">Association rules + hybrid ranking ensemble</div>
+                            <a href="{{ url_for('recommendation_page') }}" class="feature-link">
+                                Open recommendations <span>→</span>
+                            </a>
+                        </article>
+                        <article class="feature-card reveal">
+                            <div class="feature-icon feature-icon-amber">02</div>
+                            <h3>AI Guidance</h3>
+                            <p>
+                                Answers college, placement, and admission questions with Gemini-backed responses grounded in the same project datasets.
+                            </p>
+                            <div class="feature-meta">Conversational guidance on demand</div>
+                            <a href="{{ url_for('ai_guidance') }}" class="feature-link">
+                                Talk to AI <span>→</span>
+                            </a>
+                        </article>
+                        <article class="feature-card reveal">
+                            <div class="feature-icon feature-icon-sky">03</div>
+                            <h3>Adaptive Career Quiz</h3>
+                            <p>
+                                Measures performance across logical, coding, analytical, design, and systems categories while adapting question difficulty in real time.
+                            </p>
+                            <div class="feature-meta">Bayesian skill estimation + career matching</div>
+                            <a href="{{ url_for('quiz_page') }}" class="feature-link">
+                                Start the quiz <span>→</span>
+                            </a>
+                        </article>
+                    </div>
+                </section>
+                <section class="stats-section">
+                    <div class="section-heading reveal">
+                        <span class="section-label">Project Metrics</span>
+                        <h2 class="section-title">What powers the platform underneath.</h2>
+                    </div>
+                    <div class="stats-grid">
+                        {% for stat in home_stats %}
+                            <article class="stat-card reveal">
+                                <div class="stat-value">{{ stat.value }}</div>
+                                <div class="stat-label">{{ stat.label }}</div>
+                            </article>
+                        {% endfor %}
+                    </div>
+                </section>
+                <section class="journey-section">
+                    <div class="journey-panel reveal">
+                        <div class="journey-copy">
+                            <span class="section-label">How It Flows</span>
+                            <h2 class="section-title">From rank uncertainty to a clearer shortlist.</h2>
+                            <p class="section-subtitle">
+                                Start with recommendation filters, validate options through comparison and top-ranked views, then use the adaptive quiz to understand where your skills may fit best.
+                            </p>
+                        </div>
+                        <div class="journey-steps">
+                            <div class="journey-step">
+                                <span class="step-number">1</span>
+                                <div>
+                                    <h3>Filter your options</h3>
+                                    <p>Use rank, quota, stream, and placement thresholds to narrow realistic colleges quickly.</p>
+                                </div>
+                            </div>
+                            <div class="journey-step">
+                                <span class="step-number">2</span>
+                                <div>
+                                    <h3>Inspect the trade-offs</h3>
+                                    <p>Compare colleges side by side, explore district-level coverage, and review top-ranked alternatives.</p>
+                                </div>
+                            </div>
+                            <div class="journey-step">
+                                <span class="step-number">3</span>
+                                <div>
+                                    <h3>Check your career fit</h3>
+                                    <p>
+                                        Run the adaptive quiz to turn performance patterns into career recommendations without breaking the rest of the flow.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="quick-section" id="explore">
+                    <div class="section-heading reveal">
+                        <span class="section-label">Explore</span>
+                        <h2 class="section-title">Jump straight into the tool you need.</h2>
+                    </div>
+                    <div class="quick-links reveal">
+                        <a href="{{ url_for('recommendation_page') }}">Recommendation</a>
+                        <a href="{{ url_for('comparison') }}">Comparison</a>
+                        <a href="{{ url_for('explore_colleges') }}">Explore Colleges</a>
+                        <a href="{{ url_for('top_ranked_colleges') }}">Top Ranked</a>
+                        <a href="{{ url_for('ai_guidance') }}">AI Guidance</a>
+                        <a href="{{ url_for('quiz_page') }}">Skill Quiz</a>
+                    </div>
+                </section>
+            </main>
+            {% include 'partials/about.html' %}
         </div>
-
-        <a href="#features" class="hero-scroll" aria-label="Scroll to feature overview">
-          <span class="hero-scroll-dot"></span>
-        </a>
-      </section>
-
-      <section class="features-section" id="features">
-        <div class="section-heading reveal">
-          <span class="section-label">Platform Overview</span>
-          <h2 class="section-title">Three decision systems, one student workflow.</h2>
-          <p class="section-subtitle">
-            Built around real counselling inputs: historical WBJEE rank data, college quality signals, and adaptive quiz telemetry.
-          </p>
-        </div>
-
-        <div class="feature-grid">
-          <article class="feature-card reveal">
-            <div class="feature-icon feature-icon-teal">01</div>
-            <h3>Recommendation Engine</h3>
-            <p>
-              Matches rank, program, quota, and location preferences against historical closing ranks, review scores, and placement signals.
-            </p>
-            <div class="feature-meta">Association rules + hybrid ranking ensemble</div>
-            <a href="{{ url_for('recommendation_page') }}" class="feature-link">
-              Open recommendations <span>→</span>
-            </a>
-          </article>
-
-          <article class="feature-card reveal">
-            <div class="feature-icon feature-icon-amber">02</div>
-            <h3>AI Guidance</h3>
-            <p>
-              Answers college, placement, and admission questions with Gemini-backed responses grounded in the same project datasets.
-            </p>
-            <div class="feature-meta">Conversational guidance on demand</div>
-            <a href="{{ url_for('ai_guidance') }}" class="feature-link">
-              Talk to AI <span>→</span>
-            </a>
-          </article>
-
-          <article class="feature-card reveal">
-            <div class="feature-icon feature-icon-sky">03</div>
-            <h3>Adaptive Career Quiz</h3>
-            <p>
-              Measures performance across logical, coding, analytical, design, and systems categories while adapting question difficulty in real time.
-            </p>
-            <div class="feature-meta">Bayesian skill estimation + career matching</div>
-            <a href="{{ url_for('quiz_page') }}" class="feature-link">
-              Start the quiz <span>→</span>
-            </a>
-          </article>
-        </div>
-      </section>
-
-      <section class="stats-section">
-        <div class="section-heading reveal">
-          <span class="section-label">Project Metrics</span>
-          <h2 class="section-title">What powers the platform underneath.</h2>
-        </div>
-
-        <div class="stats-grid">
-          {% for stat in home_stats %}
-          <article class="stat-card reveal">
-            <div class="stat-value">{{ stat.value }}</div>
-            <div class="stat-label">{{ stat.label }}</div>
-          </article>
-          {% endfor %}
-        </div>
-      </section>
-
-      <section class="journey-section">
-        <div class="journey-panel reveal">
-          <div class="journey-copy">
-            <span class="section-label">How It Flows</span>
-            <h2 class="section-title">From rank uncertainty to a clearer shortlist.</h2>
-            <p class="section-subtitle">
-              Start with recommendation filters, validate options through comparison and top-ranked views, then use the adaptive quiz to understand where your skills may fit best.
-            </p>
-          </div>
-
-          <div class="journey-steps">
-            <div class="journey-step">
-              <span class="step-number">1</span>
-              <div>
-                <h3>Filter your options</h3>
-                <p>Use rank, quota, stream, and placement thresholds to narrow realistic colleges quickly.</p>
-              </div>
-            </div>
-            <div class="journey-step">
-              <span class="step-number">2</span>
-              <div>
-                <h3>Inspect the trade-offs</h3>
-                <p>Compare colleges side by side, explore district-level coverage, and review top-ranked alternatives.</p>
-              </div>
-            </div>
-            <div class="journey-step">
-              <span class="step-number">3</span>
-              <div>
-                <h3>Check your career fit</h3>
-                <p>Run the adaptive quiz to turn performance patterns into career recommendations without breaking the rest of the flow.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="quick-section" id="explore">
-        <div class="section-heading reveal">
-          <span class="section-label">Explore</span>
-          <h2 class="section-title">Jump straight into the tool you need.</h2>
-        </div>
-
-        <div class="quick-links reveal">
-          <a href="{{ url_for('recommendation_page') }}">Recommendation</a>
-          <a href="{{ url_for('comparison') }}">Comparison</a>
-          <a href="{{ url_for('explore_colleges') }}">Explore Colleges</a>
-          <a href="{{ url_for('top_ranked_colleges') }}">Top Ranked</a>
-          <a href="{{ url_for('ai_guidance') }}">AI Guidance</a>
-          <a href="{{ url_for('quiz_page') }}">Skill Quiz</a>
-        </div>
-      </section>
-    </main>
-
-    {% include 'partials/about.html' %}
-
-  </div>
-
-  <button id="aiBtn" aria-label="Open adaptive quiz">
-    <span class="ai-btn-label">Quiz</span>
-    <span class="ai-btn-ring"></span>
-  </button>
-
-  <script src="{{ url_for('static', filename='js/header.js') }}"></script>
-  <script>
+        <button id="aiBtn" aria-label="Open adaptive quiz">
+            <span class="ai-btn-label">Quiz</span>
+            <span class="ai-btn-ring"></span>
+        </button>
+        <script src="{{ url_for('static', filename='js/header.js') }}"></script>
+        <script>
     (function () {
       const btn = document.getElementById('hamburger');
       const nav = document.querySelector('.main-nav');
@@ -263,6 +246,6 @@
 
       revealItems.forEach(item => observer.observe(item));
     })();
-  </script>
-</body>
+        </script>
+    </body>
 </html>

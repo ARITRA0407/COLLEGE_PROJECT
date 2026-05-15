@@ -1,4 +1,4 @@
-(function () {
+(function() {
   const select = document.getElementById("college-select");
   const btn = document.getElementById("load-btn");
   const refreshBtn = document.getElementById("refresh-btn");
@@ -31,19 +31,23 @@
     linksBody: document.getElementById("links-body"),
   };
 
-  // ── KEY FIX: reveal the grid and hide the placeholder ──
   function revealGrid() {
     if (detailGrid) detailGrid.classList.add("revealed");
   }
 
-  // small Leaflet map
   let map = null;
+
   function initMap(lat, lon) {
     try {
       if (!map) {
-        map = L.map("mini-map", { zoomControl: false, attributionControl: false })
+        map = L.map("mini-map", {
+            zoomControl: false,
+            attributionControl: false
+          })
           .setView([lat, lon], 12);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19
+        }).addTo(map);
         L.marker([lat, lon]).addTo(map);
       } else {
         map.setView([lat, lon], 12);
@@ -58,11 +62,13 @@
   function enaSelect(items) {
     select.innerHTML = "";
     const start = document.createElement("option");
-    start.value = ""; start.textContent = "Choose college / institute";
+    start.value = "";
+    start.textContent = "Choose college / institute";
     select.appendChild(start);
     items.forEach((name) => {
       const o = document.createElement("option");
-      o.value = name; o.textContent = name;
+      o.value = name;
+      o.textContent = name;
       select.appendChild(o);
     });
   }
@@ -106,10 +112,14 @@
 
   function renderChipList(containerEl, items) {
     containerEl.innerHTML = "";
-    if (!items || !items.length) { containerEl.textContent = "—"; return; }
+    if (!items || !items.length) {
+      containerEl.textContent = "—";
+      return;
+    }
     items.forEach((it) => {
       const c = document.createElement("span");
-      c.className = "chip"; c.textContent = it;
+      c.className = "chip";
+      c.textContent = it;
       containerEl.appendChild(c);
     });
   }
@@ -134,7 +144,7 @@
   async function loadDetails(name) {
     if (!name) return;
     clearDetails();
-    revealGrid();           // ← show grid before populating
+    revealGrid();
     selName.textContent = name;
     try {
       const q = encodeURIComponent(name);
@@ -145,7 +155,9 @@
       ]);
       if (!dRes.ok) throw new Error("details failed");
       const d = await dRes.json();
-      const reviews = rRes.ok ? await rRes.json() : { reviews: [] };
+      const reviews = rRes.ok ? await rRes.json() : {
+        reviews: []
+      };
       const placement = pRes.ok ? await pRes.json() : {};
 
       ids.title.textContent = d.institute_name || name;
@@ -177,22 +189,23 @@
 
       const programs = d.programs && d.programs.length ? d.programs : placement.programs || [];
       ids.numPrograms.textContent =
-        d.num_programs !== undefined && d.num_programs !== null
-          ? d.num_programs : placement.num_programs || programs.length || 0;
+        d.num_programs !== undefined && d.num_programs !== null ?
+        d.num_programs : placement.num_programs || programs.length || 0;
       ids.programList.innerHTML = "";
       if (programs && programs.length) {
         programs.forEach((p) => {
-          const li = document.createElement("li"); li.textContent = p;
+          const li = document.createElement("li");
+          li.textContent = p;
           ids.programList.appendChild(li);
         });
       } else {
         ids.programList.innerHTML = '<li style="opacity:.6">No program names available</li>';
       }
 
-      const recruiters = d.top_recruiters && d.top_recruiters.length
-        ? d.top_recruiters : placement.top_recruiters || [];
-      const profiles = d.key_profiles && d.key_profiles.length
-        ? d.key_profiles : placement.job_profiles || [];
+      const recruiters = d.top_recruiters && d.top_recruiters.length ?
+        d.top_recruiters : placement.top_recruiters || [];
+      const profiles = d.key_profiles && d.key_profiles.length ?
+        d.key_profiles : placement.job_profiles || [];
       renderChipList(document.getElementById("top-recruiters"), recruiters);
       renderChipList(document.getElementById("key-profiles"), profiles);
 
@@ -214,15 +227,18 @@
       } else {
         ids.reviewsList.innerHTML = "";
         rlist.forEach((rv) => {
-          const item = document.createElement("div"); item.className = "review-item";
-          const meta = document.createElement("div"); meta.className = "review-meta";
+          const item = document.createElement("div");
+          item.className = "review-item";
+          const meta = document.createElement("div");
+          meta.className = "review-meta";
           const dstr = rv.date ? ` • ${rv.date}` : "";
           const ratingText = rv.rating ? ` • ${rv.rating}` : "";
           meta.innerHTML = `<strong>${rv.source || "Unknown"}</strong>${dstr}${ratingText}`;
           const txt = document.createElement("div");
           const cleaned = cleanReviewTextForUI(rv.review_text || "");
           txt.textContent = cleaned || "No usable review text.";
-          item.appendChild(meta); item.appendChild(txt);
+          item.appendChild(meta);
+          item.appendChild(txt);
           ids.reviewsList.appendChild(item);
         });
       }
@@ -241,8 +257,12 @@
     try {
       const res = await fetch("/explore/api/reviews/refresh", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Refresh failed");
@@ -270,7 +290,9 @@
     if (refreshBtn) refreshBtn.style.display = v ? "inline-block" : "none";
   });
 
-  select.addEventListener("keydown", (ev) => { if (ev.key === "Enter") btn.click(); });
+  select.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") btn.click();
+  });
   if (refreshBtn) {
     refreshBtn.addEventListener("click", refreshSelectedCollege);
   }

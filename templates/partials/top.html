@@ -1,16 +1,8 @@
-
 <div id="top-root">
-  <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/top.css') }}"
-    />
- 
-
-  <div id="top-scroller-wrap" aria-label="Top 10 colleges scroller">
-    <div id="top-track" role="list" aria-live="polite">
-      <!-- Cards inserted here by JS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/top.css') }}" />
+    <div id="top-scroller-wrap" aria-label="Top 10 colleges scroller">
+        <div id="top-track" role="list" aria-live="polite"></div>
     </div>
-  </div>
-
-   <script src="{{ url_for('static', filename='js/top.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/top.js') }}"></script>
 </div>

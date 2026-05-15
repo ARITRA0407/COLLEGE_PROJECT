@@ -1,4 +1,3 @@
-/* ===== HEADER ===== */
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -38,16 +37,20 @@
   letter-spacing: -0.03em;
 }
 
-.website-name:hover { color: #0f766e; }
+.website-name:hover {
+  color: #0f766e;
+}
 
-/* ===== NAV ===== */
+
 .main-nav {
   display: flex;
   gap: 2rem;
   align-items: center;
 }
 
-.nav-item { position: relative; }
+.nav-item {
+  position: relative;
+}
 
 .nav-link {
   color: #334155;
@@ -59,7 +62,9 @@
   white-space: nowrap;
 }
 
-.nav-link:hover { color: #0f766e; }
+.nav-link:hover {
+  color: #0f766e;
+}
 
 .dropdown-toggle::after {
   content: ' \25BE';
@@ -106,7 +111,7 @@
   color: #0f766e;
 }
 
-/* ===== AUTH BUTTONS ===== */
+
 .auth-buttons {
   display: flex;
   align-items: center;
@@ -131,6 +136,7 @@
   border-color: rgba(15, 118, 110, 0.18);
   color: #0f766e;
 }
+
 .login-btn:hover {
   background: #0f766e;
   color: #ffffff;
@@ -141,6 +147,7 @@
   color: #ffffff;
   border-color: transparent;
 }
+
 .signup-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 16px 28px rgba(13, 148, 136, 0.25);
@@ -159,9 +166,12 @@
   color: #334155;
   border-color: rgba(148, 163, 184, 0.25);
 }
-.logout-btn:hover { background: #e2e8f0; }
 
-/* ===== HAMBURGER ===== */
+.logout-btn:hover {
+  background: #e2e8f0;
+}
+
+
 .hamburger {
   display: none;
   flex-direction: column;
@@ -176,7 +186,11 @@
   border-radius: 6px;
   flex-shrink: 0;
 }
-.hamburger:hover { background: #f3f4f6; }
+
+.hamburger:hover {
+  background: #f3f4f6;
+}
+
 .hamburger span {
   display: block;
   height: 2px;
@@ -185,17 +199,32 @@
   border-radius: 2px;
   transition: all 0.25s ease;
 }
-.hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* ===== MOBILE NAV DRAWER ===== */
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+
 @media (max-width: 768px) {
-  .main-header { padding: 0.75rem 1rem; position: relative; border-radius: 18px; }
+  .main-header {
+    padding: 0.75rem 1rem;
+    position: relative;
+    border-radius: 18px;
+  }
 
-  .hamburger { display: flex; }
+  .hamburger {
+    display: flex;
+  }
 
-  /* nav + auth become a drawer */
+
   .main-nav,
   .auth-buttons {
     display: none;
@@ -210,11 +239,25 @@
     display: flex;
   }
 
-  .main-nav { border-top: 1px solid #f3f4f6; padding-top: 8px; }
-  .auth-buttons { border-top: 1px solid #f3f4f6; padding: 8px 0 4px; }
+  .main-nav {
+    border-top: 1px solid #f3f4f6;
+    padding-top: 8px;
+  }
 
-  .nav-item { width: 100%; }
-  .nav-link { display: block; padding: 10px 4px; font-size: 1rem; }
+  .auth-buttons {
+    border-top: 1px solid #f3f4f6;
+    padding: 8px 0 4px;
+  }
+
+  .nav-item {
+    width: 100%;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 10px 4px;
+    font-size: 1rem;
+  }
 
   .dropdown-menu {
     position: static;
@@ -227,23 +270,37 @@
     flex-direction: column;
   }
 
-  .auth-btn { width: 100%; text-align: center; padding: 0.65rem 1rem; }
-  .welcome-text { padding: 8px 4px; }
+  .auth-btn {
+    width: 100%;
+    text-align: center;
+    padding: 0.65rem 1rem;
+  }
+
+  .welcome-text {
+    padding: 8px 4px;
+  }
 }
 
 @media (max-width: 480px) {
-  .logo-img { height: 30px; }
-  .website-name { font-size: 1.2rem; }
+  .logo-img {
+    height: 30px;
+  }
+
+  .website-name {
+    font-size: 1.2rem;
+  }
 }
 
-/* ===== MODALS ===== */
+
 .modal {
   display: none;
   position: fixed;
   z-index: 2000;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.6);
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
   align-items: center;
   justify-content: center;
 }
@@ -261,13 +318,17 @@
 
 .close-btn {
   position: absolute;
-  top: 10px; right: 15px;
+  top: 10px;
+  right: 15px;
   font-size: 24px;
   color: #9ca3af;
   cursor: pointer;
   transition: color 0.2s ease;
 }
-.close-btn:hover { color: #1f2937; }
+
+.close-btn:hover {
+  color: #1f2937;
+}
 
 .modal-content h2 {
   font-size: 1.5rem;
@@ -292,9 +353,16 @@
   transition: all 0.3s ease;
   margin-bottom: 1rem;
 }
-.google-auth-btn:hover { background-color: #f9fafb; }
 
-.google-icon { width: 20px; height: 20px; margin-right: 0.75rem; }
+.google-auth-btn:hover {
+  background-color: #f9fafb;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+}
 
 .separator {
   color: #9ca3af;
@@ -303,14 +371,22 @@
   display: flex;
   align-items: center;
 }
-.separator::before, .separator::after {
+
+.separator::before,
+.separator::after {
   content: '';
   flex-grow: 1;
   height: 1px;
   background-color: #d1d5db;
 }
-.separator::before { margin-right: 0.5rem; }
-.separator::after  { margin-left: 0.5rem; }
+
+.separator::before {
+  margin-right: 0.5rem;
+}
+
+.separator::after {
+  margin-left: 0.5rem;
+}
 
 #auth-form {
   display: flex;
@@ -327,9 +403,10 @@
   width: 100%;
   box-sizing: border-box;
 }
+
 #auth-form input:focus {
   border-color: #0ea5a4;
-  box-shadow: 0 0 0 3px rgba(14,165,164,0.18);
+  box-shadow: 0 0 0 3px rgba(14, 165, 164, 0.18);
   outline: none;
 }
 
@@ -346,7 +423,10 @@
   transition: background-color 0.3s ease;
   width: 100%;
 }
-.auth-submit-btn:hover { filter: brightness(0.98); }
+
+.auth-submit-btn:hover {
+  filter: brightness(0.98);
+}
 
 .toggle-auth {
   font-size: 0.875rem;
@@ -360,6 +440,7 @@
   cursor: pointer;
   transition: color 0.2s ease;
 }
+
 #toggle-to-signup:hover {
   color: #0f9488;
   text-decoration: underline;
@@ -371,7 +452,7 @@
   overflow: hidden;
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 28px 65px rgba(15, 23, 42, 0.12);
-  background: linear-gradient(135deg, rgba(255,255,255,0.94), rgba(240,249,255,0.96));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(240, 249, 255, 0.96));
 }
 
 .main-content img {

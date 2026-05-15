@@ -11,7 +11,6 @@ import urllib.request
 import urllib.error
 import json
 
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_FILE_PATH = os.path.normpath(os.path.join(BASE_DIR, "..", "csv", "reviews.csv"))
 PROJECT_ROOT_DIR = os.path.normpath(os.path.join(BASE_DIR, ".."))
@@ -40,10 +39,6 @@ def clean_text(raw_text):
 
 
 def load_dotenv_if_present(dotenv_path=DOTENV_PATH):
-    """
-    Minimal .env loader (KEY=VALUE per line).
-    Only sets variables that are not already set in the environment.
-    """
     try:
         if not os.path.exists(dotenv_path):
             return
@@ -68,7 +63,6 @@ def extract_snippets(search_html):
         r'<div[^>]*class="[^"]*snippet[^"]*"[^>]*>(.*?)</div>',
         r'<td[^>]*class="result-snippet"[^>]*>(.*?)</td>',
     ]
-
     snippets = []
     for pattern in snippet_patterns:
         matches = re.findall(pattern, search_html, flags=re.IGNORECASE | re.DOTALL)
@@ -78,7 +72,6 @@ def extract_snippets(search_html):
                 snippets.append(cleaned)
         if snippets:
             break
-
     return snippets
 
 
@@ -105,7 +98,9 @@ def http_get(url):
 
     def _do_get(target_url):
         request = urllib.request.Request(target_url, headers=headers, method="GET")
-        with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
+        with urllib.request.urlopen(
+            request, timeout=REQUEST_TIMEOUT_SECONDS
+        ) as response:
             return response.read().decode("utf-8", errors="ignore")
 
     try:
@@ -115,7 +110,6 @@ def http_get(url):
             proxied_url = f"{JINA_AI_PROXY_PREFIX}{url}"
             return _do_get(proxied_url)
         raise
-
     lower = response_html.lower()
     blocked_markers = [
         "captcha",
@@ -127,7 +121,6 @@ def http_get(url):
     if any(marker in lower for marker in blocked_markers):
         proxied_url = f"{JINA_AI_PROXY_PREFIX}{url}"
         response_html = _do_get(proxied_url)
-
     return response_html
 
 
@@ -140,14 +133,12 @@ def fetch_online_review_snippets(college_name, max_snippets):
         f"{simplified_name} college reviews",
         f"{simplified_name} google reviews",
     ]
-
     for query in queries:
         encoded_query = urllib.parse.quote_plus(query)
         urls = [
             DUCKDUCKGO_HTML_SEARCH_URL.format(query=encoded_query),
             DUCKDUCKGO_LITE_SEARCH_URL.format(query=encoded_query),
         ]
-
         for url in urls:
             last_error = None
             for attempt in range(MAX_FETCH_RETRIES + 1):
@@ -160,10 +151,8 @@ def fetch_online_review_snippets(college_name, max_snippets):
                 except Exception as error:
                     last_error = error
                     time.sleep(0.6 * (attempt + 1))
-
             if last_error is not None:
                 continue
-
     return []
 
 
@@ -177,13 +166,11 @@ def fetch_serper_snippets(college_name, max_snippets, api_key, existing_text="")
         f"{base} faculty reviews",
     ]
     random.shuffle(query_options)
-
     headers = {
         "X-API-KEY": api_key,
         "Content-Type": "application/json",
         "User-Agent": "reviewCollection.py (college project)",
     }
-
     existing_norm = str(existing_text or "").strip().lower()
     snippets = []
     for query in query_options:
@@ -200,8 +187,12 @@ def fetch_serper_snippets(college_name, max_snippets, api_key, existing_text="")
                 SERPER_ENDPOINT, data=payload, headers=headers, method="POST"
             )
             try:
-                with urllib.request.urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
-                    data = json.loads(response.read().decode("utf-8", errors="ignore") or "{}")
+                with urllib.request.urlopen(
+                    request, timeout=REQUEST_TIMEOUT_SECONDS
+                ) as response:
+                    data = json.loads(
+                        response.read().decode("utf-8", errors="ignore") or "{}"
+                    )
             except urllib.error.HTTPError as error:
                 body = ""
                 try:
@@ -213,8 +204,9 @@ def fetch_serper_snippets(college_name, max_snippets, api_key, existing_text="")
                     detail = detail[:500] + "..."
                 if detail:
                     raise RuntimeError(f"Serper HTTP {error.code}: {detail}") from error
-                raise RuntimeError(f"Serper HTTP {error.code}: {error.reason}") from error
-
+                raise RuntimeError(
+                    f"Serper HTTP {error.code}: {error.reason}"
+                ) from error
             for item in (data.get("organic") or [])[: max_snippets * 4]:
                 snippet = (item.get("snippet") or "").strip()
                 if not snippet:
@@ -226,7 +218,6 @@ def fetch_serper_snippets(college_name, max_snippets, api_key, existing_text="")
                     snippets.append(snippet)
                 if len(snippets) >= max_snippets:
                     return snippets[:max_snippets]
-
     return snippets[:max_snippets]
 
 
@@ -236,7 +227,6 @@ def fetch_searchapi_snippets(college_name, max_snippets, api_key):
     url = f"{SEARCHAPI_ENDPOINT}?engine=google&q={q}&api_key={urllib.parse.quote_plus(api_key)}"
     response_text = http_get(url)
     data = json.loads(response_text or "{}")
-
     snippets = []
     for item in (data.get("organic_results") or [])[: max_snippets * 2]:
         snippet = (item.get("snippet") or "").strip()
@@ -269,7 +259,6 @@ def build_review_text(college_name, snippets):
             f"No reliable public review snippets were found online for {college_name} "
             "during this run."
         )
-
     lines = [f"Collected online review snippets for {college_name}:"]
     for snippet in snippets:
         lines.append(f"- {snippet}")
@@ -335,29 +324,23 @@ def collect_reviews(
 ):
     fieldnames, rows = read_rows(csv_path)
     ensure_required_columns(fieldnames)
-
     total_rows = len(rows)
     updated_rows = 0
     today = dt.date.today().isoformat()
-
     if limit and limit > 0:
         rows_iter = rows[:limit]
         total_rows = len(rows_iter)
     else:
         rows_iter = rows
-
     for index, row in enumerate(rows_iter, start=1):
         college_name = (row.get("college_name") or "").strip()
         existing_text = (row.get("review_text") or "").strip()
-
         if college_name_filter:
             if college_name.lower() != str(college_name_filter).strip().lower():
                 continue
-
         if not college_name:
             print(f"[{index}/{total_rows}] Skipped row without college_name.")
             continue
-
         if existing_text and not overwrite:
             if overwrite_placeholders and is_placeholder_review_text(existing_text):
                 pass
@@ -368,8 +351,9 @@ def collect_reviews(
                 continue
         elif existing_text and overwrite_placeholders and not overwrite:
             pass
-
-        print(f"[{index}/{total_rows}] Collecting reviews for: {college_name}", flush=True)
+        print(
+            f"[{index}/{total_rows}] Collecting reviews for: {college_name}", flush=True
+        )
         try:
             if debug_save_html and index == 1:
                 debug_pages = fetch_debug_html(college_name)
@@ -380,7 +364,6 @@ def collect_reviews(
                         file.write(page_html)
                         file.write("\n\n")
                 print(f"  -> Debug HTML saved to: {debug_path}", flush=True)
-
             if provider == "serper":
                 if not serper_api_key:
                     raise ValueError(
@@ -409,7 +392,6 @@ def collect_reviews(
                     college_name, max_snippets=max_snippets
                 )
                 source_value = "Web Reviews (DuckDuckGo)"
-
             if snippets or write_empty:
                 new_text = build_review_text(college_name, snippets)
                 if mode == "append" and existing_text:
@@ -422,7 +404,10 @@ def collect_reviews(
                 updated_rows += 1
                 print(f"  -> Updated with {len(snippets)} snippet(s).", flush=True)
             else:
-                print("  -> Got 0 snippets; leaving existing review_text unchanged.", flush=True)
+                print(
+                    "  -> Got 0 snippets; leaving existing review_text unchanged.",
+                    flush=True,
+                )
         except Exception as error:
             print(f"  -> Error while collecting reviews: {error}", flush=True)
             if write_empty:
@@ -431,13 +416,13 @@ def collect_reviews(
                     f"Error: {error}"
                 )
                 row["source"] = (
-                    "Web Reviews (Serper)" if provider == "serper" else "Web Reviews (DuckDuckGo)"
+                    "Web Reviews (Serper)"
+                    if provider == "serper"
+                    else "Web Reviews (DuckDuckGo)"
                 )
                 row["date"] = today
                 updated_rows += 1
-
         time.sleep(REQUEST_PAUSE_SECONDS)
-
     if updated_rows > 0:
         saved_path = write_rows(csv_path, fieldnames, rows)
         print(f"\nDone. Updated {updated_rows} row(s) out of {total_rows}.")
@@ -533,25 +518,24 @@ def main():
     args = parse_args()
     csv_path = os.path.normpath(args.csv_path)
     overwrite = not args.no_overwrite
-
     if not os.path.exists(csv_path):
         raise FileNotFoundError(f"CSV file not found: {csv_path}")
-
-    if args.provider in ("serper", "searchapi") and not (args.serper_api_key or "").strip():
+    if (
+        args.provider in ("serper", "searchapi")
+        and not (args.serper_api_key or "").strip()
+    ):
         raise SystemExit(
             "Error: this provider requires an API key.\n"
             "PowerShell:\n"
-            "  $env:SERPER_API_KEY=\"YOUR_KEY\"   (for serper)\n"
-            "  $env:SEARCHAPI_API_KEY=\"YOUR_KEY\" (for searchapi)\n"
+            '  $env:SERPER_API_KEY="YOUR_KEY"   (for serper)\n'
+            '  $env:SEARCHAPI_API_KEY="YOUR_KEY" (for searchapi)\n'
             "Or:\n"
             "  python backend/reviewCollection.py --provider <serper|searchapi> --serper-api-key YOUR_KEY\n"
         )
-
     print("--- Starting Online Review Collection ---")
     print(f"CSV path: {csv_path}")
     print(f"Overwrite existing review_text: {overwrite}")
     print(f"Max snippets per college: {args.max_snippets}\n")
-
     collect_reviews(
         csv_path=csv_path,
         max_snippets=max(1, args.max_snippets),

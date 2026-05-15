@@ -1,4 +1,3 @@
-// -------- CONFIG --------
 const CSV_BASE = '/csv/';
 const YEARS = [2021, 2022, 2023, 2024, 2025];
 const RANK_FILES = YEARS.map(y => `rank_${y}.csv`);
@@ -6,7 +5,6 @@ const COLLEGE_FILE = 'college.csv';
 const PLACEMENT_FILE = 'placement.csv';
 const REVIEWS_FILE = 'reviews.csv';
 
-// -------- CSV PARSER --------
 function parseCSV(text) {
   const lines = text.split(/\r?\n/);
   const headers = splitCSVLine(lines[0]);
@@ -15,7 +13,10 @@ function parseCSV(text) {
   for (let i = 1; i < lines.length; i++) {
     buf += lines[i];
     const quotes = (buf.match(/"/g) || []).length;
-    if (quotes % 2 !== 0) { buf += '\n'; continue; }
+    if (quotes % 2 !== 0) {
+      buf += '\n';
+      continue;
+    }
     const cols = splitCSVLine(buf);
     if (cols.length === headers.length) {
       const obj = {};
@@ -28,10 +29,19 @@ function parseCSV(text) {
 }
 
 function splitCSVLine(line) {
-  const out = []; let cur = ''; let inQ = false;
+  const out = [];
+  let cur = '';
+  let inQ = false;
   for (const ch of line) {
-    if (ch === '"') { inQ = !inQ; continue; }
-    if (ch === ',' && !inQ) { out.push(cur); cur = ''; continue; }
+    if (ch === '"') {
+      inQ = !inQ;
+      continue;
+    }
+    if (ch === ',' && !inQ) {
+      out.push(cur);
+      cur = '';
+      continue;
+    }
     cur += ch;
   }
   out.push(cur);
@@ -42,12 +52,15 @@ function getVal(row, names) {
   for (const n of names) {
     if (n in row) return row[n];
     const lo = n.toLowerCase();
-    for (const k of Object.keys(row)) if (k.toLowerCase() === lo) return row[k];
+    for (const k of Object.keys(row))
+      if (k.toLowerCase() === lo) return row[k];
   }
   return '';
 }
 
-function norm(s) { return (s == null ? '' : String(s)).trim().replace(/\s+/g, ' ').toLowerCase(); }
+function norm(s) {
+  return (s == null ? '' : String(s)).trim().replace(/\s+/g, ' ').toLowerCase();
+}
 
 function findBestRow(rows, institute, program = '') {
   const instituteKey = norm(institute);
@@ -75,11 +88,11 @@ function findBestRow(rows, institute, program = '') {
   }) || {};
 }
 
-// -------- GLOBAL DATA --------
 const rankData = {};
-let collegeData = [], placementData = [], reviewsData = [];
+let collegeData = [],
+  placementData = [],
+  reviewsData = [];
 
-// institutePrograms[instituteName] = Set of program names across all years
 const institutePrograms = {};
 
 async function loadAll() {
@@ -87,10 +100,12 @@ async function loadAll() {
     try {
       const txt = await (await fetch(CSV_BASE + f)).text();
       rankData[YEARS[idx]] = parseCSV(txt);
-    } catch (e) { console.warn('rank load failed', f, e); rankData[YEARS[idx]] = []; }
+    } catch (e) {
+      console.warn('rank load failed', f, e);
+      rankData[YEARS[idx]] = [];
+    }
   }));
 
-  // Build institute→programs map
   for (const y of YEARS) {
     for (const row of rankData[y]) {
       const inst = getVal(row, ['Institute', 'institute', 'College', 'college', 'INSTITUTE']);
@@ -101,24 +116,39 @@ async function loadAll() {
     }
   }
 
-  try { collegeData = parseCSV(await (await fetch(CSV_BASE + COLLEGE_FILE)).text()); } catch (e) { collegeData = []; }
-  try { placementData = parseCSV(await (await fetch(CSV_BASE + PLACEMENT_FILE)).text()); } catch (e) { placementData = []; }
-  try { reviewsData = parseCSV(await (await fetch(CSV_BASE + REVIEWS_FILE)).text()); } catch (e) { reviewsData = []; }
+  try {
+    collegeData = parseCSV(await (await fetch(CSV_BASE + COLLEGE_FILE)).text());
+  } catch (e) {
+    collegeData = [];
+  }
+  try {
+    placementData = parseCSV(await (await fetch(CSV_BASE + PLACEMENT_FILE)).text());
+  } catch (e) {
+    placementData = [];
+  }
+  try {
+    reviewsData = parseCSV(await (await fetch(CSV_BASE + REVIEWS_FILE)).text());
+  } catch (e) {
+    reviewsData = [];
+  }
 
   populateInstituteSelects();
 }
 
-// -------- POPULATE INSTITUTE DROPDOWNS --------
 function populateInstituteSelects() {
   const instList = Object.keys(institutePrograms).sort((a, b) => a.localeCompare(b));
 
   ['A', 'B'].forEach(side => {
     const el = document.getElementById('institute' + side);
     while (el.firstChild) el.removeChild(el.firstChild);
-    const def = document.createElement('option'); def.value = ''; def.textContent = 'Select Institute';
+    const def = document.createElement('option');
+    def.value = '';
+    def.textContent = 'Select Institute';
     el.appendChild(def);
     instList.forEach(inst => {
-      const opt = document.createElement('option'); opt.value = inst; opt.textContent = inst;
+      const opt = document.createElement('option');
+      opt.value = inst;
+      opt.textContent = inst;
       el.appendChild(opt);
     });
     el.disabled = false;
@@ -128,20 +158,22 @@ function populateInstituteSelects() {
   document.getElementById('compareBtn').addEventListener('click', doCompare);
 }
 
-// -------- FILTER PROGRAMS WHEN INSTITUTE CHOSEN --------
 function onInstituteChange(side) {
   const inst = document.getElementById('institute' + side).value;
   const progSelect = document.getElementById('program' + side);
 
-  // Reset program dropdown
   while (progSelect.firstChild) progSelect.removeChild(progSelect.firstChild);
-  const def = document.createElement('option'); def.value = ''; def.textContent = 'Select Program';
+  const def = document.createElement('option');
+  def.value = '';
+  def.textContent = 'Select Program';
   progSelect.appendChild(def);
 
   if (inst && institutePrograms[inst]) {
     const progs = Array.from(institutePrograms[inst]).sort((a, b) => a.localeCompare(b));
     progs.forEach(p => {
-      const opt = document.createElement('option'); opt.value = p; opt.textContent = p;
+      const opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
       progSelect.appendChild(opt);
     });
     progSelect.disabled = false;
@@ -156,14 +188,13 @@ function onInstituteChange(side) {
 
 function checkEnableCompare() {
   const ok = document.getElementById('instituteA').value &&
-             document.getElementById('programA').value &&
-             document.getElementById('instituteB').value &&
-             document.getElementById('programB').value;
+    document.getElementById('programA').value &&
+    document.getElementById('instituteB').value &&
+    document.getElementById('programB').value;
   const btn = document.getElementById('compareBtn');
   btn.disabled = !ok;
 }
 
-// -------- BUILD PANEL HTML (injected on compare) --------
 function buildPanelHTML(side) {
   return `
     <div class="visuals">
@@ -202,8 +233,10 @@ function buildPanelHTML(side) {
   `;
 }
 
-// -------- MAIN COMPARE ACTION --------
-const charts = { A: null, B: null };
+const charts = {
+  A: null,
+  B: null
+};
 
 function doCompare() {
   ['A', 'B'].forEach(side => {
@@ -223,11 +256,10 @@ function doCompare() {
   renderPlacementAndReview('B', instB, progB);
   updateChart('A', instA, progA);
   updateChart('B', instB, progB);
-  // Tell parent page the new height so iframe resizes
+
   notifyHeightSoon();
 }
 
-// -------- BASIC INFO --------
 function renderBasicInfo(side, institute) {
   let row = findBestRow(collegeData, institute);
 
@@ -244,7 +276,8 @@ function renderBasicInfo(side, institute) {
   }
 
   const websiteEl = document.getElementById('website' + side);
-  websiteEl.href = website || '#'; websiteEl.textContent = website || '—';
+  websiteEl.href = website || '#';
+  websiteEl.textContent = website || '—';
 
   const locText = document.getElementById('locText' + side);
   const mapDiv = document.getElementById('map' + side);
@@ -252,9 +285,13 @@ function renderBasicInfo(side, institute) {
   if (location) {
     locText.textContent = location;
     const parts = location.split(/[;, ]+/).map(s => s.trim()).filter(Boolean);
-    let lat = null, lng = null;
+    let lat = null,
+      lng = null;
     for (const p of parts) {
-      if (/^-?\d+(\.\d+)?$/.test(p)) { if (lat === null) lat = parseFloat(p); else if (lng === null) lng = parseFloat(p); }
+      if (/^-?\d+(\.\d+)?$/.test(p)) {
+        if (lat === null) lat = parseFloat(p);
+        else if (lng === null) lng = parseFloat(p);
+      }
     }
     if (lat !== null && lng !== null) {
       mapDiv.innerHTML = `<iframe width="100%" height="100%" frameborder="0" scrolling="no"
@@ -269,7 +306,6 @@ function renderBasicInfo(side, institute) {
   notifyHeightSoon();
 }
 
-// -------- PLACEMENT & REVIEWS --------
 function renderPlacementAndReview(side, institute, program) {
   const p = findBestRow(placementData, institute, program);
   const r = findBestRow(reviewsData, institute);
@@ -320,16 +356,26 @@ function compareNumericPairs() {
     const bVal = parseFloat((bEl.textContent || '').replace(/[^0-9.\-]/g, ''));
     if (!isNaN(aVal) && !isNaN(bVal)) {
       const inverse = k === 'instRank';
-      if (aVal === bVal) { aEl.className = 'num'; bEl.className = 'num'; }
-      else if ((aVal > bVal) ^ inverse) { aEl.className = 'num higher'; bEl.className = 'num lower'; }
-      else { aEl.className = 'num lower'; bEl.className = 'num higher'; }
-    } else { if (aEl) aEl.className = 'num'; if (bEl) bEl.className = 'num'; }
+      if (aVal === bVal) {
+        aEl.className = 'num';
+        bEl.className = 'num';
+      } else if ((aVal > bVal) ^ inverse) {
+        aEl.className = 'num higher';
+        bEl.className = 'num lower';
+      } else {
+        aEl.className = 'num lower';
+        bEl.className = 'num higher';
+      }
+    } else {
+      if (aEl) aEl.className = 'num';
+      if (bEl) bEl.className = 'num';
+    }
   }
 }
 
-// -------- CHART --------
 function updateChart(side, institute, program) {
-  const opening = [], closing = [];
+  const opening = [],
+    closing = [];
   const instituteKey = norm(institute);
   const programKey = norm(program);
   for (const y of YEARS) {
@@ -337,7 +383,11 @@ function updateChart(side, institute, program) {
       norm(getVal(r, ['Institute', 'institute', 'College', 'college', 'NAME'])) === instituteKey &&
       norm(getVal(r, ['Program', 'program', 'Course', 'course'])) === programKey
     );
-    if (!rows.length) { opening.push(null); closing.push(null); continue; }
+    if (!rows.length) {
+      opening.push(null);
+      closing.push(null);
+      continue;
+    }
     const oVals = rows.map(r => parseFloat(getVal(r, ['Opening Rank', 'opening_rank', 'OR', 'open_rank']))).filter(x => !isNaN(x));
     const cVals = rows.map(r => parseFloat(getVal(r, ['Closing Rank', 'closing_rank', 'CR', 'close_rank']))).filter(x => !isNaN(x));
     opening.push(oVals.length ? oVals.reduce((a, b) => a + b, 0) / oVals.length : null);
@@ -349,26 +399,52 @@ function updateChart(side, institute, program) {
     type: 'line',
     data: {
       labels: YEARS.map(String),
-      datasets: [
-        { label: 'Opening Rank', data: opening, fill: false, tension: 0.2, borderWidth: 2 },
-        { label: 'Closing Rank', data: closing, fill: false, tension: 0.2, borderWidth: 2 }
-      ]
+      datasets: [{
+        label: 'Opening Rank',
+        data: opening,
+        fill: false,
+        tension: 0.2,
+        borderWidth: 2
+      }, {
+        label: 'Closing Rank',
+        data: closing,
+        fill: false,
+        tension: 0.2,
+        borderWidth: 2
+      }]
     },
     options: {
       animation: {
         onComplete: notifyHeightSoon
       },
-      plugins: { title: { display: true, text: 'Opening / Closing Rank by Year' } },
-      interaction: { mode: 'index' },
+      plugins: {
+        title: {
+          display: true,
+          text: 'Opening / Closing Rank by Year'
+        }
+      },
+      interaction: {
+        mode: 'index'
+      },
       scales: {
-        y: { title: { display: true, text: 'Rank' }, beginAtZero: false },
-        x: { title: { display: true, text: 'Year' } }
+        y: {
+          title: {
+            display: true,
+            text: 'Rank'
+          },
+          beginAtZero: false
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Year'
+          }
+        }
       }
     }
   });
 }
 
-// -------- INIT --------
 document.addEventListener('DOMContentLoaded', () => {
   loadAll().catch(e => console.warn('loadAll failed', e));
   setTimeout(notifyHeight, 200);
@@ -379,13 +455,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// -------- NOTIFY PARENT IFRAME OF HEIGHT --------
 function notifyHeight() {
   const h = Math.max(
     document.documentElement.scrollHeight,
     document.body.scrollHeight
   );
-  try { window.parent.postMessage({ type: 'iframeHeight', height: h }, '*'); } catch(e) {}
+  try {
+    window.parent.postMessage({
+      type: 'iframeHeight',
+      height: h
+    }, '*');
+  } catch (e) {}
 }
 
 function notifyHeightSoon() {

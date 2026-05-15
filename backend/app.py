@@ -1,9 +1,10 @@
-# app.py
 try:
     from dotenv import load_dotenv
 except Exception:
+
     def load_dotenv():
         return False
+
 
 load_dotenv()
 import hashlib
@@ -34,18 +35,17 @@ def _env_float(name, default=0.0):
         return default
 
 
-# ensure backend module path is available for imports
-BACKEND_DIR = os.path.dirname(os.path.abspath(__file__)) # Get the directory of the current file (app.py).
-PROJECT_ROOT = os.path.dirname(BACKEND_DIR) # Get the parent directory, which is the project root.
-sys.path.append(BACKEND_DIR) # Add the backend directory to the Python path for importing modules.
+BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
+sys.path.append(BACKEND_DIR)
 RESULT_REPORT_DIR = os.path.join(PROJECT_ROOT, "results")
 VIDEO_DIR = os.path.join(PROJECT_ROOT, "videos")
 os.makedirs(RESULT_REPORT_DIR, exist_ok=True)
 os.makedirs(VIDEO_DIR, exist_ok=True)
-
 try:
     from calibrated_weights import get_weight_vector
 except Exception:
+
     def get_weight_vector(weight_key, names=None, data_root_dir=None):
         defaults = {
             "skill_assessment_score": {
@@ -66,15 +66,16 @@ except Exception:
             return {name: value / total for name, value in weights.items()}
         return weights
 
-# ================= QUIZ SYSTEM INTEGRATION ================= #
-# template/static configuration
-TEMPLATE_DIR = os.path.join(PROJECT_ROOT, 'templates') # Define the path to the templates folder.
-STATIC_DIR = os.path.join(PROJECT_ROOT, 'static') if os.path.exists(os.path.join(PROJECT_ROOT, 'static')) else None # Define the path to the static folder, checking if it exists.
-app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR) # Initialize the Flask application with template and static paths.
-# Correct CSV paths
-# ================= QUIZ CSV LOAD ================= #
 
-CSV_FOLDER = os.path.join(PROJECT_ROOT, 'csv')
+# App config
+TEMPLATE_DIR = os.path.join(PROJECT_ROOT, "templates")
+STATIC_DIR = (
+    os.path.join(PROJECT_ROOT, "static")
+    if os.path.exists(os.path.join(PROJECT_ROOT, "static"))
+    else None
+)
+app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+CSV_FOLDER = os.path.join(PROJECT_ROOT, "csv")
 user_data = {}
 quiz_recommender = None
 college_recommender = None
@@ -101,33 +102,25 @@ AUTO_MODEL_WARMUP = _env_flag("ENABLE_MODEL_WARMUP", False)
 QUIZ_RESULT_WAIT_TIMEOUT = _env_float("QUIZ_RESULT_WAIT_TIMEOUT", 4.5)
 QUIZ_MODEL_WARMUP_ON_BOOT = _env_flag("ENABLE_QUIZ_MODEL_WARMUP", True)
 QUIZ_PERSIST_REPORTS = _env_flag("ENABLE_QUIZ_REPORT_PERSISTENCE", False)
-
+# Data load
 try:
     q_df = pd.read_csv(os.path.join(CSV_FOLDER, "QUESTIONS.csv"), encoding="latin1")
-    career_df = pd.read_csv(os.path.join(CSV_FOLDER, "CAREER.csv"), encoding="utf-8-sig")
-
-    # CLEANING
+    career_df = pd.read_csv(
+        os.path.join(CSV_FOLDER, "CAREER.csv"), encoding="utf-8-sig"
+    )
     q_df.columns = q_df.columns.str.strip()
     career_df.columns = career_df.columns.str.strip()
     career_df.columns = [col.strip().replace("\ufeff", "") for col in career_df.columns]
-
-    # Fix Job column
     job_col = None
     for col in career_df.columns:
         if col.lower() == "job":
             job_col = col
             break
-
     if job_col:
         career_df.rename(columns={job_col: "Job"}, inplace=True)
         career_df["Job"] = career_df["Job"].astype(str).fillna("Unknown Job")
-
-    # Difficulty weight map
     d_map = {"Easy": 0.2, "Medium": 0.5, "Hard": 0.8}
-
-
     print("Quiz CSV loaded successfully from:", CSV_FOLDER)
-
 except Exception as e:
     print("Quiz CSV load error:", e)
     q_df, career_df = None, None
@@ -138,7 +131,6 @@ def _format_compact_number(value):
         value = int(value)
     except Exception:
         return "0"
-
     if value >= 1_000_000:
         return f"{value / 1_000_000:.1f}M+"
     if value >= 1_000:
@@ -168,13 +160,12 @@ def _build_homepage_metrics():
         "ml_model_count": 3,
         "ml_model_display": "3",
     }
-
     try:
         college_path = os.path.join(CSV_FOLDER, "college.csv")
         college_df = pd.read_csv(
             college_path,
             usecols=lambda col: str(col).strip().lower() == "institute",
-            encoding="latin1"
+            encoding="latin1",
         )
         if not college_df.empty:
             institute_col = college_df.columns[0]
@@ -184,32 +175,32 @@ def _build_homepage_metrics():
             metrics["college_display"] = str(metrics["college_count"])
     except Exception:
         pass
-
     rank_files = sorted(
-        file_name for file_name in os.listdir(CSV_FOLDER)
+        file_name
+        for file_name in os.listdir(CSV_FOLDER)
         if file_name.startswith("rank_") and file_name.endswith(".csv")
     )
     metrics["rank_year_count"] = len(rank_files)
-    metrics["rank_years_display"] = f"{len(rank_files)} Years" if rank_files else "0 Years"
-
+    metrics["rank_years_display"] = (
+        f"{len(rank_files)} Years" if rank_files else "0 Years"
+    )
     rank_years = []
     for file_name in rank_files:
-        metrics["rank_rows_count"] += _count_csv_rows(os.path.join(CSV_FOLDER, file_name))
+        metrics["rank_rows_count"] += _count_csv_rows(
+            os.path.join(CSV_FOLDER, file_name)
+        )
         try:
             rank_years.append(int(file_name.split("_")[-1].split(".")[0]))
         except Exception:
             continue
-
     metrics["rank_rows_display"] = _format_compact_number(metrics["rank_rows_count"])
     if rank_years:
         metrics["rank_year_range"] = f"{min(rank_years)}-{max(rank_years)}"
-
     if q_df is not None and "Category" in q_df.columns:
         metrics["skill_category_count"] = int(
             q_df["Category"].astype(str).str.strip().nunique()
         )
         metrics["skill_category_display"] = str(metrics["skill_category_count"])
-
     return metrics
 
 
@@ -220,72 +211,64 @@ def get_homepage_metrics():
     global HOME_PAGE_METRICS
     if HOME_PAGE_METRICS is not None:
         return HOME_PAGE_METRICS
-
     with _home_metrics_lock:
         if HOME_PAGE_METRICS is None:
             HOME_PAGE_METRICS = _build_homepage_metrics()
-
     return HOME_PAGE_METRICS
 
 
 def get_quiz_recommender():
     global quiz_recommender
     global HybridCareerRecommender
-
     if quiz_recommender is not None or career_df is None:
         return quiz_recommender
-
     with _quiz_recommender_lock:
         if quiz_recommender is not None or career_df is None:
             return quiz_recommender
-
         if HybridCareerRecommender is None:
             try:
                 from quiz_recommender import HybridCareerRecommender as quiz_model_class
+
                 HybridCareerRecommender = quiz_model_class
             except Exception as import_error:
                 print("Error importing quiz recommender module:", import_error)
                 return None
-
         try:
             quiz_recommender = HybridCareerRecommender(career_df, RESULT_REPORT_DIR)
             print("Quiz recommender initialized.")
         except Exception as recommender_error:
             quiz_recommender = None
             print("Quiz recommender initialization failed:", recommender_error)
-
     return quiz_recommender
 
 
 def _start_quiz_model_warmup():
     global _quiz_model_warmup_started
-
     if career_df is None or quiz_recommender is not None:
         return
-
     with _quiz_model_warmup_lock:
-        if _quiz_model_warmup_started or quiz_recommender is not None or career_df is None:
+        if (
+            _quiz_model_warmup_started
+            or quiz_recommender is not None
+            or career_df is None
+        ):
             return
         _quiz_model_warmup_started = True
 
     def _warmup_task():
         global _quiz_model_warmup_started
-
         try:
             if get_quiz_recommender() is not None:
                 print("Quiz recommender quiz-session warmup complete.")
                 return
         except Exception as exc:
             print("Quiz recommender quiz-session warmup failed:", exc)
-
         with _quiz_model_warmup_lock:
             if quiz_recommender is None:
                 _quiz_model_warmup_started = False
 
     threading.Thread(
-        target=_warmup_task,
-        name="quiz-recommender-session-warmup",
-        daemon=True
+        target=_warmup_task, name="quiz-recommender-session-warmup", daemon=True
     ).start()
 
 
@@ -293,22 +276,19 @@ def get_college_recommender():
     global college_recommender
     global CollegeRecommender
     global recommender
-
     if college_recommender is not None:
         return college_recommender
-
     with _college_recommender_lock:
         if college_recommender is not None:
             return college_recommender
-
         if CollegeRecommender is None:
             try:
                 from recommendation import CollegeRecommender as college_model_class
+
                 CollegeRecommender = college_model_class
             except Exception as import_error:
                 print("Error importing recommendation module:", import_error)
                 return None
-
         try:
             college_recommender = CollegeRecommender(data_root_dir=PROJECT_ROOT)
             recommender = college_recommender
@@ -317,13 +297,11 @@ def get_college_recommender():
             college_recommender = None
             recommender = None
             print("Error initializing recommender:", recommender_error)
-
     return college_recommender
 
 
 def _start_background_warmup():
     global _warmup_started
-
     with _warmup_lock:
         if _warmup_started:
             return
@@ -336,7 +314,6 @@ def _start_background_warmup():
                 print("Quiz recommender warmup complete.")
         except Exception as exc:
             print("Quiz recommender warmup failed:", exc)
-
         try:
             college_model = get_college_recommender()
             if college_model is not None:
@@ -345,16 +322,17 @@ def _start_background_warmup():
             print("College recommender warmup failed:", exc)
 
     threading.Thread(
-        target=_warmup_task,
-        name="recommender-warmup",
-        daemon=True
+        target=_warmup_task, name="recommender-warmup", daemon=True
     ).start()
 
 
 def _warm_quiz_model_on_boot():
-    if not QUIZ_MODEL_WARMUP_ON_BOOT or career_df is None or quiz_recommender is not None:
+    if (
+        not QUIZ_MODEL_WARMUP_ON_BOOT
+        or career_df is None
+        or quiz_recommender is not None
+    ):
         return
-
     try:
         if get_quiz_recommender() is not None:
             print("Quiz recommender boot warmup complete.")
@@ -379,7 +357,6 @@ def _reset_quiz_payload_cache():
     with _quiz_payload_lock:
         _quiz_payload_cache["signature"] = None
         _quiz_payload_cache["payload"] = None
-
     with _quiz_payload_prefetch_lock:
         _quiz_payload_prefetch_state["signature"] = None
         _quiz_payload_prefetch_state["event"] = None
@@ -389,7 +366,6 @@ def _get_cached_quiz_payload(signature=None):
     with _quiz_payload_lock:
         cached_signature = _quiz_payload_cache.get("signature")
         cached_payload = _quiz_payload_cache.get("payload")
-
     if signature is not None and cached_signature != signature:
         return None
     return cached_payload
@@ -404,16 +380,13 @@ def _store_cached_quiz_payload(signature, payload):
 def _attach_quiz_report(payload, store_history=False):
     if not payload:
         return payload
-
     if payload.get("report_paths"):
         return payload
-
     if not QUIZ_PERSIST_REPORTS:
         hydrated_payload = dict(payload)
         hydrated_payload["report_paths"] = {}
         hydrated_payload["report_file"] = ""
         return hydrated_payload
-
     report_paths = {}
     active_quiz_recommender = get_quiz_recommender()
     if active_quiz_recommender is not None:
@@ -421,34 +394,34 @@ def _attach_quiz_report(payload, store_history=False):
             category_metrics=payload.get("result", {}),
             recommendations=payload.get("rec", []),
             summary_metrics=payload.get("summary_metrics", {}),
-            store_history=store_history
+            store_history=store_history,
         )
-
     hydrated_payload = dict(payload)
     hydrated_payload["report_paths"] = report_paths
     hydrated_payload["report_file"] = (
-        os.path.basename(report_paths.get("latest", ""))
-        if report_paths else ""
+        os.path.basename(report_paths.get("latest", "")) if report_paths else ""
     )
     return hydrated_payload
 
 
-def _refresh_quiz_payload_cache(persist_report=False, store_history=False, wait_timeout=2.5):
+def _refresh_quiz_payload_cache(
+    persist_report=False, store_history=False, wait_timeout=2.5
+):
     signature = _quiz_payload_signature()
     cached_payload = _get_cached_quiz_payload(signature)
     if cached_payload is not None:
         has_report = bool(cached_payload.get("report_paths"))
         if not persist_report or has_report:
             return cached_payload
-        cached_payload = _attach_quiz_report(cached_payload, store_history=store_history)
+        cached_payload = _attach_quiz_report(
+            cached_payload, store_history=store_history
+        )
         _store_cached_quiz_payload(signature, cached_payload)
         return cached_payload
-
     wait_event = None
     with _quiz_payload_prefetch_lock:
         if _quiz_payload_prefetch_state.get("signature") == signature:
             wait_event = _quiz_payload_prefetch_state.get("event")
-
     if wait_event is not None and wait_timeout > 0:
         wait_event.wait(timeout=wait_timeout)
         cached_payload = _get_cached_quiz_payload(signature)
@@ -456,13 +429,13 @@ def _refresh_quiz_payload_cache(persist_report=False, store_history=False, wait_
             has_report = bool(cached_payload.get("report_paths"))
             if not persist_report or has_report:
                 return cached_payload
-            cached_payload = _attach_quiz_report(cached_payload, store_history=store_history)
+            cached_payload = _attach_quiz_report(
+                cached_payload, store_history=store_history
+            )
             _store_cached_quiz_payload(signature, cached_payload)
             return cached_payload
-
     payload = _build_quiz_result_payload(
-        persist_report=persist_report,
-        store_history=store_history
+        persist_report=persist_report, store_history=store_history
     )
     _store_cached_quiz_payload(signature, payload)
     return payload
@@ -471,14 +444,12 @@ def _refresh_quiz_payload_cache(persist_report=False, store_history=False, wait_
 def _schedule_quiz_payload_refresh(persist_report=False, store_history=False):
     if not user_data.get("answer_log"):
         return
-
     signature = _quiz_payload_signature()
     cached_payload = _get_cached_quiz_payload(signature)
     if cached_payload is not None:
         has_report = bool(cached_payload.get("report_paths"))
         if not persist_report or has_report:
             return
-
     with _quiz_payload_prefetch_lock:
         if _quiz_payload_prefetch_state.get("signature") == signature:
             return
@@ -492,8 +463,7 @@ def _schedule_quiz_payload_refresh(persist_report=False, store_history=False):
                 event = _quiz_payload_prefetch_state.get("event")
         try:
             payload = _build_quiz_result_payload(
-                persist_report=persist_report,
-                store_history=store_history
+                persist_report=persist_report, store_history=store_history
             )
             _store_cached_quiz_payload(signature, payload)
         except Exception as exc:
@@ -507,17 +477,18 @@ def _schedule_quiz_payload_refresh(persist_report=False, store_history=False):
                     _quiz_payload_prefetch_state["event"] = None
 
     threading.Thread(
-        target=_prefetch_worker,
-        name="quiz-payload-prefetch",
-        daemon=True
+        target=_prefetch_worker, name="quiz-payload-prefetch", daemon=True
     ).start()
 
 
 if hasattr(app, "before_serving") and AUTO_MODEL_WARMUP:
+
     @app.before_serving
     def _before_serving_warmup():
         _start_background_warmup()
+
 elif AUTO_MODEL_WARMUP:
+
     @app.before_request
     def _before_request_warmup():
         _start_background_warmup()
@@ -526,67 +497,48 @@ elif AUTO_MODEL_WARMUP:
 _warm_quiz_model_on_boot()
 
 
-
-# =========================
-# 🔥 HELPER FUNCTION (FIXED)
-# =========================
 def get_question(category, difficulty, asked):
-
     category = str(category).strip()
-
     df = q_df[
-        (q_df["Category"].astype(str).str.strip() == category) &
-        (~q_df["Question ID"].isin(asked))
+        (q_df["Category"].astype(str).str.strip() == category)
+        & (~q_df["Question ID"].isin(asked))
     ]
-
     if df.empty:
         return None
-
     df_diff = df[df["Difficulty"] == difficulty]
     if not df_diff.empty:
         df = df_diff
-
     q = df.sample(1).iloc[0].to_dict()
-
     options = [
         str(q.get("Option1", "") or ""),
         str(q.get("Option2", "") or ""),
-        str(q.get("Option3", "") or "")
+        str(q.get("Option3", "") or ""),
     ]
-
     weights = [
         float(q.get("Weight1", 0) or 0),
         float(q.get("Weight2", 0) or 0),
-        float(q.get("Weight3", 0) or 0)
+        float(q.get("Weight3", 0) or 0),
     ]
-
     clean_options = []
     clean_weights = []
-
     for o, w in zip(options, weights):
         o = str(o).strip()
         if o and o.lower() != "nan":
             clean_options.append(o)
             clean_weights.append(w)
-
     if len(clean_options) == 0:
         clean_options = ["A", "B", "C"]
         clean_weights = [1, 0, 0]
-
     combined = list(zip(clean_options, clean_weights))
     random.shuffle(combined)
-
     opt, wgt = zip(*combined)
-
     q["Option1"] = opt[0]
     q["Weight1"] = wgt[0]
     q["Option2"] = opt[1] if len(opt) > 1 else ""
     q["Weight2"] = wgt[1] if len(opt) > 1 else 0
     q["Option3"] = opt[2] if len(opt) > 2 else ""
     q["Weight3"] = wgt[2] if len(opt) > 2 else 0
-
     q["Correct Answer"] = opt[list(wgt).index(max(wgt))]
-
     return q
 
 
@@ -603,13 +555,26 @@ def _clip(value, low=0.0, high=1.0):
     return max(low, min(high, value))
 
 
+# Quiz scoring
 def _priority_categories():
     return [
-        "Logical_Reasoning", "Math_Reasoning", "Analytical_Reasoning",
-        "Coding_Skill", "Coding_Int", "Data_Mining", "AI_Int",
-        "System_Opt", "DB_Design", "Web_Arch", "Low_Level",
-        "Cloud_Ops", "Design_Int", "User_Empathy", "Risk_Eval",
-        "Verbal_Reasoning", "Crypto_Focus"
+        "Logical_Reasoning",
+        "Math_Reasoning",
+        "Analytical_Reasoning",
+        "Coding_Skill",
+        "Coding_Int",
+        "Data_Mining",
+        "AI_Int",
+        "System_Opt",
+        "DB_Design",
+        "Web_Arch",
+        "Low_Level",
+        "Cloud_Ops",
+        "Design_Int",
+        "User_Empathy",
+        "Risk_Eval",
+        "Verbal_Reasoning",
+        "Crypto_Focus",
     ]
 
 
@@ -619,13 +584,11 @@ def _assign_rank_levels(final):
         final.items(),
         key=lambda item: (
             -item[1]["score"],
-            priority.index(item[0]) if item[0] in priority else 999
-        )
+            priority.index(item[0]) if item[0] in priority else 999,
+        ),
     )
-
     top_6 = {category for category, _ in sorted_items[:6]}
     mid_5 = {category for category, _ in sorted_items[6:11]}
-
     for category in final.keys():
         if category in top_6:
             final[category]["level"] = "High"
@@ -633,12 +596,7 @@ def _assign_rank_levels(final):
             final[category]["level"] = "Medium"
         else:
             final[category]["level"] = "Low"
-
-    return dict(sorted(
-        final.items(),
-        key=lambda item: item[1]["score"],
-        reverse=True
-    ))
+    return dict(sorted(final.items(), key=lambda item: item[1]["score"], reverse=True))
 
 
 def _fallback_career_match(final_scores):
@@ -649,18 +607,14 @@ def _fallback_career_match(final_scores):
         score = 0
         total = 0
         lvl = {"low": 1, "medium": 2, "high": 3}
-
         for col in career_df.columns:
             if col == "Job":
                 continue
-
             total += 1
             user_level = user_levels.get(col, {"level": "Low"})["level"].lower()
             required_level = str(row[col]).lower()
-
             if lvl.get(user_level, 1) >= lvl.get(required_level, 1):
                 score += 1
-
         return (score / total) * 100 if total else 0
 
     df = career_df.copy()
@@ -676,59 +630,53 @@ def _build_quiz_result_payload(persist_report=False, store_history=False):
     answer_log = user_data.get("answer_log", [])
     state = user_data.get("state", {})
     skill_summary = get_skill_summary(state)
-
     final = {}
     time_avg = {}
-
     for category in categories:
         category_answers = [
-            item for item in answer_log
+            item
+            for item in answer_log
             if str(item.get("category", "")).strip() == category
         ]
-
         telemetry = state.get("telemetry", {}).get(category, {})
         bayesian_skill = float(skill_summary.get("categories", {}).get(category, 0.5))
         observed_accuracy = _safe_mean(
-            [item.get("normalized_score") for item in category_answers],
-            default=0.0
+            [item.get("normalized_score") for item in category_answers], default=0.0
         )
         avg_time = _safe_mean(
-            [item.get("time") for item in category_answers],
-            default=0.0
+            [item.get("time") for item in category_answers], default=0.0
         )
         time_efficiency = _safe_mean(
-            [item.get("time_factor") for item in category_answers],
-            default=0.5
+            [item.get("time_factor") for item in category_answers], default=0.5
         )
         confidence_alignment = _safe_mean(
             [item.get("confidence_alignment") for item in category_answers],
-            default=float(telemetry.get("confidence_alignment", 0.5))
+            default=float(telemetry.get("confidence_alignment", 0.5)),
         )
         consistency = _safe_mean(
             [item.get("consistency") for item in category_answers],
-            default=float(telemetry.get("consistency", 0.5))
+            default=float(telemetry.get("consistency", 0.5)),
         )
         momentum = _safe_mean(
             [item.get("momentum") for item in category_answers],
-            default=float(telemetry.get("momentum", 0.5))
+            default=float(telemetry.get("momentum", 0.5)),
         )
         uncertainty = _safe_mean(
             [item.get("uncertainty") for item in category_answers],
-            default=float(telemetry.get("uncertainty", 0.5))
+            default=float(telemetry.get("uncertainty", 0.5)),
         )
         reliability = _safe_mean(
             [item.get("reliability") for item in category_answers],
-            default=float(telemetry.get("reliability", 0.5))
+            default=float(telemetry.get("reliability", 0.5)),
         )
         challenge_index = _safe_mean(
             [
-                (float(d_map.get(item.get("difficulty", "Medium"), 0.5)) / 0.8) *
-                float(item.get("normalized_score", 0.0))
+                (float(d_map.get(item.get("difficulty", "Medium"), 0.5)) / 0.8)
+                * float(item.get("normalized_score", 0.0))
                 for item in category_answers
             ],
-            default=0.0
+            default=0.0,
         )
-
         skill_weights = get_weight_vector(
             "skill_assessment_score",
             names=[
@@ -743,16 +691,18 @@ def _build_quiz_result_payload(persist_report=False, store_history=False):
             data_root_dir=PROJECT_ROOT,
         )
         blended_score = (
-            (float(skill_weights.get("bayesian_skill", 0.0)) * bayesian_skill) +
-            (float(skill_weights.get("observed_accuracy", 0.0)) * observed_accuracy) +
-            (float(skill_weights.get("confidence_alignment", 0.0)) * confidence_alignment) +
-            (float(skill_weights.get("time_efficiency", 0.0)) * time_efficiency) +
-            (float(skill_weights.get("consistency", 0.0)) * consistency) +
-            (float(skill_weights.get("momentum", 0.0)) * momentum) +
-            (float(skill_weights.get("challenge_index", 0.0)) * challenge_index)
+            (float(skill_weights.get("bayesian_skill", 0.0)) * bayesian_skill)
+            + (float(skill_weights.get("observed_accuracy", 0.0)) * observed_accuracy)
+            + (
+                float(skill_weights.get("confidence_alignment", 0.0))
+                * confidence_alignment
+            )
+            + (float(skill_weights.get("time_efficiency", 0.0)) * time_efficiency)
+            + (float(skill_weights.get("consistency", 0.0)) * consistency)
+            + (float(skill_weights.get("momentum", 0.0)) * momentum)
+            + (float(skill_weights.get("challenge_index", 0.0)) * challenge_index)
         )
         blended_score = _clip(blended_score * (1.0 - (0.12 * uncertainty)))
-
         final[category] = {
             "score": round(blended_score, 3),
             "level": "Low",
@@ -765,150 +715,126 @@ def _build_quiz_result_payload(persist_report=False, store_history=False):
             "uncertainty": round(uncertainty, 3),
             "reliability": round(reliability, 3),
             "challenge_index": round(challenge_index, 3),
-            "attempts": len(category_answers)
+            "attempts": len(category_answers),
         }
         time_avg[category] = round(avg_time, 2)
-
     final = _assign_rank_levels(final)
     ordered_items = list(final.items())
-
     summary_metrics = {
         "questions_answered": len(answer_log),
         "avg_skill": round(float(skill_summary.get("avg_skill", 0.0)), 3),
         "avg_reliability": round(float(skill_summary.get("avg_reliability", 0.0)), 3),
         "avg_uncertainty": round(float(skill_summary.get("avg_uncertainty", 0.0)), 3),
         "avg_confidence_alignment": round(
-            _safe_mean([item["confidence_alignment"] for item in final.values()], default=0.0),
-            3
+            _safe_mean(
+                [item["confidence_alignment"] for item in final.values()], default=0.0
+            ),
+            3,
         ),
         "avg_time_efficiency": round(
-            _safe_mean([item["time_efficiency"] for item in final.values()], default=0.0),
-            3
+            _safe_mean(
+                [item["time_efficiency"] for item in final.values()], default=0.0
+            ),
+            3,
         ),
         "top_strengths": [item[0] for item in ordered_items[:3]],
-        "growth_areas": [item[0] for item in ordered_items[-2:]] if ordered_items else []
+        "growth_areas": (
+            [item[0] for item in ordered_items[-2:]] if ordered_items else []
+        ),
     }
-
     active_quiz_recommender = get_quiz_recommender()
-
     report_paths = {}
     if active_quiz_recommender is not None:
         recommendations = active_quiz_recommender.recommend(
             user_scores={key: value["score"] for key, value in final.items()},
             user_levels={key: value["level"] for key, value in final.items()},
             category_metrics=final,
-            top_n=5
+            top_n=5,
         )
         if persist_report:
             _, report_paths = active_quiz_recommender.build_report(
                 category_metrics=final,
                 recommendations=recommendations,
                 summary_metrics=summary_metrics,
-                store_history=store_history
+                store_history=store_history,
             )
         model_metrics = getattr(active_quiz_recommender, "model_metrics", {})
     else:
         recommendations = _fallback_career_match(final)
         model_metrics = {}
-
     return {
         "result": final,
         "rec": recommendations,
         "time_avg": time_avg,
         "summary_metrics": summary_metrics,
         "report_paths": report_paths,
-        "report_file": os.path.basename(report_paths.get("latest", "")) if report_paths else "",
-        "model_metrics": model_metrics
+        "report_file": (
+            os.path.basename(report_paths.get("latest", "")) if report_paths else ""
+        ),
+        "model_metrics": model_metrics,
     }
 
 
-# =========================
-# 🚀 START QUIZ (FIXED FOR ALL 17 CATEGORIES)
-# =========================
 @app.route("/start", methods=["POST"])
 def start_quiz():
-
     if q_df is None:
         return jsonify([])
-
     q_df["Category"] = q_df["Category"].astype(str).str.strip()
-
-    # ✅ FIX: ensures ALL 17 categories are always included
     categories = sorted(q_df["Category"].unique())
-
     user_data.clear()
     _reset_quiz_payload_cache()
-
-    # 🔥 IMPORTANT: pre-initialize ALL categories safely
-    user_data.update({
-        "asked": [],
-        "scores": {c: [] for c in categories},
-        "time": {c: [] for c in categories},
-        "last_diff": {c: "Medium" for c in categories},
-        "state": {},
-        "category_order": categories,
-        "answer_log": [],
-        "report_paths": {}
-    })
-
+    user_data.update(
+        {
+            "asked": [],
+            "scores": {c: [] for c in categories},
+            "time": {c: [] for c in categories},
+            "last_diff": {c: "Medium" for c in categories},
+            "state": {},
+            "category_order": categories,
+            "answer_log": [],
+            "report_paths": {},
+        }
+    )
     _start_quiz_model_warmup()
-
     questions = []
-
     for c in categories:
         q = get_question(c, "Medium", user_data["asked"])
-
         if q:
             user_data["asked"].append(q["Question ID"])
             questions.append(q)
-
     return jsonify(questions)
 
 
-# =========================
-# ⚡ NEXT QUESTION (FIXED + CATEGORY SAFE)
-# =========================
 @app.route("/next", methods=["POST"])
 def next_question():
-
     if q_df is None:
         return jsonify([])
-
     answers = request.json
     if not answers:
         return jsonify([])
-
     new_questions = []
-
     from ai_engine import process_answer
 
     for ans in answers:
-
         c = str(ans.get("category", "")).strip()
         w = float(ans.get("weight", 0))
         all_w = [
-            float(item) for item in ans.get("all_weights", [w])
-            if item is not None
+            float(item) for item in ans.get("all_weights", [w]) if item is not None
         ]
-
         time_sec = float(ans.get("time", 5))
         confidence = float(ans.get("confidence", 50)) / 100
         question_id = str(ans.get("question_id", "")).strip()
         question_text = str(ans.get("question_text", "")).strip()
         difficulty = str(ans.get("difficulty", "Medium")).strip() or "Medium"
         selected_option = str(ans.get("selected_option", "")).strip()
-
         try:
             max_weight = max(all_w) if all_w else (w if w > 0 else 1.0)
             correct = w >= max_weight if all_w else False
         except:
             max_weight = w if w > 0 else 1.0
             correct = False
-
         normalized_score = _clip((w / max_weight) if max_weight else 0.0)
-
         prev_diff = user_data["last_diff"].get(c, "Medium")
-
         result = process_answer(
             state=user_data["state"],
             category=c,
@@ -916,116 +842,93 @@ def next_question():
             time_taken=time_sec,
             correct=correct,
             last_diff=prev_diff,
-            confidence=confidence
+            confidence=confidence,
         )
-
         user_data["state"] = result["updated_state"]
         next_diff = result["next_difficulty"]
-
-        # 🔥 FIX: ensure category always exists
         user_data["scores"].setdefault(c, [])
         user_data["time"].setdefault(c, [])
         user_data["last_diff"].setdefault(c, "Medium")
-
         user_data["time"][c].append(time_sec)
         user_data["scores"][c].append(max(0.0, min(1.0, normalized_score * confidence)))
-        user_data.setdefault("answer_log", []).append({
-            "question_id": question_id,
-            "question_text": question_text,
-            "category": c,
-            "difficulty": difficulty,
-            "selected_option": selected_option,
-            "selected_weight": round(w, 4),
-            "max_weight": round(max_weight, 4),
-            "normalized_score": round(normalized_score, 4),
-            "correct": bool(correct),
-            "time": round(time_sec, 3),
-            "confidence": round(confidence, 4),
-            "confidence_alignment": result.get("confidence_alignment", 0.5),
-            "consistency": result.get("consistency", 0.5),
-            "momentum": result.get("momentum", 0.5),
-            "uncertainty": result.get("uncertainty", 0.5),
-            "reliability": result.get("reliability", 0.5),
-            "time_factor": result.get("time_factor", 0.5),
-            "skill": result.get("skill", 0.5),
-            "next_difficulty": next_diff
-        })
-
+        user_data.setdefault("answer_log", []).append(
+            {
+                "question_id": question_id,
+                "question_text": question_text,
+                "category": c,
+                "difficulty": difficulty,
+                "selected_option": selected_option,
+                "selected_weight": round(w, 4),
+                "max_weight": round(max_weight, 4),
+                "normalized_score": round(normalized_score, 4),
+                "correct": bool(correct),
+                "time": round(time_sec, 3),
+                "confidence": round(confidence, 4),
+                "confidence_alignment": result.get("confidence_alignment", 0.5),
+                "consistency": result.get("consistency", 0.5),
+                "momentum": result.get("momentum", 0.5),
+                "uncertainty": result.get("uncertainty", 0.5),
+                "reliability": result.get("reliability", 0.5),
+                "time_factor": result.get("time_factor", 0.5),
+                "skill": result.get("skill", 0.5),
+                "next_difficulty": next_diff,
+            }
+        )
         q = get_question(c, next_diff, user_data["asked"])
-
         if q:
             user_data["asked"].append(q["Question ID"])
             user_data["last_diff"][c] = next_diff
             new_questions.append(q)
-
-    # fallback safety
     if not new_questions:
         remaining = q_df[~q_df["Question ID"].isin(user_data["asked"])]
-
         if not remaining.empty:
             q = remaining.sample(1).iloc[0].to_dict()
             user_data["asked"].append(q["Question ID"])
             new_questions.append(q)
-
     answer_count = len(user_data.get("answer_log", []))
     if answer_count >= 15:
         _start_quiz_model_warmup()
-        _schedule_quiz_payload_refresh(
-            persist_report=False,
-            store_history=False
-        )
-
+        _schedule_quiz_payload_refresh(persist_report=False, store_history=False)
     return jsonify(new_questions)
 
 
 @app.route("/quiz-finalize", methods=["POST"])
 def quiz_finalize():
-
     if career_df is None:
         return jsonify({"status": "error", "message": "Career data not loaded"}), 500
-
     if not user_data.get("answer_log"):
         return jsonify({"status": "error", "message": "No quiz progress found"}), 400
-
     _start_quiz_model_warmup()
-    _schedule_quiz_payload_refresh(
-        persist_report=False,
-        store_history=False
-    )
+    _schedule_quiz_payload_refresh(persist_report=False, store_history=False)
     payload = _refresh_quiz_payload_cache(
         persist_report=QUIZ_PERSIST_REPORTS,
         store_history=False,
-        wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT
+        wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT,
     )
     user_data["report_paths"] = payload.get("report_paths", {})
+    return jsonify(
+        {
+            "status": "ready",
+            "report_file": payload.get("report_file", ""),
+            "questions_answered": payload.get("summary_metrics", {}).get(
+                "questions_answered", 0
+            ),
+        }
+    )
 
-    return jsonify({
-        "status": "ready",
-        "report_file": payload.get("report_file", ""),
-        "questions_answered": payload.get("summary_metrics", {}).get("questions_answered", 0)
-    })
 
-# =========================
-# 🧠 RESULT PAGE (RANK-BASED LEVEL LOGIC)
-# =========================
 @app.route("/quiz-result")
 def quiz_result():
-
     if career_df is None:
         return "Career data not loaded", 500
-
     _start_quiz_model_warmup()
-    _schedule_quiz_payload_refresh(
-        persist_report=False,
-        store_history=False
-    )
+    _schedule_quiz_payload_refresh(persist_report=False, store_history=False)
     payload = _refresh_quiz_payload_cache(
         persist_report=QUIZ_PERSIST_REPORTS,
         store_history=False,
-        wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT
+        wait_timeout=QUIZ_RESULT_WAIT_TIMEOUT,
     )
     user_data["report_paths"] = payload.get("report_paths", {})
-
     return render_template(
         "partials/result.html",
         result=payload["result"],
@@ -1034,63 +937,56 @@ def quiz_result():
         summary_metrics=payload["summary_metrics"],
         report_paths=payload["report_paths"],
         report_file=payload["report_file"],
-        model_metrics=payload["model_metrics"]
+        model_metrics=payload["model_metrics"],
     )
 
-# Register explore routes explicitly.
+
 try:
     from explore import register_explore
+
     register_explore(app)
 except Exception as _e:
     print("Warning: could not register explore routes:", _e)
-# ----------------------------------------------------------------------
-
-# --- NEW: import top module so we can provide an API endpoint and page ---
-# This is non-destructive: if top.py is missing or fails, we still run the app.
 try:
-    import top as top_module  # backend/top.py - provides load_top10() helper
+    import top as top_module
+
     print("Imported top module (for top-ranked colleges).")
 except Exception as _e:
     top_module = None
     print("Could not import top module (top endpoints may not be available):", _e)
-
-# If top_module exists, register simple routes that use it.
 if top_module is not None:
     try:
-        @app.route('/top')  # lightweight preview page for the top scroller (alternate to /top-ranked)
+
+        @app.route("/top")
         def top_preview():
             try:
-                return render_template('partials/top.html')
+                return render_template("partials/top.html")
             except Exception as e:
                 return f"<h2>Template error</h2><pre>{e}</pre>", 500
 
-        @app.route('/top/data')
+        @app.route("/top/data")
         def top_data():
-            """
-            Returns JSON list of top-10 colleges. Delegates to top.load_top10() when available.
-            """
             try:
-                if hasattr(top_module, 'load_top10'):
+                if hasattr(top_module, "load_top10"):
                     data = top_module.load_top10()
                     return jsonify(data)
                 else:
-                    return jsonify({'error': 'top module missing load_top10 function'}), 500
+                    return (
+                        jsonify({"error": "top module missing load_top10 function"}),
+                        500,
+                    )
             except Exception as e:
                 print("Error in /top/data:", e)
-                return jsonify({'error': str(e)}), 500
+                return jsonify({"error": str(e)}), 500
 
     except Exception as _e:
         print("Warning: could not register /top endpoints:", _e)
-# ----------------------------------------------------------------------
-
-# --- NEW: import ai module so it can register AI routes (if present) ---
-# Non-destructive: if ai.py is missing or errors, the app still runs.
 try:
-    import ai as ai_module  # backend/ai.py — should register endpoints like /ai and /ai/chat
+    import ai as ai_module
+
     print("Imported ai module (AI endpoints available).")
-    # Try to register routes explicitly if module exposes register_ai
     try:
-        if hasattr(ai_module, 'register_ai'):
+        if hasattr(ai_module, "register_ai"):
             ai_module.register_ai(app)
             print("Registered AI routes via ai.register_ai(app).")
     except Exception as _e_inner:
@@ -1098,26 +994,22 @@ try:
 except Exception as _e:
     ai_module = None
     print("Could not import ai module (AI routes may not be available):", _e)
+CSV_FOLDER = os.path.join(PROJECT_ROOT, "csv")
 
-# Serve CSVs from project-root/csv at /csv/<filename>
-CSV_FOLDER = os.path.join(PROJECT_ROOT, 'csv') # Define the path to the CSV data folder.
 
-@app.route('/csv/<path:filename>')
+@app.route("/csv/<path:filename>")
 def serve_csv(filename):
-    # basic safety: only serve files that exist in the csv directory
     try:
-        # safe_join ensures no path traversal
-        requested = safe_join(CSV_FOLDER, filename) # Safely construct the full path to the requested file.
-        if not requested or not os.path.exists(requested): # Check if the path is safe and the file exists.
-            return "Not found", 404 # Return 404 if file is not found or path is unsafe.
-        return send_from_directory(CSV_FOLDER, filename, conditional=True) # Serve the file from the CSV folder.
+        requested = safe_join(CSV_FOLDER, filename)
+        if not requested or not os.path.exists(requested):
+            return "Not found", 404
+        return send_from_directory(CSV_FOLDER, filename, conditional=True)
     except Exception as e:
-        # avoid revealing internals in production, but helpful in dev
-        print("Error serving csv:", e) # Log the error.
-        abort(404) # Abort with a 404 response.
+        print("Error serving csv:", e)
+        abort(404)
 
 
-@app.route('/videos/<path:filename>')
+@app.route("/videos/<path:filename>")
 def serve_video(filename):
     try:
         requested = safe_join(VIDEO_DIR, filename)
@@ -1129,29 +1021,21 @@ def serve_video(filename):
         abort(404)
 
 
-@app.route('/favicon.ico')
+@app.route("/favicon.ico")
 def favicon():
-    """
-    Serve the site favicon from the existing logo file so browsers
-    stop logging a 404 for /favicon.ico.
-    """
     if STATIC_DIR is None:
         return "", 204
-
-    image_dir = os.path.join(STATIC_DIR, 'images')
-    icon_name = 'logo.png'
+    image_dir = os.path.join(STATIC_DIR, "images")
+    icon_name = "logo.png"
     icon_path = os.path.join(image_dir, icon_name)
-
     if os.path.exists(icon_path):
-        return send_from_directory(image_dir, icon_name, mimetype='image/png')
-
+        return send_from_directory(image_dir, icon_name, mimetype="image/png")
     return "", 204
 
-@app.route('/')
+
+# Page routes
+@app.route("/")
 def index():
-    """
-    Render the main page. Expects PROJECT_ROOT/templates/index.html to exist.
-    """
     try:
         home_page_metrics = get_homepage_metrics()
         home_stats = [
@@ -1177,26 +1061,20 @@ def index():
             },
         ]
         return render_template(
-            'index.html',
+            "index.html",
             home_metrics=home_page_metrics,
             home_stats=home_stats,
-            hero_video_url='/videos/FrontVideo.mp4',
-            hero_poster_url='/videos/FrontVideoPoster.png'
-        ) # Render the main index page.
+            hero_video_url="/videos/FrontVideo.mp4",
+            hero_poster_url="/videos/FrontVideoPoster.png",
+        )
     except Exception as e:
-        # Helpful error if template missing
-        return f"<h2>Template error</h2><pre>{e}</pre>", 500 # Return an error message if the template is missing.
+        return f"<h2>Template error</h2><pre>{e}</pre>", 500
 
-# NEW: route to serve the full standalone comparison page used by the iframe.
-@app.route('/comparison')
+
+@app.route("/comparison")
 def comparison():
-    """
-    Serve the standalone comparison page so it can be embedded in an iframe.
-    Renders 'partials/comparision.html'. If the template is missing,
-    returns a friendly HTML error message so the iframe shows it.
-    """
     try:
-        return render_template('partials/comparision.html') # Render the comparison partial from the 'partials' subfolder.
+        return render_template("partials/comparision.html")
     except Exception:
         error_html = """
         <!doctype html>
@@ -1213,150 +1091,151 @@ def comparison():
           </body>
         </html>
         """
-        return error_html, 500 # Return a template error for the comparison page.
+        return error_html, 500
 
-# ----------------------------------------------------------------------
-# NEW NAVIGATION ROUTES TO RENDER SEPARATE PARTIAL PAGES
-# These correspond to the links in partials/header.html
-# ----------------------------------------------------------------------
 
-@app.route('/explore-colleges')
+@app.route("/explore-colleges")
 def explore_colleges():
-    """
-    Renders the 'Explore College' page.
-    The URL_FOR name is 'explore_colleges'
-    Renders 'partials/explore.html'.
-    """
     try:
-        return render_template('partials/explore.html') # Render the 'explore.html' template from the 'partials' subfolder.
+        return render_template("partials/explore.html")
     except Exception as e:
-        return f"<h2>Template Error</h2><p>Could not find 'partials/explore.html'.</p><pre>{e}</pre>", 500 # Return an error if the template is not found.
+        return (
+            f"<h2>Template Error</h2><p>Could not find 'partials/explore.html'.</p><pre>{e}</pre>",
+            500,
+        )
 
-@app.route('/top-ranked')
+
+@app.route("/top-ranked")
 def top_ranked_colleges():
-    """
-    Renders the 'Top Ranked Colleges' page.
-    The URL_FOR name is 'top_ranked_colleges'
-    Renders 'partials/top.html'.
-    """
     try:
-        return render_template('partials/top.html') # Render the 'top.html' template from the 'partials' subfolder.
+        return render_template("partials/top.html")
     except Exception as e:
-        return f"<h2>Template Error</h2><p>Could not find 'partials/top.html'.</p><pre>{e}</pre>", 500 # Return an error if the template is not found.
+        return (
+            f"<h2>Template Error</h2><p>Could not find 'partials/top.html'.</p><pre>{e}</pre>",
+            500,
+        )
 
-@app.route('/recommendation')
+
+@app.route("/recommendation")
 def recommendation_page():
-    """
-    Renders the 'Recommendation' page.
-    The URL_FOR name is 'recommendation_page'
-    Renders 'partials/recommendation.html'.
-    """
     try:
-        return render_template('partials/recommendation.html') # Render the 'recommendation.html' template from the 'partials' subfolder.
+        return render_template("partials/recommendation.html")
     except Exception as e:
-        return f"<h2>Template Error</h2><p>Could not find 'partials/recommendation.html'.</p><pre>{e}</pre>", 500 # Return an error if the template is not found.
+        return (
+            f"<h2>Template Error</h2><p>Could not find 'partials/recommendation.html'.</p><pre>{e}</pre>",
+            500,
+        )
 
-@app.route('/ai-guidance')
+
+@app.route("/ai-guidance")
 def ai_guidance():
-    """
-    Renders the 'AI Guidance' page.
-    The URL_FOR name is 'ai_guidance'
-    Renders 'partials/ai.html'.
-    """
     try:
-        return render_template('partials/ai.html') # Render the 'ai.html' template from the 'partials' subfolder.
+        return render_template("partials/ai.html")
     except Exception as e:
-        return f"<h2>Template Error</h2><p>Could not find 'partials/ai.html'.</p><pre>{e}</pre>", 500 # Return an error if the template is not found.
-# ----------------------------------------------------------------------
+        return (
+            f"<h2>Template Error</h2><p>Could not find 'partials/ai.html'.</p><pre>{e}</pre>",
+            500,
+        )
 
-@app.route('/quiz')
+
+@app.route("/quiz")
 def quiz_page():
-    """
-    Renders the Quiz page.
-    """
     try:
-        return render_template('partials/quiz.html')
+        return render_template("partials/quiz.html")
     except Exception as e:
-        return f"<h2>Template Error</h2><p>Could not find 'partials/quiz.html'.</p><pre>{e}</pre>", 500
+        return (
+            f"<h2>Template Error</h2><p>Could not find 'partials/quiz.html'.</p><pre>{e}</pre>",
+            500,
+        )
 
-@app.route('/metadata', methods=['GET'])
+
+@app.route("/metadata", methods=["GET"])
 def metadata():
-    """
-    Returns dropdown metadata for the frontend:
-      programs, streams, quotas, categories, locations, sort options
-    """
     active_recommender = get_college_recommender()
     if active_recommender is None:
-        return jsonify({'error': 'Recommender not available'}), 503 # Return error if recommender is not initialized.
-
+        return jsonify({"error": "Recommender not available"}), 503
     try:
-        # gather lists (they are lowercased in recommender; frontend can display them)
-        programs = sorted(active_recommender.master_rank_df['Program'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique program names.
-        streams = sorted(active_recommender.master_rank_df['Stream'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique stream names.
-        quotas = sorted(active_recommender.master_rank_df['Quota'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique quota names.
-        categories = sorted(active_recommender.master_rank_df['Category'].dropna().unique().tolist()) if not active_recommender.master_rank_df.empty else [] # Extract and sort unique category names.
-        locations = sorted(active_recommender.merged_df['District'].dropna().unique().tolist()) if not active_recommender.merged_df.empty else [] # Extract and sort unique location names.
-
+        programs = (
+            sorted(
+                active_recommender.master_rank_df["Program"].dropna().unique().tolist()
+            )
+            if not active_recommender.master_rank_df.empty
+            else []
+        )
+        streams = (
+            sorted(
+                active_recommender.master_rank_df["Stream"].dropna().unique().tolist()
+            )
+            if not active_recommender.master_rank_df.empty
+            else []
+        )
+        quotas = (
+            sorted(
+                active_recommender.master_rank_df["Quota"].dropna().unique().tolist()
+            )
+            if not active_recommender.master_rank_df.empty
+            else []
+        )
+        categories = (
+            sorted(
+                active_recommender.master_rank_df["Category"].dropna().unique().tolist()
+            )
+            if not active_recommender.master_rank_df.empty
+            else []
+        )
+        locations = (
+            sorted(active_recommender.merged_df["District"].dropna().unique().tolist())
+            if not active_recommender.merged_df.empty
+            else []
+        )
         sort_options = [
-            {'value': 'Predicted Closing Rank', 'label': 'Predicted Closing Rank (asc)'}, # Sort option for rank.
-            {'value': 'Max Average CTC', 'label': 'Max Average CTC (desc)'}, # Sort option for average CTC.
-            {'value': 'placement_score', 'label': 'Placement Score (desc)'}, # Sort option for placement score.
-            {'value': 'overall_aspect_score', 'label': 'Overall Score (desc)'}, # Sort option for overall score.
-            {'value': 'professor_score', 'label': 'Professor Score (desc)'}, # Sort option for professor score.
-            {'value': 'mess_score', 'label': 'Mess Score (desc)'}, # Sort option for mess score.
+            {
+                "value": "Predicted Closing Rank",
+                "label": "Predicted Closing Rank (asc)",
+            },
+            {"value": "Max Average CTC", "label": "Max Average CTC (desc)"},
+            {"value": "placement_score", "label": "Placement Score (desc)"},
+            {"value": "overall_aspect_score", "label": "Overall Score (desc)"},
+            {"value": "professor_score", "label": "Professor Score (desc)"},
+            {"value": "mess_score", "label": "Mess Score (desc)"},
         ]
-
-        return jsonify({
-            'programs': programs, # Return list of programs.
-            'streams': streams, # Return list of streams.
-            'quotas': quotas, # Return list of quotas.
-            'categories': categories, # Return list of categories.
-            'locations': locations, # Return list of locations.
-            'sort_options': sort_options # Return list of sort options.
-        })
+        return jsonify(
+            {
+                "programs": programs,
+                "streams": streams,
+                "quotas": quotas,
+                "categories": categories,
+                "locations": locations,
+                "sort_options": sort_options,
+            }
+        )
     except Exception as e:
-        print("Error in /metadata:", e) # Log the error.
-        return jsonify({'error': str(e)}), 500 # Return a JSON error response.
-    
+        print("Error in /metadata:", e)
+        return jsonify({"error": str(e)}), 500
 
-## REPLACE your existing /metadata/filtered route in app.py with this ##
 
-@app.route('/metadata/filtered', methods=['GET'])
+@app.route("/metadata/filtered", methods=["GET"])
 def metadata_filtered():
-    """
-    Returns cascaded filtered options based on current selections.
-    Uses recommender.master_rank_df (already loaded + clean) — no fresh CSV reads.
-    All comparisons are case-insensitive to avoid mismatch bugs.
-    Query params: program, stream, quota, category
-    Returns: { streams, quotas, categories, locations }
-    """
     active_recommender = get_college_recommender()
     if active_recommender is None:
-        return jsonify({'error': 'Recommender not available'}), 503
-
-    program  = request.args.get('program',  '').strip().lower()
-    stream   = request.args.get('stream',   '').strip().lower()
-    quota    = request.args.get('quota',    '').strip().lower()
-    category = request.args.get('category', '').strip().lower()
-
-    # Work on a copy of the already-loaded, already-clean master rank dataframe
+        return jsonify({"error": "Recommender not available"}), 503
+    program = request.args.get("program", "").strip().lower()
+    stream = request.args.get("stream", "").strip().lower()
+    quota = request.args.get("quota", "").strip().lower()
+    category = request.args.get("category", "").strip().lower()
     df = active_recommender.master_rank_df.copy()
 
-    # Build lowercase versions of each column for comparison (don't modify original)
     def col(name):
-        """Case-insensitive column finder."""
         for c in df.columns:
             if c.strip().lower() == name.lower():
                 return c
         return None
 
-    program_col  = col('program')
-    stream_col   = col('stream')
-    quota_col    = col('quota')
-    category_col = col('category')
-    institute_col = col('institute')
-
-    # Apply filters case-insensitively
+    program_col = col("program")
+    stream_col = col("stream")
+    quota_col = col("quota")
+    category_col = col("category")
+    institute_col = col("institute")
     if program and program_col:
         df = df[df[program_col].astype(str).str.strip().str.lower() == program]
     if stream and stream_col:
@@ -1370,89 +1249,88 @@ def metadata_filtered():
         if not column or column not in dataframe.columns:
             return []
         vals = dataframe[column].dropna().astype(str).str.strip()
-        vals = vals[vals != ''].unique().tolist()
+        vals = vals[vals != ""].unique().tolist()
         return sorted(vals)
 
-    streams    = unique_sorted(df, stream_col)
-    quotas     = unique_sorted(df, quota_col)
+    streams = unique_sorted(df, stream_col)
+    quotas = unique_sorted(df, quota_col)
     categories = unique_sorted(df, category_col)
-
-    # Locations: filter recommender.merged_df by institutes in filtered result
     locations = []
     try:
         if institute_col and not active_recommender.merged_df.empty:
             merged = active_recommender.merged_df
-
-            # find institute + district columns in merged_df
-            mcol = lambda n: next((c for c in merged.columns if c.strip().lower() == n.lower()), None)
-            inst_col_m = mcol('institute')
-            dist_col_m = mcol('district')
-
+            mcol = lambda n: next(
+                (c for c in merged.columns if c.strip().lower() == n.lower()), None
+            )
+            inst_col_m = mcol("institute")
+            dist_col_m = mcol("district")
             if inst_col_m and dist_col_m:
                 institutes_in_filter = set(
-                    df[institute_col].dropna().astype(str).str.strip().str.lower().unique()
+                    df[institute_col]
+                    .dropna()
+                    .astype(str)
+                    .str.strip()
+                    .str.lower()
+                    .unique()
                 )
                 loc_df = merged[
-                    merged[inst_col_m].astype(str).str.strip().str.lower().isin(institutes_in_filter)
+                    merged[inst_col_m]
+                    .astype(str)
+                    .str.strip()
+                    .str.lower()
+                    .isin(institutes_in_filter)
                 ]
                 locations = unique_sorted(loc_df, dist_col_m)
     except Exception as e:
         print("metadata_filtered: location lookup error:", e)
+    return jsonify(
+        {
+            "streams": streams,
+            "quotas": quotas,
+            "categories": categories,
+            "locations": locations,
+        }
+    )
 
-    return jsonify({
-        'streams':    streams,
-        'quotas':     quotas,
-        'categories': categories,
-        'locations':  locations,
-    })
 
-@app.route('/recommend_colleges', methods=['POST'])
+@app.route("/recommend_colleges", methods=["POST"])
 def recommend_colleges():
-    """
-    Accepts JSON:
-      - rank (required)
-      - program (required)
-      - stream, quota, category, location (optional)
-      - min_ctc (optional numeric)
-      - min_placements_score (optional numeric)
-      - target_year (optional int)
-      - top_n (optional int)
-    Returns the dictionary result from recommender.recommend()
-    """
     active_recommender = get_college_recommender()
     if active_recommender is None:
-        return jsonify({'status': 'error', 'message': 'Recommender not available.'}), 503 # Return error if recommender is unavailable.
-
+        return (
+            jsonify({"status": "error", "message": "Recommender not available."}),
+            503,
+        )
     try:
-        data = request.get_json() or {} # Get JSON data from the request body.
-
-        # accept both naming variants
-        user_rank = data.get('rank') or data.get('user_rank') # Get user rank, accepting 'rank' or 'user_rank'.
-        user_program = data.get('program') or data.get('user_program', '') # Get user program.
-        user_stream = data.get('stream') or data.get('user_stream', '') # Get user stream.
-        user_quota = data.get('quota') or data.get('user_quota', '') # Get user quota.
-        user_category = data.get('category') or data.get('user_category', '') # Get user category.
-        user_location = data.get('location') or data.get('user_location', '') # Get user location.
-
-        # optional numeric filters
+        data = request.get_json() or {}
+        user_rank = data.get("rank") or data.get("user_rank")
+        user_program = data.get("program") or data.get("user_program", "")
+        user_stream = data.get("stream") or data.get("user_stream", "")
+        user_quota = data.get("quota") or data.get("user_quota", "")
+        user_category = data.get("category") or data.get("user_category", "")
+        user_location = data.get("location") or data.get("user_location", "")
         try:
-            min_ctc = float(data.get('min_ctc', 0) or 0) # Convert min_ctc to float, default is 0.
+            min_ctc = float(data.get("min_ctc", 0) or 0)
         except Exception:
-            min_ctc = 0.0 # Set min_ctc to 0.0 on conversion error.
+            min_ctc = 0.0
         try:
-            min_placements_score = float(data.get('min_placements_score', 0) or 0) # Convert min_placements_score to float, default is 0.
+            min_placements_score = float(data.get("min_placements_score", 0) or 0)
         except Exception:
-            min_placements_score = 0.0 # Set min_placements_score to 0.0 on conversion error.
-
-        target_year = int(data.get('target_year', 2026)) # Convert target_year to int, default is 2026.
-        top_n = int(data.get('top_n', 10)) # Convert top_n to int, default is 10.
-
-        # validate required
-        if user_rank is None or str(user_rank).strip() == '' or str(user_program).strip() == '': # Check if required fields (rank and program) are missing.
-            return jsonify({'status': 'error', 'message': 'Required fields: rank and program.'}), 400 # Return 400 error for missing required fields.
-
-        # call recommender
-        result = active_recommender.recommend( # Call the recommend method with all user inputs.
+            min_placements_score = 0.0
+        target_year = int(data.get("target_year", 2026))
+        top_n = int(data.get("top_n", 10))
+        if (
+            user_rank is None
+            or str(user_rank).strip() == ""
+            or str(user_program).strip() == ""
+        ):
+            return (
+                jsonify(
+                    {"status": "error", "message": "Required fields: rank and program."}
+                ),
+                400,
+            )
+        result = active_recommender.recommend(
             user_rank=user_rank,
             user_program=user_program,
             user_stream=user_stream,
@@ -1461,20 +1339,21 @@ def recommend_colleges():
             user_location=user_location,
             min_ctc=min_ctc,
             min_placements_score=min_placements_score,
-            target_year=target_year
+            target_year=target_year,
         )
-
-        # trim results to top_n if present
-        if isinstance(result, dict) and 'data' in result and isinstance(result['data'], list): # Check if the result is valid and contains a list of data.
-            result['data'] = result['data'][:top_n] # Trims the list of recommendations to the top_n results.
-
-        return jsonify(result) # Return the final recommendation result as JSON.
-
+        if (
+            isinstance(result, dict)
+            and "data" in result
+            and isinstance(result["data"], list)
+        ):
+            result["data"] = result["data"][:top_n]
+        return jsonify(result)
     except Exception as e:
-        print("Error in recommendation API:", e) # Log the error.
-        return jsonify({'status': 'error', 'message': str(e)}), 500 # Return a JSON error response.
+        print("Error in recommendation API:", e)
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/claude-proxy', methods=['POST'])
+
+@app.route("/claude-proxy", methods=["POST"])
 def claude_proxy():
     import json
     import urllib.request as urlreq
@@ -1483,42 +1362,34 @@ def claude_proxy():
     try:
         payload = request.get_json()
         if not payload:
-            return jsonify({'error': 'No payload'}), 400
-
+            return jsonify({"error": "No payload"}), 400
         GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
         if not GEMINI_API_KEY:
-            return jsonify({'error': 'GEMINI_API_KEY not set'}), 500
-
-        messages = payload.get('messages', [])
-        prompt = messages[0].get('content', '') if messages else ''
-        system = payload.get('system', '')
+            return jsonify({"error": "GEMINI_API_KEY not set"}), 500
+        messages = payload.get("messages", [])
+        prompt = messages[0].get("content", "") if messages else ""
+        system = payload.get("system", "")
         full_prompt = f"{system}\n\n{prompt}" if system else prompt
-
-        gemini_payload = {
-            "contents": [{"parts": [{"text": full_prompt}]}]
-        }
-
+        gemini_payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
         url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
-
-        body = json.dumps(gemini_payload).encode('utf-8')
-        req = urlreq.Request(url, data=body,
-            headers={'Content-Type': 'application/json'}, method='POST')
-
+        body = json.dumps(gemini_payload).encode("utf-8")
+        req = urlreq.Request(
+            url, data=body, headers={"Content-Type": "application/json"}, method="POST"
+        )
         with urlreq.urlopen(req, timeout=60) as resp:
             data = json.loads(resp.read())
-            text = data['candidates'][0]['content']['parts'][0]['text']
-            return jsonify({
-                "content": [{"type": "text", "text": text}]
-            })
-
+            text = data["candidates"][0]["content"]["parts"][0]["text"]
+            return jsonify({"content": [{"type": "text", "text": text}]})
     except urlerr.HTTPError as e:
-        return app.response_class(response=e.read(), status=e.code, mimetype='application/json')
+        return app.response_class(
+            response=e.read(), status=e.code, mimetype="application/json"
+        )
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     debug_mode = _env_flag("FLASK_DEBUG", False)
     use_reloader = debug_mode and _env_flag("FLASK_USE_RELOADER", False)
-    app.run(host='0.0.0.0', port=port, debug=debug_mode, use_reloader=use_reloader)
+    app.run(host="0.0.0.0", port=port, debug=debug_mode, use_reloader=use_reloader)

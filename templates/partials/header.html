@@ -1,72 +1,69 @@
 <header class="main-header" id="main-header">
-  <div class="logo-container">
-    <img
-      src="{{ url_for('static', filename='images/logo.png') }}"
-      alt="edVance Logo"
-      class="logo-img"
-    />
-    <a href="{{ url_for('index') }}" class="website-name">edVance</a>
-  </div>
-
-  <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
-  <nav class="main-nav" aria-label="Primary navigation">
-    <div class="nav-item dropdown">
-      <span class="nav-link dropdown-toggle">Services</span>
-      <div class="dropdown-menu">
-        <a href="{{ url_for('recommendation_page') }}" class="dropdown-item">Recommendation Engine</a>
-        <a href="{{ url_for('comparison') }}" class="dropdown-item">College Comparison</a>
-        <a href="{{ url_for('explore_colleges') }}" class="dropdown-item">Explore Colleges</a>
-        <a href="{{ url_for('top_ranked_colleges') }}" class="dropdown-item">Top Ranked</a>
-      </div>
+    <div class="logo-container">
+        <img src="{{ url_for('static', filename='images/logo.png') }}"
+             alt="EdVance Logo"
+             class="logo-img" />
+        <a href="{{ url_for('index') }}" class="website-name">EdVance</a>
     </div>
-
-    <div class="nav-item dropdown">
-      <span class="nav-link dropdown-toggle">Counselling</span>
-      <div class="dropdown-menu">
-        <a href="{{ url_for('ai_guidance') }}" class="dropdown-item">AI Guidance</a>
-        <a href="{{ url_for('quiz_page') }}" class="dropdown-item">Adaptive Quiz</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="auth-buttons">
-    {% if logged_in %}
-      <span class="welcome-text">Welcome, {{ username.split('@')[0] }}</span>
-      <a href="{{ url_for('logout') }}" class="auth-btn logout-btn">Logout</a>
-    {% else %}
-      <button class="auth-btn login-btn" id="open-login">Login</button>
-      <button class="auth-btn signup-btn" id="open-signup">Sign Up</button>
-    {% endif %}
-  </div>
-</header>
-
-{% if not logged_in %}
-<div id="auth-modal" class="modal" aria-hidden="true">
-  <div class="modal-content">
-    <span class="close-btn">&times;</span>
-    <h2>Access edVance</h2>
-    <button class="google-auth-btn">
-      <img
-        src="{{ url_for('static', filename='images/google-icon.png') }}"
-        alt="Google Icon"
-        class="google-icon"
-      />
-      Continue with Google
+    <button class="hamburger"
+            id="hamburger"
+            aria-label="Toggle menu"
+            aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
     </button>
-    <div class="separator">OR</div>
-    <form id="auth-form">
-      <input type="text" id="auth-username" placeholder="Username or Email" required />
-      <input type="password" id="auth-password" placeholder="Password" required />
-      <button type="submit" id="auth-submit-btn" class="auth-submit-btn">Login</button>
-      <p class="toggle-auth">
-        New user? <span id="toggle-to-signup">Sign Up</span>
-      </p>
-    </form>
-  </div>
-</div>
+    <nav class="main-nav" aria-label="Primary navigation">
+        <div class="nav-item dropdown">
+            <span class="nav-link dropdown-toggle">Services</span>
+            <div class="dropdown-menu">
+                <a href="{{ url_for('recommendation_page') }}" class="dropdown-item">Recommendation Engine</a>
+                <a href="{{ url_for('comparison') }}" class="dropdown-item">College Comparison</a>
+                <a href="{{ url_for('explore_colleges') }}" class="dropdown-item">Explore Colleges</a>
+                <a href="{{ url_for('top_ranked_colleges') }}" class="dropdown-item">Top Ranked</a>
+            </div>
+        </div>
+        <div class="nav-item dropdown">
+            <span class="nav-link dropdown-toggle">Counselling</span>
+            <div class="dropdown-menu">
+                <a href="{{ url_for('ai_guidance') }}" class="dropdown-item">AI Guidance</a>
+                <a href="{{ url_for('quiz_page') }}" class="dropdown-item">Adaptive Quiz</a>
+            </div>
+        </div>
+    </nav>
+    <div class="auth-buttons">
+        {% if logged_in %}
+            <span class="welcome-text">Welcome, {{ username.split("@")[0] }}</span>
+            <a href="{{ url_for('logout') }}" class="auth-btn logout-btn">Logout</a>
+        {% else %}
+            <button class="auth-btn login-btn" id="open-login">Login</button>
+            <button class="auth-btn signup-btn" id="open-signup">Sign Up</button>
+        {% endif %}
+    </div>
+</header>
+{% if not logged_in %}
+    <div id="auth-modal" class="modal" aria-hidden="true">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Access EdVance</h2>
+            <button class="google-auth-btn">
+                <img src="{{ url_for('static', filename='images/google-icon.png') }}"
+                     alt="Google Icon"
+                     class="google-icon" />
+                Continue with Google
+            </button>
+            <div class="separator">OR</div>
+            <form id="auth-form">
+                <input type="text"
+                       id="auth-username"
+                       placeholder="Username or Email"
+                       required />
+                <input type="password" id="auth-password" placeholder="Password" required />
+                <button type="submit" id="auth-submit-btn" class="auth-submit-btn">Login</button>
+                <p class="toggle-auth">
+                    New user? <span id="toggle-to-signup">Sign Up</span>
+                </p>
+            </form>
+        </div>
+    </div>
 {% endif %}

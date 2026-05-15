@@ -2,10 +2,7 @@ import json
 import os
 from copy import deepcopy
 
-
 CALIBRATED_WEIGHTS_FILENAME = "calibrated_weights.json"
-
-
 DEFAULT_WEIGHT_CONFIG = {
     "college_model_ensemble": {
         "decision_tree": 1.0 / 3.0,
@@ -58,8 +55,6 @@ DEFAULT_WEIGHT_CONFIG = {
         "likelihood": 0.30,
     },
 }
-
-
 _PAYLOAD_CACHE = {}
 
 
@@ -92,17 +87,14 @@ def _load_payload(data_root_dir=None):
     except OSError:
         _PAYLOAD_CACHE[path] = (0, {})
         return {}
-
     cached = _PAYLOAD_CACHE.get(path)
     if cached and cached[0] == mtime:
         return cached[1]
-
     try:
         with open(path, "r", encoding="utf-8") as file_obj:
             payload = json.load(file_obj)
     except Exception:
         payload = {}
-
     _PAYLOAD_CACHE[path] = (mtime, payload)
     return payload
 
@@ -117,11 +109,9 @@ def _normalise(weights):
         if numeric < 0:
             numeric = 0.0
         clean[key] = numeric
-
     total = sum(clean.values())
     if total <= 0:
         return clean
-
     return {key: value / total for key, value in clean.items()}
 
 
@@ -140,11 +130,9 @@ def get_saved_weight_vector(weight_key, names=None, data_root_dir=None):
     section = payload.get("weights", {}).get(weight_key)
     if not isinstance(section, dict):
         return None
-
     raw_weights = section.get("weights")
     if not isinstance(raw_weights, dict):
         return None
-
     if names is not None:
         names = list(names)
         defaults = default_weight_vector(weight_key, names)
@@ -154,7 +142,6 @@ def get_saved_weight_vector(weight_key, names=None, data_root_dir=None):
         }
     else:
         weights = dict(raw_weights)
-
     weights = _normalise(weights)
     if not weights or sum(weights.values()) <= 0:
         return None
@@ -162,7 +149,9 @@ def get_saved_weight_vector(weight_key, names=None, data_root_dir=None):
 
 
 def get_weight_vector(weight_key, names=None, data_root_dir=None):
-    saved = get_saved_weight_vector(weight_key, names=names, data_root_dir=data_root_dir)
+    saved = get_saved_weight_vector(
+        weight_key, names=names, data_root_dir=data_root_dir
+    )
     if saved is not None:
         return saved
     return default_weight_vector(weight_key, names=names)

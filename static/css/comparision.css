@@ -11,7 +11,8 @@
   --radius: 12px;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   background: var(--bg);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -43,7 +44,7 @@ html, body {
   align-items: center;
   padding: 12px 16px;
   border-bottom: 1px solid #eef2f7;
-  background: linear-gradient(90deg, rgba(14,165,164,0.03), rgba(37,99,235,0.02));
+  background: linear-gradient(90deg, rgba(14, 165, 164, 0.03), rgba(37, 99, 235, 0.02));
   flex-wrap: wrap;
 }
 
@@ -66,7 +67,11 @@ select {
   box-sizing: border-box;
   pointer-events: auto;
 }
-select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 .compare-btn {
   padding: 9px 14px;
@@ -78,12 +83,20 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   cursor: pointer;
   opacity: 0.45;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(15,23,42,0.12);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
   transition: opacity 0.15s ease;
   white-space: nowrap;
 }
-.compare-btn:not([disabled]) { opacity: 1; cursor: pointer; }
-.compare-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+
+.compare-btn:not([disabled]) {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.compare-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 
 .panel-body {
   display: none;
@@ -92,7 +105,10 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   padding: 18px;
   overflow: visible;
 }
-.panel-body.active { display: flex; }
+
+.panel-body.active {
+  display: flex;
+}
 
 .visuals {
   display: flex;
@@ -120,6 +136,7 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   align-items: flex-start;
   flex-wrap: wrap;
 }
+
 .item-row .label {
   min-width: 140px;
   color: var(--muted);
@@ -127,6 +144,7 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   padding-top: 10px;
   font-size: 13px;
 }
+
 .value {
   flex: 1;
   min-width: 100px;
@@ -158,52 +176,120 @@ select:disabled { opacity: 0.5; cursor: not-allowed; }
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
+
 .stat {
   padding: 10px;
   border-radius: 8px;
   background: #fff;
   border: 1px solid #eef2f7;
 }
-.stat .title { color: var(--muted); font-size: 13px; }
-.stat .num { font-weight: 700; font-size: 17px; margin-top: 6px; }
 
-.stars { display: inline-block; }
+.stat .title {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.stat .num {
+  font-weight: 700;
+  font-size: 17px;
+  margin-top: 6px;
+}
+
+.stars {
+  display: inline-block;
+}
+
 .star {
   position: relative;
   display: inline-block;
-  width: 18px; height: 18px;
-  font-size: 18px; line-height: 18px;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+  line-height: 18px;
   margin-right: 2px;
 }
-.star .star-empty { color: #e6e6e6; }
+
+.star .star-empty {
+  color: #e6e6e6;
+}
+
 .star .star-fill {
   position: absolute;
-  left: 0; top: 0;
+  left: 0;
+  top: 0;
   overflow: hidden;
   white-space: nowrap;
   color: var(--gold);
   height: 100%;
 }
 
-.higher { color: var(--good); font-weight: 700; }
-.lower  { color: var(--bad);  font-weight: 700; }
-
-/* Tablet */
-@media (max-width: 960px) {
-  .container { flex-direction: column; }
-  select { max-width: 100%; min-width: 120px; }
-  .stat-grid { grid-template-columns: 1fr; }
+.higher {
+  color: var(--good);
+  font-weight: 700;
 }
 
-/* Mobile */
+.lower {
+  color: var(--bad);
+  font-weight: 700;
+}
+
+
+@media (max-width: 960px) {
+  .container {
+    flex-direction: column;
+  }
+
+  select {
+    max-width: 100%;
+    min-width: 120px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 @media (max-width: 560px) {
-  .container { padding: 10px; gap: 12px; }
-  .panel-header { padding: 10px 12px; }
-  .panel-body { padding: 12px; }
-  select { min-width: 0; width: 100%; max-width: 100%; }
-  .compare-btn { width: 100%; text-align: center; }
-  .item-row .label { min-width: 100%; padding-top: 0; padding-bottom: 4px; }
-  .stat-grid { grid-template-columns: 1fr 1fr; }
-  .map-frame { height: 140px; }
-  .college-img { height: 150px; }
+  .container {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .panel-header {
+    padding: 10px 12px;
+  }
+
+  .panel-body {
+    padding: 12px;
+  }
+
+  select {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .compare-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .item-row .label {
+    min-width: 100%;
+    padding-top: 0;
+    padding-bottom: 4px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .map-frame {
+    height: 140px;
+  }
+
+  .college-img {
+    height: 150px;
+  }
 }
