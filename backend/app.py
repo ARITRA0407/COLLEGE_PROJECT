@@ -88,6 +88,20 @@ d_map = {"Easy": 0.2, "Medium": 0.5, "Hard": 0.8}
 _quiz_recommender_lock = threading.Lock()
 _college_recommender_lock = threading.Lock()
 _top_module_lock = threading.Lock()
+
+
+def _ensure_model_diagrams_generated():
+    try:
+        from model_diagrams import generate_model_diagrams
+
+        result = generate_model_diagrams(force=False)
+        if result.get("generated"):
+            print("Model diagrams generated:", ", ".join(result["generated"]))
+    except Exception as exc:
+        print("Warning: model diagram generation skipped:", exc)
+
+
+_ensure_model_diagrams_generated()
 _ai_module_lock = threading.Lock()
 _quiz_payload_lock = threading.Lock()
 _quiz_payload_prefetch_lock = threading.Lock()
