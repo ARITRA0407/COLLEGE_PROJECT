@@ -20,6 +20,12 @@ DB_FILE = os.path.join(RESULTS_DIR, "ai_cache.db")
 AI_FILE = __file__
 RELEVANCE_THRESHOLD = 0.05
 LRU_MAX = 128
+GEMINI_FALLBACK_MODELS = [
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-2.0-flash",
+]
 _index_lock = threading.Lock()
 DOCS = None
 META = None
@@ -288,6 +294,308 @@ def retrieve_top_rows(query, top_k=5):
     ]
 
 
+_csv_data_lock = threading.Lock()
+_csv_data_cache = {}
+
+
+def _read_csv_cached(file_name):
+    path = os.path.join(CSV_DIR, file_name)
+    if not os.path.exists(path):
+        return None
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return None
+    with _csv_data_lock:
+        cached = _csv_data_cache.get(file_name)
+        if cached and cached[0] == mtime:
+            return cached[1].copy()
+        try:
+            df = pd.read_csv(path, dtype=str).fillna("")
+        except Exception:
+            return None
+        _csv_data_cache[file_name] = (mtime, df)
+        return df.copy()
+
+
+def _query_top_n(query_l, default=5):
+    for token in query_l.replace("-", " ").split():
+        if token.isdigit():
+            value = int(token)
+            if 1 <= value <= 20:
+                return value
+    return default
+
+
+def _has_any(text, words):
+    return any(word in text for word in words)
+
+
+def _looks_like_refusal(answer):
+    text = str(answer or "").lower()
+    return (
+        "cannot provide a ranking" in text
+        or "not available in the provided context" in text
+        or "cannot provide a ranking based" in text
+    )
+
+
+def _clean_source_row(row):
+    clean = {}
+    for key, value in row.items():
+        if pd.isna(value):
+            clean[key] = ""
+        else:
+            clean[key] = value.item() if hasattr(value, "item") else value
+    return clean
+
+
+STRUCTURED_METRICS = [
+    {
+        "file": "reviews.csv",
+        "metric": "mess_score",
+        "entity": "college_name",
+        "label": "mess score",
+        "aliases": ["mess", "food", "hostel food", "canteen"],
+        "scale": "/5",
+    },
+    {
+        "file": "reviews.csv",
+        "metric": "professor_score",
+        "entity": "college_name",
+        "label": "professor score",
+        "aliases": ["professor", "faculty", "teacher", "teaching"],
+        "scale": "/5",
+    },
+    {
+        "file": "reviews.csv",
+        "metric": "campus_score",
+        "entity": "college_name",
+        "label": "campus score",
+        "aliases": ["campus", "college life", "environment"],
+        "scale": "/5",
+    },
+    {
+        "file": "reviews.csv",
+        "metric": "infrastructure_score",
+        "entity": "college_name",
+        "label": "infrastructure score",
+        "aliases": ["infrastructure", "infra", "labs", "building", "facilities"],
+        "scale": "/5",
+    },
+    {
+        "file": "reviews.csv",
+        "metric": "placements_score",
+        "entity": "college_name",
+        "label": "placement review score",
+        "aliases": ["placement score", "placements score", "placement review"],
+        "scale": "/5",
+    },
+    {
+        "file": "reviews.csv",
+        "metric": "overall_aspect_score",
+        "entity": "college_name",
+        "label": "overall review score",
+        "aliases": ["overall", "review score", "reviews", "review"],
+        "scale": "/5",
+    },
+    {
+        "file": "reviews.csv",
+        "metric": "sentiment_score",
+        "entity": "college_name",
+        "label": "sentiment score",
+        "aliases": ["sentiment", "positive reviews", "student sentiment"],
+        "scale": "",
+    },
+    {
+        "file": "placement.csv",
+        "metric": "highest_ctc",
+        "entity": "Institute",
+        "label": "highest CTC",
+        "aliases": ["highest ctc", "highest package", "maximum package", "max package"],
+        "scale": "",
+    },
+    {
+        "file": "placement.csv",
+        "metric": "average_ctc",
+        "entity": "Institute",
+        "label": "average CTC",
+        "aliases": ["average ctc", "avg ctc", "average package", "package", "salary", "ctc"],
+        "scale": "",
+    },
+    {
+        "file": "placement.csv",
+        "metric": "median_ctc",
+        "entity": "Institute",
+        "label": "median CTC",
+        "aliases": ["median ctc", "median package"],
+        "scale": "",
+    },
+    {
+        "file": "placement.csv",
+        "metric": "placement_rating",
+        "entity": "Institute",
+        "label": "placement rating",
+        "aliases": ["placement rating", "placements", "placement"],
+        "scale": "",
+    },
+    {
+        "file": "placement.csv",
+        "metric": "inst_rank",
+        "entity": "Institute",
+        "label": "institution rank",
+        "aliases": ["institution rank", "college rank", "top ranked", "ranked college", "rank"],
+        "higher_better": False,
+        "scale": "",
+    },
+]
+
+
+def _is_structured_metric_query(query: str):
+    query_l = query.lower()
+    ranking_words = [
+        "best",
+        "top",
+        "rank",
+        "ranking",
+        "highest",
+        "lowest",
+        "based on",
+        "list",
+        "show",
+    ]
+    if not _has_any(query_l, ranking_words):
+        return False
+    for config in STRUCTURED_METRICS:
+        names = [config["metric"], config["label"], *config["aliases"]]
+        if _has_any(query_l, names):
+            return True
+    return False
+
+
+def structured_metric_answer(query: str):
+    query_l = query.lower()
+    ranking_words = [
+        "best",
+        "top",
+        "rank",
+        "ranking",
+        "highest",
+        "lowest",
+        "based on",
+        "list",
+        "show",
+    ]
+    if not _has_any(query_l, ranking_words):
+        return None
+
+    metric_config = None
+    for config in STRUCTURED_METRICS:
+        names = [config["metric"], config["label"], *config["aliases"]]
+        if _has_any(query_l, names):
+            metric_config = config
+            break
+    if metric_config is None:
+        return None
+
+    df = _read_csv_cached(metric_config["file"])
+    if df is None:
+        return None
+    metric = metric_config["metric"]
+    entity = metric_config["entity"]
+    if metric not in df.columns or entity not in df.columns:
+        return None
+
+    work = df.copy()
+    work[metric] = pd.to_numeric(work[metric], errors="coerce")
+    work = work.dropna(subset=[metric])
+    work = work[work[entity].astype(str).str.strip() != ""]
+    if metric != "inst_rank":
+        work = work[work[metric] > 0]
+    if work.empty:
+        return None
+
+    higher_better = metric_config.get("higher_better", True)
+    if "lowest" in query_l or "low " in query_l:
+        higher_better = False
+    if metric == "inst_rank":
+        higher_better = False
+
+    agg_metric = "max" if higher_better else "min"
+    agg_map = {metric: agg_metric}
+    optional_numeric = [
+        "rating",
+        "sentiment_score",
+        "average_ctc",
+        "median_ctc",
+        "highest_ctc",
+        "placement_rating",
+    ]
+    for col in optional_numeric:
+        if col in work.columns and col != metric:
+            work[col] = pd.to_numeric(work[col], errors="coerce")
+            agg_map[col] = "mean"
+    for col in ["Program", "source", "date"]:
+        if col in work.columns:
+            agg_map[col] = "first"
+
+    grouped = (
+        work.groupby(entity, as_index=False)
+        .agg(agg_map)
+        .sort_values(metric, ascending=not higher_better)
+        .head(_query_top_n(query_l))
+    )
+    if grouped.empty:
+        return None
+
+    label = metric_config["label"]
+    scale = metric_config.get("scale", "")
+    direction = "highest" if higher_better else "lowest"
+    lines = [
+        f"Top colleges by {label} ({direction} values first), calculated from {metric_config['file']}:"
+    ]
+    sources = []
+    for idx, row in enumerate(grouped.to_dict("records"), 1):
+        college = str(row.get(entity, "")).strip()
+        score = round(float(row.get(metric, 0.0)), 2)
+        detail = f"{idx}. {college} - {label} {score}{scale}"
+        for extra_col, extra_label in [
+            ("Program", "program"),
+            ("average_ctc", "avg CTC"),
+            ("highest_ctc", "highest CTC"),
+            ("placement_rating", "placement rating"),
+            ("rating", "rating"),
+            ("sentiment_score", "sentiment"),
+        ]:
+            if extra_col == metric or extra_col not in row:
+                continue
+            value = row.get(extra_col, "")
+            if str(value).strip() == "" or pd.isna(value):
+                continue
+            try:
+                value_text = str(round(float(value), 2))
+            except Exception:
+                value_text = str(value).strip()
+            if value_text:
+                detail += f", {extra_label} {value_text}"
+        lines.append(detail)
+        source_match = work[work[entity].astype(str) == college]
+        source_row = source_match.iloc[0].to_dict() if not source_match.empty else row
+        sources.append(
+            {
+                "file": metric_config["file"],
+                "score": score,
+                "data": _clean_source_row(source_row),
+            }
+        )
+    lines.append(f"This is a direct database answer using the `{metric}` column.")
+    return {
+        "answer": "\n".join(lines),
+        "mode": "database",
+        "sources": sources,
+    }
+
+
 def call_gemini(system_prompt: str, user_message: str) -> str:
     import urllib.request
     import urllib.error
@@ -295,10 +603,6 @@ def call_gemini(system_prompt: str, user_message: str) -> str:
     api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         return "⚠️ GEMINI_API_KEY is not set. Please check your .env file."
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.5-flash-lite:generateContent?key={api_key}"
-    )
     payload = json.dumps(
         {
             "system_instruction": {"parts": [{"text": system_prompt}]},
@@ -306,20 +610,36 @@ def call_gemini(system_prompt: str, user_message: str) -> str:
             "generationConfig": {"maxOutputTokens": 512, "temperature": 0.7},
         }
     ).encode("utf-8")
-    req = urllib.request.Request(
-        url, data=payload, headers={"Content-Type": "application/json"}, method="POST"
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=20) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data["candidates"][0]["content"]["parts"][0]["text"].strip()
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8")
-        print("Gemini API HTTPError:", body)
-        return f"Gemini API error ({e.code}). Check your API key and quota."
-    except Exception as e:
-        print("Gemini API error:", e)
-        return f"Could not reach Gemini API: {str(e)}"
+    last_http_error = None
+    for model_name in GEMINI_FALLBACK_MODELS:
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{model_name}:generateContent?key={api_key}"
+        )
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                return data["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", errors="replace")
+            last_http_error = (e.code, body)
+            if e.code in {400, 401, 403}:
+                break
+            print(f"Gemini model {model_name} failed ({e.code}); trying fallback.")
+            continue
+        except Exception as e:
+            print(f"Gemini model {model_name} error:", e)
+            continue
+    if last_http_error:
+        print("Gemini API HTTPError:", last_http_error[1])
+        return f"Gemini API error ({last_http_error[0]}). Check your API key and quota."
+    return "Could not reach Gemini API with the available fallback models."
 
 
 def rag_answer(query: str, results: list) -> str:
@@ -369,8 +689,19 @@ def register_ai(app):
         key = _make_key(query)
         cached = _cache_get(key)
         if cached:
-            print(f"ai.py: [{cached.get('_cache','?')}] cache hit - {query[:60]}")
-            return jsonify(cached)
+            if not (
+                _is_structured_metric_query(query)
+                and _looks_like_refusal(cached.get("answer", ""))
+            ):
+                print(f"ai.py: [{cached.get('_cache','?')}] cache hit - {query[:60]}")
+                return jsonify(cached)
+            print(f"ai.py: bypassing stale metric cache - {query[:60]}")
+        metric_answer = structured_metric_answer(query)
+        if metric_answer:
+            payload = {"ok": True, **metric_answer}
+            _cache_set(key, query, payload)
+            print(f"ai.py: [new] cached [database-metric] - {query[:60]}")
+            return jsonify(payload)
         results = retrieve_top_rows(query, top_k=5)
         top_score = results[0]["score"] if results else 0.0
         if top_score >= RELEVANCE_THRESHOLD:

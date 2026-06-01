@@ -35,6 +35,14 @@ def _env_float(name, default=0.0):
         return default
 
 
+GEMINI_FALLBACK_MODELS = [
+    "gemini-2.5-flash-lite",
+    "gemini-2.5-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-2.0-flash",
+]
+
+
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
 sys.path.append(BACKEND_DIR)
@@ -1385,15 +1393,43 @@ def claude_proxy():
         system = payload.get("system", "")
         full_prompt = f"{system}\n\n{prompt}" if system else prompt
         gemini_payload = {"contents": [{"parts": [{"text": full_prompt}]}]}
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}"
         body = json.dumps(gemini_payload).encode("utf-8")
-        req = urlreq.Request(
-            url, data=body, headers={"Content-Type": "application/json"}, method="POST"
-        )
-        with urlreq.urlopen(req, timeout=60) as resp:
-            data = json.loads(resp.read())
-            text = data["candidates"][0]["content"]["parts"][0]["text"]
-            return jsonify({"content": [{"type": "text", "text": text}]})
+        last_error = None
+        for model_name in GEMINI_FALLBACK_MODELS:
+            url = (
+                "https://generativelanguage.googleapis.com/v1beta/models/"
+                f"{model_name}:generateContent?key={GEMINI_API_KEY}"
+            )
+            req = urlreq.Request(
+                url,
+                data=body,
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            try:
+                with urlreq.urlopen(req, timeout=60) as resp:
+                    data = json.loads(resp.read())
+                    text = data["candidates"][0]["content"]["parts"][0]["text"]
+                    return jsonify(
+                        {
+                            "content": [{"type": "text", "text": text}],
+                            "model": model_name,
+                        }
+                    )
+            except urlerr.HTTPError as e:
+                error_body = e.read().decode("utf-8", errors="replace")
+                last_error = (e.code, error_body)
+                if e.code in {400, 401, 403}:
+                    break
+                print(f"Gemini model {model_name} failed ({e.code}); trying fallback.")
+                continue
+        if last_error:
+            return app.response_class(
+                response=last_error[1],
+                status=last_error[0],
+                mimetype="application/json",
+            )
+        return jsonify({"error": "No Gemini model returned a response"}), 500
     except urlerr.HTTPError as e:
         return app.response_class(
             response=e.read(), status=e.code, mimetype="application/json"
