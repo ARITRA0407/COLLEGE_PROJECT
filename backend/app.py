@@ -7,12 +7,21 @@ except Exception:
 
 
 load_dotenv()
-import hashlib
 import json
 import os
 import sys
 import threading
-from flask import Flask, render_template, request, jsonify, send_from_directory, abort
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    send_from_directory,
+    abort,
+    session,
+    redirect,
+    url_for,
+)
 from werkzeug.utils import safe_join
 import pandas as pd
 import random
@@ -83,7 +92,9 @@ STATIC_DIR = (
     else None
 )
 app = Flask(__name__, template_folder=TEMPLATE_DIR, static_folder=STATIC_DIR)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "edvance-local-dev-secret")
 CSV_FOLDER = os.path.join(PROJECT_ROOT, "csv")
+USERS_FILE = os.path.join(PROJECT_ROOT, "users.txt")
 user_data = {}
 quiz_recommender = None
 college_recommender = None
@@ -166,6 +177,104 @@ def _count_csv_rows(file_path):
             return max(sum(1 for _ in file_obj) - 1, 0)
     except Exception:
         return 0
+
+
+def _normalize_auth_username(value):
+    return str(value or "").strip().lower()
+
+
+def _load_users():
+    users = {}
+    if not os.path.exists(USERS_FILE):
+        return users
+    try:
+        with open(USERS_FILE, "r", encoding="utf-8", errors="ignore") as file_obj:
+            for line in file_obj:
+                line = line.strip()
+                if not line or "," not in line:
+                    continue
+                username, password = line.split(",", 1)
+                username = _normalize_auth_username(username)
+                if username:
+                    users[username] = password
+    except Exception as exc:
+        print("User file read error:", exc)
+    return users
+
+
+def _save_user(username, password):
+    os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
+    with open(USERS_FILE, "a", encoding="utf-8") as file_obj:
+        file_obj.write(f"{username},{password}\n")
+
+
+def _valid_email(value):
+    value = _normalize_auth_username(value)
+    return "@" in value and "." in value.rsplit("@", 1)[-1]
+
+
+@app.context_processor
+def inject_auth_state():
+    username = session.get("username", "")
+    return {
+        "logged_in": bool(username),
+        "username": username,
+    }
+
+
+@app.route("/signup", methods=["POST"])
+def signup():
+    data = request.get_json(silent=True) or {}
+    username = _normalize_auth_username(data.get("username"))
+    password = str(data.get("password") or "")
+    if not username or not password:
+        return jsonify({"success": False, "message": "Email and password are required."}), 400
+    if len(password) < 6:
+        return jsonify({"success": False, "message": "Password must be at least 6 characters."}), 400
+    users = _load_users()
+    if username in users:
+        return jsonify({"success": False, "message": "Account already exists. Please login."}), 409
+    try:
+        _save_user(username, password)
+    except Exception as exc:
+        print("Signup save error:", exc)
+        return jsonify({"success": False, "message": "Could not create account right now."}), 500
+    return jsonify({"success": True, "message": "Account created. Please login."})
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json(silent=True) or {}
+    username = _normalize_auth_username(data.get("username"))
+    password = str(data.get("password") or "")
+    users = _load_users()
+    if users.get(username) != password:
+        return jsonify({"success": False, "message": "Invalid email or password."}), 401
+    session["username"] = username
+    return jsonify({"success": True, "message": "Login successful."})
+
+
+@app.route("/google_auth", methods=["POST"])
+def google_auth():
+    data = request.get_json(silent=True) or {}
+    username = _normalize_auth_username(data.get("username"))
+    if not _valid_email(username):
+        return jsonify({"success": False, "message": "Enter a valid Google email address."}), 400
+    users = _load_users()
+    if username not in users:
+        try:
+            _save_user(username, "google_verified_password")
+        except Exception as exc:
+            print("Google auth save error:", exc)
+            return jsonify({"success": False, "message": "Could not complete Google sign-in."}), 500
+    session["username"] = username
+    return jsonify({"success": True, "message": "Signed in with Google."})
+
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
+    return redirect(url_for("index"))
 
 
 def _build_homepage_metrics():
