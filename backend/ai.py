@@ -20,6 +20,34 @@ DB_FILE = os.path.join(RESULTS_DIR, "ai_cache.db")
 AI_FILE = __file__
 RELEVANCE_THRESHOLD = 0.05
 LRU_MAX = 128
+MAX_HISTORY_TURNS = 20
+FOLLOW_UP_TRIGGERS = (
+    "why",
+    "how",
+    "explain",
+    "clarify",
+    "elaborate",
+    "meaning",
+    "reason",
+    "what do you mean",
+    "tell me more",
+    "can you explain",
+    "what about",
+)
+FOLLOW_UP_HINTS = (
+    " it ",
+    " this ",
+    " that ",
+    " those ",
+    " these ",
+    " they ",
+    " previous",
+    " above",
+    " you said",
+    " your answer",
+    " last answer",
+    " same",
+)
 GEMINI_FALLBACK_MODELS = [
     "gemini-2.5-flash-lite",
     "gemini-2.5-flash",
@@ -170,8 +198,44 @@ def _db_stats():
     }
 
 
-def _make_key(query: str) -> str:
-    return hashlib.sha256(query.lower().strip().encode("utf-8")).hexdigest()
+def _make_key(query: str, history=None) -> str:
+    raw = query.lower().strip()
+    if history:
+        tail = json.dumps(history[-6:], sort_keys=True, ensure_ascii=False)
+        raw = f"{raw}|{tail}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _normalize_history(history):
+    if not isinstance(history, list):
+        return []
+    cleaned = []
+    for item in history[-MAX_HISTORY_TURNS:]:
+        if not isinstance(item, dict):
+            continue
+        role = str(item.get("role", "")).strip().lower()
+        content = str(item.get("content", "")).strip()
+        if not content:
+            continue
+        if role == "user":
+            cleaned.append({"role": "user", "content": content})
+        elif role in {"assistant", "model", "bot"}:
+            cleaned.append({"role": "assistant", "content": content})
+    return cleaned
+
+
+def _is_follow_up_query(query: str, history: list) -> bool:
+    if not history:
+        return False
+    q = f" {query.lower().strip()} "
+    q_compact = q.strip()
+    if len(q_compact.split()) <= 4:
+        return True
+    if any(q_compact.startswith(trigger) or trigger in q for trigger in FOLLOW_UP_TRIGGERS):
+        return True
+    if any(hint in q for hint in FOLLOW_UP_HINTS):
+        return True
+    return False
 
 
 def _cache_get(key: str):
@@ -596,17 +660,22 @@ def structured_metric_answer(query: str):
     }
 
 
-def call_gemini(system_prompt: str, user_message: str) -> str:
+def call_gemini(system_prompt: str, user_message: str, history=None) -> str:
     import urllib.request
     import urllib.error
 
     api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
         return "⚠️ GEMINI_API_KEY is not set. Please check your .env file."
+    contents = []
+    for turn in _normalize_history(history):
+        role = "user" if turn["role"] == "user" else "model"
+        contents.append({"role": role, "parts": [{"text": turn["content"]}]})
+    contents.append({"role": "user", "parts": [{"text": user_message}]})
     payload = json.dumps(
         {
             "system_instruction": {"parts": [{"text": system_prompt}]},
-            "contents": [{"role": "user", "parts": [{"text": user_message}]}],
+            "contents": contents,
             "generationConfig": {"maxOutputTokens": 512, "temperature": 0.7},
         }
     ).encode("utf-8")
@@ -642,7 +711,7 @@ def call_gemini(system_prompt: str, user_message: str) -> str:
     return "Could not reach Gemini API with the available fallback models."
 
 
-def rag_answer(query: str, results: list) -> str:
+def rag_answer(query: str, results: list, history=None) -> str:
     context_lines = []
     for i, r in enumerate(results, 1):
         row = r["meta"]["raw_row"]
@@ -658,20 +727,34 @@ def rag_answer(query: str, results: list) -> str:
         "Keep answers concise (2-4 sentences unless detail is needed)."
         "\n\nContext from database:\n" + "\n".join(context_lines)
     )
-    return call_gemini(system_prompt, query)
+    return call_gemini(system_prompt, query, history=history)
 
 
-def fallback_answer(query: str) -> str:
+def conversation_answer(query: str, history: list) -> str:
+    """Follow-up replies: Gemini uses chat history only (no new CSV/RAG context)."""
+    system_prompt = (
+        "You are a helpful assistant for the EdVance college information platform. "
+        "The user is continuing an earlier conversation. Use the chat history to interpret "
+        "short or vague follow-ups such as 'why', 'how', 'explain', or 'what about that'. "
+        "If they refer to your previous answer, explain the reasoning behind that answer. "
+        "Do not invent new placement statistics, ranks, or college facts that were not in the "
+        "conversation already. Keep your answer concise and friendly."
+    )
+    return call_gemini(system_prompt, query, history=history)
+
+
+def fallback_answer(query: str, history=None) -> str:
+    """Off-database questions: Gemini general knowledge only (no CSV context)."""
     system_prompt = (
         "You are a helpful assistant for the EdVance college information platform. "
         "The user asked a question not covered in the college database. "
-        "Answer helpfully from your general knowledge. "
+        "Answer helpfully from your general knowledge only. Do not pretend you searched a database. "
         "If the question is about a specific college or ranking not in your knowledge, say so. "
         "Keep your answer concise and friendly. "
         "At the end, add a one-line note: "
         "'📌 Note: This answer is based on general knowledge, not the EdVance database.'"
     )
-    return call_gemini(system_prompt, query)
+    return call_gemini(system_prompt, query, history=history)
 
 
 # AI routes
@@ -682,30 +765,44 @@ def register_ai(app):
 
     @app.route("/ai/chat", methods=["POST"])
     def chat():
-        data = request.get_json()
+        data = request.get_json(silent=True) or {}
         query = (data.get("query") or "").strip()
+        history = _normalize_history(data.get("history"))
         if not query:
             return jsonify({"ok": False, "answer": "Please enter a question."})
-        key = _make_key(query)
-        cached = _cache_get(key)
-        if cached:
-            if not (
-                _is_structured_metric_query(query)
-                and _looks_like_refusal(cached.get("answer", ""))
-            ):
-                print(f"ai.py: [{cached.get('_cache','?')}] cache hit - {query[:60]}")
-                return jsonify(cached)
-            print(f"ai.py: bypassing stale metric cache - {query[:60]}")
+        key = _make_key(query, history if history else None)
+        use_cache = not history
+        if use_cache:
+            cached = _cache_get(key)
+            if cached:
+                if not (
+                    _is_structured_metric_query(query)
+                    and _looks_like_refusal(cached.get("answer", ""))
+                ):
+                    print(f"ai.py: [{cached.get('_cache','?')}] cache hit - {query[:60]}")
+                    return jsonify(cached)
+                print(f"ai.py: bypassing stale metric cache - {query[:60]}")
+        if history and _is_follow_up_query(query, history):
+            answer = conversation_answer(query, history)
+            payload = {
+                "ok": True,
+                "answer": answer,
+                "mode": "followup",
+                "sources": [],
+            }
+            print(f"ai.py: [new] followup (history={len(history)}) - {query[:60]}")
+            return jsonify(payload)
         metric_answer = structured_metric_answer(query)
         if metric_answer:
             payload = {"ok": True, **metric_answer}
-            _cache_set(key, query, payload)
+            if use_cache:
+                _cache_set(key, query, payload)
             print(f"ai.py: [new] cached [database-metric] - {query[:60]}")
             return jsonify(payload)
         results = retrieve_top_rows(query, top_k=5)
         top_score = results[0]["score"] if results else 0.0
         if top_score >= RELEVANCE_THRESHOLD:
-            answer = rag_answer(query, results)
+            answer = rag_answer(query, results, history=history or None)
             sources = [
                 {
                     "file": r["meta"]["source_file"],
@@ -716,12 +813,13 @@ def register_ai(app):
             ]
             mode = "database"
         else:
-            answer = fallback_answer(query)
+            answer = fallback_answer(query, history=history or None)
             sources = []
             mode = "general"
         payload = {"ok": True, "answer": answer, "mode": mode, "sources": sources}
-        _cache_set(key, query, payload)
-        print(f"ai.py: [new] cached [{mode}] - {query[:60]}")
+        if use_cache:
+            _cache_set(key, query, payload)
+        print(f"ai.py: [new] {'cached ' if use_cache else ''}[{mode}] - {query[:60]}")
         return jsonify(payload)
 
     @app.route("/ai/cache-stats", methods=["GET"])

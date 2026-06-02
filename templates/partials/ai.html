@@ -157,8 +157,9 @@
     border-radius: 20px;
     margin-top: 5px;
   }
-  .edv-ai-badge-db      { background: #dcfce7; color: #166534; }
-  .edv-ai-badge-general { background: #fef3c7; color: #92400e; }
+  .edv-ai-badge-db       { background: #dcfce7; color: #166534; }
+  .edv-ai-badge-general  { background: #fef3c7; color: #92400e; }
+  .edv-ai-badge-followup { background: #dbeafe; color: #1e40af; }
 
   .edv-ai-sources { margin-top: 6px; max-width: 85%; }
   .edv-ai-sources summary {
@@ -224,6 +225,8 @@
   const messagesEl = document.getElementById('edv-ai-messages');
   const input      = document.getElementById('edv-ai-query');
   const btn        = document.getElementById('edv-ai-send');
+  const chatHistory = [];
+  const MAX_HISTORY = 20;
 
   function appendUser(text) {
     const wrap = document.createElement('div');
@@ -260,6 +263,9 @@
     if (mode === 'database') {
       badge.className = 'edv-ai-badge edv-ai-badge-db';
       badge.textContent = '📊 From database';
+    } else if (mode === 'followup') {
+      badge.className = 'edv-ai-badge edv-ai-badge-followup';
+      badge.textContent = '💬 Continuing conversation';
     } else {
       badge.className = 'edv-ai-badge edv-ai-badge-general';
       badge.textContent = '🌐 General knowledge';
@@ -307,12 +313,20 @@
       const res = await fetch('/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q })
+        body: JSON.stringify({
+          query: q,
+          history: chatHistory.slice(-MAX_HISTORY)
+        })
       });
       let data;
       try { data = await res.json(); }
       catch (e) { throw new Error('Server did not return valid JSON'); }
       if (data.ok) {
+        chatHistory.push({ role: 'user', content: q });
+        chatHistory.push({ role: 'assistant', content: data.answer });
+        if (chatHistory.length > MAX_HISTORY) {
+          chatHistory.splice(0, chatHistory.length - MAX_HISTORY);
+        }
         replaceThinking(thinkingWrap, data.answer, data.mode, data.sources);
       } else {
         thinkingWrap.remove();
